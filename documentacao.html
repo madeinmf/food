@@ -166,6 +166,39 @@
     .list-agora b {
       color: #14171F;
     }
+    @media print {
+      body {
+        background: #fff;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .doc-container {
+        padding: 0;
+        max-width: 100%;
+        gap: 16px;
+      }
+      .btn-primary, .header-card a, div:has(> .btn-primary) {
+        display: none !important;
+      }
+      .section-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #E2E5EA;
+        margin-bottom: 14px;
+        padding: 20px;
+      }
+      .stat-card {
+        box-shadow: none;
+        border: 1px solid #E2E5EA;
+        padding: 16px;
+      }
+      .header-card {
+        box-shadow: none;
+        border: 1px solid #E2E5EA;
+        padding: 24px;
+      }
+    }
   </style>
 </head>
 <body>

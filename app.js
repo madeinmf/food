@@ -6,7 +6,7 @@
 
   const LS_KEY = 'mepede-cardapio-v12';
   const uid = () => Math.random().toString(36).slice(2, 9);
-  const money = n => 'R$ ' + (Number(n) || 0).toFixed(2).replace('.', ',');
+  const money = n => 'R$\u00A0' + (Number(n) || 0).toFixed(2).replace('.', ',');
   const pm = s => {
     if (typeof s === 'number') return s;
     s = String(s || '').replace(/[^\d,.]/g, '');
@@ -287,7 +287,7 @@
   const priceOf = p => {
     if (p.type === 'var') {
       const ps = p.varOpts.map(o => o.price).filter(x => x > 0);
-      if (!ps.length) return 'R$ 0,00';
+      if (!ps.length) return 'R$\u00A00,00';
       const mn = Math.min(...ps);
       return (ps.length > 1 ? 'a partir de ' : '') + money(mn);
     }
@@ -298,6 +298,20 @@
 
   // Estado da Aplicação
   class Store {
+    updatePriceHint() {
+      const hint = document.getElementById('drawer-disc-hint');
+      if (!hint || !this.draft) return;
+      const pr = pm(this.draft.priceStr);
+      const orr = pm(this.draft.origStr);
+      if (orr > 0 && pr > 0 && orr > pr) {
+        hint.textContent = `O cliente verá ${money(orr)} riscado e -${Math.round((1 - pr / orr) * 100)}% de desconto.`;
+        hint.style.display = 'block';
+      } else {
+        hint.textContent = '';
+        hint.style.display = 'none';
+      }
+    }
+
     constructor() {
       // Sempre que acessar o link, inicia direto no tour guiado com dados limpos!
       this.data = emptyData();
@@ -1197,6 +1211,11 @@
 
   // Renderizador da Interface
   function render() {
+    const activeEl = document.activeElement;
+    const activeId = activeEl && activeEl.id ? activeEl.id : null;
+    const selStart = (activeEl && typeof activeEl.selectionStart === 'number') ? activeEl.selectionStart : null;
+    const selEnd = (activeEl && typeof activeEl.selectionEnd === 'number') ? activeEl.selectionEnd : null;
+
     const root = document.getElementById('app');
     const modalRoot = document.getElementById('modal-root');
     const S = store;
@@ -1271,11 +1290,6 @@
         </div>
 
         <div style="flex:1"></div>
-
-        <div onclick="window.__mepedeStore.openDocModal()" class="doc-banner" style="cursor:pointer">
-          <div style="font-size:13px; font-weight:600; color:var(--dark)">O que mudou neste painel</div>
-          <div style="font-size:12px; color:var(--orange); margin-top:2px; font-weight:500">Ver documentação →</div>
-        </div>
 
         <div class="user-profile">
           <div class="user-avatar">EH</div>
@@ -1593,7 +1607,7 @@
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
               <div style="display:flex; align-items:center; gap:8px; height:40px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; width:200px; background:#fff">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A91A0" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-                <input value="${S.search}" oninput="window.__mepedeStore.search = this.value; window.__mepedeStore.notify()" placeholder="Buscar produto" style="flex:1; min-width:0; border:none; outline:none; font-size:13px; background:transparent">
+                <input id="main-product-search" value="${S.search}" oninput="window.__mepedeStore.search = this.value; window.__mepedeStore.notify()" placeholder="Buscar produto" style="flex:1; min-width:0; border:none; outline:none; font-size:13px; background:transparent">
               </div>
 
               ${catHeadActions}
@@ -1731,25 +1745,25 @@
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px">
               <label style="display:flex; flex-direction:column; gap:6px; grid-column:1 / -1">
                 <span style="font-size:13px; font-weight:500">Nome da loja</span>
-                <input value="${data.store.name}" oninput="window.__mepedeStore.mut(d => { d.store.name = this.value; })" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
+                <input id="setting-store-name" value="${data.store.name}" oninput="window.__mepedeStore.data.store.name = this.value;" onchange="window.__mepedeStore.mut(d => { d.store.name = this.value; }, 'Nome da loja salvo')" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
               </label>
               <label style="display:flex; flex-direction:column; gap:6px">
                 <span style="font-size:13px; font-weight:500">Tempo de preparo/entrega</span>
-                <input value="${data.store.eta}" oninput="window.__mepedeStore.mut(d => { d.store.eta = this.value; })" placeholder="35-45 min" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
+                <input id="setting-store-eta" value="${data.store.eta}" oninput="window.__mepedeStore.data.store.eta = this.value;" onchange="window.__mepedeStore.mut(d => { d.store.eta = this.value; }, 'Tempo de preparo salvo')" placeholder="35-45 min" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
               </label>
               <label style="display:flex; flex-direction:column; gap:6px">
                 <span style="font-size:13px; font-weight:500">Taxa de entrega (0 = grátis)</span>
-                <input value="${ms(data.store.fee)}" oninput="window.__mepedeStore.mut(d => { d.store.fee = pm(this.value); })" placeholder="0,00" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
+                <input id="setting-store-fee" value="${ms(data.store.fee)}" oninput="window.__mepedeStore.data.store.fee = pm(this.value);" onchange="window.__mepedeStore.mut(d => { d.store.fee = pm(this.value); }, 'Taxa de entrega salva')" placeholder="0,00" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
               </label>
               <label style="display:flex; flex-direction:column; gap:6px">
                 <span style="font-size:13px; font-weight:500">Pedido mínimo</span>
-                <input value="${ms(data.store.min)}" oninput="window.__mepedeStore.mut(d => { d.store.min = pm(this.value); })" placeholder="0,00" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
+                <input id="setting-store-min" value="${ms(data.store.min)}" oninput="window.__mepedeStore.data.store.min = pm(this.value);" onchange="window.__mepedeStore.mut(d => { d.store.min = pm(this.value); }, 'Pedido mínimo salvo')" placeholder="0,00" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
               </label>
               <label style="display:flex; flex-direction:column; gap:6px">
                 <span style="font-size:13px; font-weight:500">Link personalizado</span>
                 <div style="display:flex; align-items:center; height:44px; border:1px solid var(--gray-200); border-radius:10px; overflow:hidden">
                   <span style="padding:0 4px 0 14px; font-size:14px; color:var(--gray-400)">mepede.ai/</span>
-                  <input value="${data.store.slug}" oninput="window.__mepedeStore.mut(d => { d.store.slug = this.value.toLowerCase().replace(/[^a-z0-9-]/g,''); })" style="flex:1; min-width:0; height:100%; border:none; outline:none; font-size:14px">
+                  <input id="setting-store-slug" value="${data.store.slug}" oninput="window.__mepedeStore.data.store.slug = this.value.toLowerCase().replace(/[^a-z0-9-]/g,'');" onchange="window.__mepedeStore.mut(d => { d.store.slug = this.value.toLowerCase().replace(/[^a-z0-9-]/g,''); }, 'Link salvo')" style="flex:1; min-width:0; height:100%; border:none; outline:none; font-size:14px">
                 </div>
               </label>
             </div>
@@ -1842,18 +1856,18 @@
                 <div style="font-size:10.5px; color:#8A9CAE; line-height:1.35; margin:0 0 6px 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden">${p.desc || ''}</div>
               </div>
               <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:6px; margin-top:auto">
-                <div style="min-width:0">
+                <div style="flex:1; min-width:0; white-space:nowrap">
                   ${disc ? `
-                    <div style="display:flex; align-items:center; gap:4px; line-height:1; margin-bottom:2px">
-                      <span style="font-size:10px; color:#94A3B8; text-decoration:line-through">${money(p.orig)}</span>
-                      <span style="background:#00B368; color:#fff; border-radius:5px; padding:1px 4.5px; font-size:8.5px; font-weight:700; line-height:1">${disc}</span>
+                    <div style="display:flex; align-items:center; gap:4px; line-height:1; margin-bottom:2px; white-space:nowrap">
+                      <span style="font-size:10px; color:#94A3B8; text-decoration:line-through; white-space:nowrap">${money(p.orig)}</span>
+                      <span style="background:#00B368; color:#fff; border-radius:5px; padding:1px 4.5px; font-size:8.5px; font-weight:700; line-height:1; white-space:nowrap">${disc}</span>
                     </div>
                   ` : ''}
-                  <div style="font-size:15.5px; font-weight:800; color:#00B368; line-height:1.1; letter-spacing:-0.2px">${priceOf(p)}</div>
+                  <div style="font-size:15px; font-weight:800; color:#00B368; line-height:1.1; letter-spacing:-0.2px; white-space:nowrap">${priceOf(p)}</div>
                 </div>
-                <button type="button" style="border:none; background:#FF5800; color:#fff; border-radius:14px; padding:6.5px 11px; font-size:10.5px; font-weight:700; display:inline-flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap; flex:none; box-shadow:0 3px 10px rgba(255,88,0,0.28); line-height:1">
+                <button type="button" style="border:none; background:#FF5800; color:#fff; border-radius:14px; padding:6px 9px; font-size:10px; font-weight:700; display:inline-flex; align-items:center; gap:4px; cursor:pointer; white-space:nowrap; flex:none; box-shadow:0 3px 10px rgba(255,88,0,0.28); line-height:1">
                   <span>Add carrinho</span>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 10h16l-2 10H6L4 10z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/><line x1="9" y1="13" x2="9" y2="16"/><line x1="12" y1="13" x2="12" y2="16"/><line x1="15" y1="13" x2="15" y2="16"/></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 10h16l-2 10H6L4 10z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/><line x1="9" y1="13" x2="9" y2="16"/><line x1="12" y1="13" x2="12" y2="16"/><line x1="15" y1="13" x2="15" y2="16"/></svg>
                 </button>
               </div>
             </div>
@@ -2446,10 +2460,21 @@
 
     // Atualiza spotlight e anel pulsante com rastreamento contínuo
     startTutorialTracking();
+
+    if (activeId) {
+      const restored = document.getElementById(activeId);
+      if (restored && typeof restored.focus === 'function') {
+        restored.focus();
+        if (typeof selStart === 'number' && typeof selEnd === 'number') {
+          try { restored.setSelectionRange(selStart, selEnd); } catch (e) {}
+        }
+      }
+    }
   }
 
   // Drawers de Edição
   function renderDrawersAndModals(container) {
+    const wasDrawerOpen = !!container.querySelector('.drawer-content');
     const S = store;
     const data = S.data;
     let html = '';
@@ -2809,7 +2834,7 @@ ${msgWhats}
             <div style="display:flex; align-items:flex-start; gap:12px">
               <div style="flex:1; min-width:0">
                 <div style="font-size:12px; font-weight:500; color:var(--orange)">${d.id ? 'Editar produto' : 'Novo produto'}</div>
-                <div style="font-size:22px; font-weight:600; letter-spacing:-0.3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${d.name || (d.id ? 'Produto' : 'Novo produto')}</div>
+                <div id="drawer-prod-title" style="font-size:22px; font-weight:600; letter-spacing:-0.3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${d.name || (d.id ? 'Produto' : 'Novo produto')}</div>
               </div>
               <div onclick="window.__mepedeStore.closeDrawer()" style="width:36px; height:36px; border-radius:18px; border:1px solid var(--gray-100); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-700)">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
@@ -2890,15 +2915,15 @@ ${msgWhats}
                 <div style="display:flex; flex-direction:column; gap:14px">
                   <label style="display:flex; flex-direction:column; gap:6px">
                     <span style="font-size:13px; font-weight:500">Nome do produto <span style="color:#FF6100">*</span></span>
-                    <input value="${d.name}" oninput="window.__mepedeStore.draft.name = this.value; window.__mepedeStore.notify()" placeholder="Ex: X-Burguer Clássico" style="height:44px; padding:0 14px; border:1px solid ${d.tried && !d.name.trim() ? '#E5352B' : 'var(--gray-200)'}; border-radius:10px; font-size:14px; outline:none">
+                    <input id="input-draft-name" value="${d.name}" oninput="window.__mepedeStore.draft.name = this.value; const t = document.getElementById('drawer-prod-title'); if(t) t.textContent = this.value || 'Novo produto';" placeholder="Ex: X-Burguer Clássico" style="height:44px; padding:0 14px; border:1px solid ${d.tried && !d.name.trim() ? '#E5352B' : 'var(--gray-200)'}; border-radius:10px; font-size:14px; outline:none">
                   </label>
 
                   <label style="display:flex; flex-direction:column; gap:6px">
                     <span style="font-size:13px; font-weight:500; display:flex">
                       <span style="flex:1">Descrição</span>
-                      <span style="font-weight:400; color:var(--gray-400); font-size:12px">${d.desc.length}/160</span>
+                      <span id="draft-desc-cnt" style="font-weight:400; color:var(--gray-400); font-size:12px">${d.desc.length}/160</span>
                     </span>
-                    <textarea maxlength="160" oninput="window.__mepedeStore.draft.desc = this.value; window.__mepedeStore.notify()" placeholder="Ingredientes e diferenciais. Ex: Blend 180g, cheddar e bacon" style="height:84px; padding:12px 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none; resize:none">${d.desc}</textarea>
+                    <textarea id="input-draft-desc" maxlength="160" oninput="window.__mepedeStore.draft.desc = this.value; const c = document.getElementById('draft-desc-cnt'); if(c) c.textContent = this.value.length + '/160';" placeholder="Ingredientes e diferenciais. Ex: Blend 180g, cheddar e bacon" style="height:84px; padding:12px 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none; resize:none">${d.desc}</textarea>
                   </label>
                 </div>
               </div>
@@ -2979,33 +3004,33 @@ ${msgWhats}
                     <span style="font-size:13px; font-weight:500">Preço de venda <span style="color:#FF6100">*</span></span>
                     <div style="display:flex; align-items:center; height:44px; border:1px solid ${d.tried && pr <= 0 ? '#E5352B' : 'var(--gray-200)'}; border-radius:10px; padding:0 14px; gap:6px; background:#fff">
                       <span style="font-size:14px; font-weight:600; color:var(--gray-700)">R$</span>
-                      <input value="${d.priceStr}" oninput="window.__mepedeStore.draft.priceStr = this.value; window.__mepedeStore.notify()" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
+                      <input id="input-draft-price" value="${d.priceStr}" oninput="window.__mepedeStore.draft.priceStr = this.value; window.__mepedeStore.updatePriceHint();" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
                     </div>
                   </label>
                   <label style="display:flex; flex-direction:column; gap:6px">
                     <span style="font-size:13px; font-weight:500">Preço antes <span style="color:var(--gray-400); font-weight:400">riscado</span></span>
                     <div style="display:flex; align-items:center; height:44px; border:1px solid var(--gray-200); border-radius:10px; padding:0 14px; gap:6px; background:#fff">
                       <span style="font-size:14px; font-weight:600; color:var(--gray-400)">R$</span>
-                      <input value="${d.origStr}" oninput="window.__mepedeStore.draft.origStr = this.value; window.__mepedeStore.notify()" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
+                      <input id="input-draft-orig" value="${d.origStr}" oninput="window.__mepedeStore.draft.origStr = this.value; window.__mepedeStore.updatePriceHint();" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
                     </div>
                   </label>
                 </div>
-                ${discHint ? `<div style="font-size:12px; color:var(--green); background:var(--green-light); border-radius:10px; padding:8px 12px">${discHint}</div>` : ''}
+                <div id="drawer-disc-hint" style="font-size:12px; color:var(--green); background:var(--green-light); border-radius:10px; padding:8px 12px; display:${discHint ? 'block' : 'none'}">${discHint}</div>
               ` : `
                 <div style="background:#F6F7F9; border-radius:14px; padding:16px; display:flex; flex-direction:column; gap:10px">
                   <label style="display:flex; align-items:center; gap:10px">
                     <span style="font-size:13px; font-weight:500">O cliente escolhe o(a)</span>
-                    <input value="${d.varName}" oninput="window.__mepedeStore.draft.varName = this.value; window.__mepedeStore.notify()" placeholder="Tamanho" style="flex:1; height:38px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none; background:#fff">
+                    <input id="input-draft-varname" value="${d.varName}" oninput="window.__mepedeStore.draft.varName = this.value;" placeholder="Tamanho" style="flex:1; height:38px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none; background:#fff">
                   </label>
                   <div style="display:grid; grid-template-columns:1fr 140px 32px; gap:8px; font-size:12px; color:var(--gray-400); padding:4px 2px 0">
                     <span>Opção</span><span>Preço</span><span></span>
                   </div>
                   ${d.varOpts.map((vr, idx) => `
                     <div style="display:grid; grid-template-columns:1fr 140px 32px; gap:8px; align-items:center">
-                      <input value="${vr.name}" oninput="window.__mepedeStore.draft.varOpts[${idx}].name = this.value; window.__mepedeStore.notify()" placeholder="Ex: 300ml" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none; background:#fff">
+                      <input id="input-draft-varopt-name-${idx}" value="${vr.name}" oninput="window.__mepedeStore.draft.varOpts[${idx}].name = this.value;" placeholder="Ex: 300ml" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none; background:#fff">
                       <div style="display:flex; align-items:center; height:42px; border:1px solid var(--gray-200); border-radius:10px; padding:0 12px; gap:6px; background:#fff">
                         <span style="font-size:13px; font-weight:600; color:var(--gray-700)">R$</span>
-                        <input value="${vr.priceStr}" oninput="window.__mepedeStore.draft.varOpts[${idx}].priceStr = this.value; window.__mepedeStore.notify()" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
+                        <input id="input-draft-varopt-price-${idx}" value="${vr.priceStr}" oninput="window.__mepedeStore.draft.varOpts[${idx}].priceStr = this.value;" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
                       </div>
                       <div onclick="if(window.__mepedeStore.draft.varOpts.length > 1){ window.__mepedeStore.draft.varOpts = window.__mepedeStore.draft.varOpts.filter((_,j) => j !== ${idx}); window.__mepedeStore.notify(); }" style="width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-400)">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
@@ -3118,7 +3143,7 @@ ${msgWhats}
           <div style="flex:none; display:flex; align-items:flex-start; gap:12px; padding:22px 28px 18px; border-bottom:1px solid var(--gray-100)">
             <div style="flex:1">
               <div style="font-size:12px; font-weight:500; color:var(--orange)">Categoria</div>
-              <div style="font-size:22px; font-weight:600">${cd.name || 'Nova categoria'}</div>
+              <div id="drawer-cat-title" style="font-size:22px; font-weight:600">${cd.name || 'Nova categoria'}</div>
             </div>
             <div onclick="window.__mepedeStore.closeDrawer()" style="width:36px; height:36px; border-radius:18px; border:1px solid var(--gray-100); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-700)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
@@ -3128,7 +3153,7 @@ ${msgWhats}
           <div style="flex:1; overflow-y:auto; padding:24px 28px; display:flex; flex-direction:column; gap:24px">
             <label style="display:flex; flex-direction:column; gap:6px">
               <span style="font-size:13px; font-weight:500">Nome da categoria</span>
-              <input value="${cd.name}" oninput="window.__mepedeStore.cd.name = this.value; window.__mepedeStore.notify()" placeholder="Ex: Hambúrgueres artesanais" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
+              <input id="input-cd-name" value="${cd.name}" oninput="window.__mepedeStore.cd.name = this.value; const t = document.getElementById('drawer-cat-title'); if(t) t.textContent = this.value || 'Nova categoria';" placeholder="Ex: Hambúrgueres artesanais" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
             </label>
 
             <div onclick="window.__mepedeStore.cd.active = !window.__mepedeStore.cd.active; window.__mepedeStore.notify()" style="display:flex; align-items:center; gap:14px; cursor:pointer; padding:14px 16px; border:1px solid var(--gray-100); border-radius:14px">
@@ -3173,11 +3198,11 @@ ${msgWhats}
                   <div style="display:flex; gap:12px; align-items:flex-end">
                     <label style="display:flex; flex-direction:column; gap:6px">
                       <span style="font-size:12px; color:var(--gray-700)">Das</span>
-                      <input type="time" value="${cd.start}" oninput="window.__mepedeStore.cd.start = this.value; window.__mepedeStore.notify()" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; background:#fff">
+                      <input id="input-cd-start" type="time" value="${cd.start}" oninput="window.__mepedeStore.cd.start = this.value;" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; background:#fff">
                     </label>
                     <label style="display:flex; flex-direction:column; gap:6px">
                       <span style="font-size:12px; color:var(--gray-700)">Até</span>
-                      <input type="time" value="${cd.end}" oninput="window.__mepedeStore.cd.end = this.value; window.__mepedeStore.notify()" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; background:#fff">
+                      <input id="input-cd-end" type="time" value="${cd.end}" oninput="window.__mepedeStore.cd.end = this.value;" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; background:#fff">
                     </label>
                   </div>
                 </div>
@@ -3224,7 +3249,7 @@ ${msgWhats}
           <div style="flex:none; display:flex; align-items:flex-start; gap:12px; padding:22px 28px 18px; border-bottom:1px solid var(--gray-100)">
             <div style="flex:1">
               <div style="font-size:12px; font-weight:500; color:var(--orange)">${isNew ? 'Novo cardápio' : 'Editar cardápio'}</div>
-              <div style="font-size:22px; font-weight:600">${md.name || 'Cardápio'}</div>
+              <div id="drawer-md-title" style="font-size:22px; font-weight:600">${md.name || 'Cardápio'}</div>
             </div>
             <div onclick="window.__mepedeStore.closeDrawer()" style="width:36px; height:36px; border-radius:18px; border:1px solid var(--gray-100); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-700)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
@@ -3234,7 +3259,7 @@ ${msgWhats}
           <div style="flex:1; overflow-y:auto; padding:24px 28px; display:flex; flex-direction:column; gap:24px">
             <label style="display:flex; flex-direction:column; gap:6px">
               <span style="font-size:13px; font-weight:500">Nome do cardápio</span>
-              <input value="${md.name}" oninput="window.__mepedeStore.md.name = this.value; window.__mepedeStore.notify()" placeholder="Ex: Almoço executivo, Festival de Hambúrguer" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
+              <input id="input-md-name" value="${md.name}" oninput="window.__mepedeStore.md.name = this.value; const t = document.getElementById('drawer-md-title'); if(t) t.textContent = this.value || 'Cardápio';" placeholder="Ex: Almoço executivo, Festival de Hambúrguer" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
             </label>
 
             ${isNew ? `
@@ -3293,11 +3318,11 @@ ${msgWhats}
                   <div style="display:flex; gap:12px">
                     <label style="display:flex; flex-direction:column; gap:6px">
                       <span style="font-size:12px; color:var(--gray-700)">Das</span>
-                      <input type="time" value="${md.start}" oninput="window.__mepedeStore.md.start = this.value; window.__mepedeStore.notify()" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; background:#fff">
+                      <input id="input-md-start" type="time" value="${md.start}" oninput="window.__mepedeStore.md.start = this.value;" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; background:#fff">
                     </label>
                     <label style="display:flex; flex-direction:column; gap:6px">
                       <span style="font-size:12px; color:var(--gray-700)">Até</span>
-                      <input type="time" value="${md.end}" oninput="window.__mepedeStore.md.end = this.value; window.__mepedeStore.notify()" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; background:#fff">
+                      <input id="input-md-end" type="time" value="${md.end}" oninput="window.__mepedeStore.md.end = this.value;" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; background:#fff">
                     </label>
                   </div>
                 </div>
@@ -3355,7 +3380,7 @@ ${msgWhats}
           <div style="flex:none; display:flex; align-items:flex-start; gap:12px; padding:22px 28px 18px; border-bottom:1px solid var(--gray-100)">
             <div style="flex:1">
               <div style="font-size:12px; font-weight:500; color:var(--orange)">Grupo de complementos</div>
-              <div style="font-size:22px; font-weight:600">${gd.name || 'Novo grupo'}</div>
+              <div id="drawer-group-title" style="font-size:22px; font-weight:600">${gd.name || 'Novo grupo'}</div>
             </div>
             <div onclick="window.__mepedeStore.closeDrawer()" style="width:36px; height:36px; border-radius:18px; border:1px solid var(--gray-100); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-700)">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
@@ -3365,7 +3390,7 @@ ${msgWhats}
           <div style="flex:1; overflow-y:auto; padding:24px 28px; display:flex; flex-direction:column; gap:20px">
             <label style="display:flex; flex-direction:column; gap:6px">
               <span style="font-size:13px; font-weight:500">Nome do grupo</span>
-              <input value="${gd.name}" oninput="window.__mepedeStore.gd.name = this.value; window.__mepedeStore.notify()" placeholder="Ex: Adicionais, Ponto da carne, Bebida" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
+              <input id="input-gd-name" value="${gd.name}" oninput="window.__mepedeStore.gd.name = this.value; const t = document.getElementById('drawer-group-title'); if(t) t.textContent = this.value || 'Novo grupo';" placeholder="Ex: Adicionais, Ponto da carne, Bebida" style="height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none">
             </label>
 
             <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap">
@@ -3392,10 +3417,10 @@ ${msgWhats}
               <span style="font-size:13px; font-weight:500">Opções do grupo</span>
               ${gd.rows.map((r, i) => `
                 <div style="display:grid; grid-template-columns:1fr 130px 32px; gap:8px; align-items:center">
-                  <input value="${r.name}" oninput="window.__mepedeStore.gd.rows[${i}].name = this.value; window.__mepedeStore.notify()" placeholder="Opção. Ex: Bacon crocante" style="height:40px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none; background:#fff">
+                  <input id="input-gd-row-name-${i}" value="${r.name}" oninput="window.__mepedeStore.gd.rows[${i}].name = this.value;" placeholder="Opção. Ex: Bacon crocante" style="height:40px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none; background:#fff">
                   <div style="display:flex; align-items:center; height:40px; border:1px solid var(--gray-200); border-radius:10px; padding:0 10px; gap:6px; background:#fff">
                     <span style="font-size:13px; font-weight:600; color:var(--gray-700)">+R$</span>
-                    <input value="${r.priceStr}" oninput="window.__mepedeStore.gd.rows[${i}].priceStr = this.value; window.__mepedeStore.notify()" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
+                    <input id="input-gd-row-price-${i}" value="${r.priceStr}" oninput="window.__mepedeStore.gd.rows[${i}].priceStr = this.value;" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
                   </div>
                   <div onclick="if(window.__mepedeStore.gd.rows.length > 1){ window.__mepedeStore.gd.rows = window.__mepedeStore.gd.rows.filter((_,j) => j !== ${i}); window.__mepedeStore.notify(); }" style="width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-400)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
@@ -3452,7 +3477,7 @@ ${msgWhats}
           <div style="flex:1; overflow-y:auto; padding:20px 28px; display:flex; flex-direction:column; gap:8px">
             <div style="display:flex; align-items:center; gap:8px; height:44px; padding:0 14px; border:1px solid var(--gray-200); border-radius:10px; margin-bottom:8px">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A91A0" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-              <input value="${S.pick.q}" oninput="window.__mepedeStore.pick.q = this.value; window.__mepedeStore.notify()" placeholder="Buscar pelo nome" style="flex:1; border:none; outline:none; font-size:14px">
+              <input id="input-pick-search" value="${S.pick.q}" oninput="window.__mepedeStore.pick.q = this.value; window.__mepedeStore.notify()" placeholder="Buscar pelo nome" style="flex:1; border:none; outline:none; font-size:14px">
             </div>
 
             ${candidates.map(p => {
@@ -3541,6 +3566,10 @@ ${msgWhats}
     }
 
     container.innerHTML = html;
+    if (wasDrawerOpen) {
+      const newDrawer = container.querySelector('.drawer-content');
+      if (newDrawer) newDrawer.style.animation = 'none';
+    }
   }
 
   const TUTORIAL_STEPS_CONFIG = [
