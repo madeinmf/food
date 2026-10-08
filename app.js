@@ -312,6 +312,24 @@
       }
     }
 
+    cleanMoneyStr(s) {
+      if (!s) return '';
+      s = String(s).replace(/[^\d,.]/g, '');
+      if (s.indexOf('.') > -1 && s.indexOf(',') === -1) s = s.replace('.', ',');
+      const parts = s.split(',');
+      if (parts.length > 1) {
+        return parts[0] + ',' + parts.slice(1).join('').slice(0, 2);
+      }
+      return parts[0];
+    }
+
+    formatMoneyBlur(s) {
+      if (!s || !s.trim()) return '';
+      const v = pm(s);
+      if (v === 0 && !s.includes('0')) return '';
+      return v.toFixed(2).replace('.', ',');
+    }
+
     constructor() {
       // Sempre que acessar o link, inicia direto no tour guiado com dados limpos!
       this.data = emptyData();
@@ -2950,20 +2968,46 @@ ${msgWhats}
               <!-- Destaques -->
               <div style="display:flex; flex-direction:column; gap:10px; padding:16px 0 8px; border-top:1px solid var(--gray-100)">
                 <div style="display:flex; justify-content:space-between; align-items:center">
-                  <span style="font-size:13.5px; font-weight:600; color:#14171F">Destaques <span style="color:var(--gray-400); font-weight:400; font-size:12px">opcional</span></span>
+                  <div>
+                    <span style="font-size:13.5px; font-weight:600; color:#14171F">Selo de destaque no produto</span>
+                    <span style="color:var(--gray-400); font-weight:400; font-size:12px; margin-left:4px">opcional</span>
+                  </div>
                   ${d.badge ? `
-                    <button type="button" onclick="window.__mepedeStore.draft.badge = ''; window.__mepedeStore.notify()" style="background:none; border:none; color:var(--gray-500); font-size:12px; cursor:pointer; text-decoration:underline; padding:0">Remover destaque</button>
+                    <button type="button" onclick="window.__mepedeStore.draft.badge = ''; window.__mepedeStore.notify()" style="background:none; border:none; color:var(--red); font-size:12px; cursor:pointer; font-weight:500; display:inline-flex; align-items:center; gap:4px; text-decoration:none">
+                      <span>✕ Remover selo</span>
+                    </button>
                   ` : ''}
                 </div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap">
-                  ${PRODUCT_TAGS.map(t => {
-                    const isSelected = d.badge && (d.badge.toLowerCase() === t.label.toLowerCase() || d.badge === t.id);
+
+                <div style="display:flex; align-items:center; gap:10px">
+                  <select id="select-draft-badge" onchange="window.__mepedeStore.draft.badge = this.value; window.__mepedeStore.notify()" style="flex:1; height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:13.5px; background:#fff; outline:none; color:var(--dark); cursor:pointer">
+                    <option value="">Sem selo (nenhum destaque)</option>
+                    ${PRODUCT_TAGS.map(t => {
+                      const isSelected = d.badge && (d.badge.toLowerCase() === t.label.toLowerCase() || d.badge === t.id);
+                      return `<option value="${t.label}" ${isSelected ? 'selected' : ''}>${t.emoji} ${t.label}</option>`;
+                    }).join('')}
+                  </select>
+                  ${d.badge ? `
+                    <div style="flex:none">
+                      ${renderBadgeHtml(d.badge, 'font-size:12px; padding:5px 12px; border-radius:12px')}
+                    </div>
+                  ` : ''}
+                </div>
+
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap">
+                  <span style="font-size:11.5px; color:var(--gray-400)">Sugestões rápidas:</span>
+                  ${[
+                    { label: 'mais pedido', emoji: '🔥' },
+                    { label: 'promoção', emoji: '🎉' },
+                    { label: 'Novidade', emoji: '✨' },
+                    { label: 'O Queridinho', emoji: '😇' }
+                  ].map(sug => {
+                    const isSel = d.badge && (d.badge.toLowerCase() === sug.label.toLowerCase());
                     return `
-                      <div onclick="window.__mepedeStore.draft.badge = '${isSelected ? '' : t.label}'; window.__mepedeStore.notify()" style="height:34px; padding:0 14px; border-radius:18px; border:1.5px solid ${isSelected ? t.color : 'transparent'}; background:${t.bg}; color:${t.color}; font-size:12.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all .15s ease; box-shadow:${isSelected ? '0 0 0 2px ' + t.color + '40' : 'none'}; transform:${isSelected ? 'scale(1.03)' : 'scale(1)'}; user-select:none">
-                        <span style="font-size:14px; line-height:1">${t.emoji}</span>
-                        <span>${t.label}</span>
-                        ${isSelected ? `<span style="font-size:11px; margin-left:2px; font-weight:900">✓</span>` : ''}
-                      </div>
+                      <button type="button" onclick="window.__mepedeStore.draft.badge = '${isSel ? '' : sug.label}'; window.__mepedeStore.notify()" style="height:28px; padding:0 10px; border-radius:14px; border:1px solid ${isSel ? '#FF6100' : 'var(--gray-200)'}; background:${isSel ? '#FFF1E8' : '#fff'}; color:${isSel ? '#E85700' : 'var(--gray-700)'}; font-size:11.5px; font-weight:${isSel ? '700' : '500'}; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:all .15s ease">
+                        <span>${sug.emoji}</span>
+                        <span>${sug.label}</span>
+                      </button>
                     `;
                   }).join('')}
                 </div>
@@ -3004,14 +3048,14 @@ ${msgWhats}
                     <span style="font-size:13px; font-weight:500">Preço de venda <span style="color:#FF6100">*</span></span>
                     <div style="display:flex; align-items:center; height:44px; border:1px solid ${d.tried && pr <= 0 ? '#E5352B' : 'var(--gray-200)'}; border-radius:10px; padding:0 14px; gap:6px; background:#fff">
                       <span style="font-size:14px; font-weight:600; color:var(--gray-700)">R$</span>
-                      <input id="input-draft-price" value="${d.priceStr}" oninput="window.__mepedeStore.draft.priceStr = this.value; window.__mepedeStore.updatePriceHint();" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
+                      <input id="input-draft-price" value="${d.priceStr}" oninput="this.value = window.__mepedeStore.cleanMoneyStr(this.value); window.__mepedeStore.draft.priceStr = this.value; window.__mepedeStore.updatePriceHint();" onblur="this.value = window.__mepedeStore.formatMoneyBlur(this.value); window.__mepedeStore.draft.priceStr = this.value; window.__mepedeStore.updatePriceHint();" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
                     </div>
                   </label>
                   <label style="display:flex; flex-direction:column; gap:6px">
                     <span style="font-size:13px; font-weight:500">Preço antes <span style="color:var(--gray-400); font-weight:400">riscado</span></span>
                     <div style="display:flex; align-items:center; height:44px; border:1px solid var(--gray-200); border-radius:10px; padding:0 14px; gap:6px; background:#fff">
                       <span style="font-size:14px; font-weight:600; color:var(--gray-400)">R$</span>
-                      <input id="input-draft-orig" value="${d.origStr}" oninput="window.__mepedeStore.draft.origStr = this.value; window.__mepedeStore.updatePriceHint();" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
+                      <input id="input-draft-orig" value="${d.origStr}" oninput="this.value = window.__mepedeStore.cleanMoneyStr(this.value); window.__mepedeStore.draft.origStr = this.value; window.__mepedeStore.updatePriceHint();" onblur="this.value = window.__mepedeStore.formatMoneyBlur(this.value); window.__mepedeStore.draft.origStr = this.value; window.__mepedeStore.updatePriceHint();" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
                     </div>
                   </label>
                 </div>
@@ -3030,7 +3074,7 @@ ${msgWhats}
                       <input id="input-draft-varopt-name-${idx}" value="${vr.name}" oninput="window.__mepedeStore.draft.varOpts[${idx}].name = this.value;" placeholder="Ex: 300ml" style="height:42px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none; background:#fff">
                       <div style="display:flex; align-items:center; height:42px; border:1px solid var(--gray-200); border-radius:10px; padding:0 12px; gap:6px; background:#fff">
                         <span style="font-size:13px; font-weight:600; color:var(--gray-700)">R$</span>
-                        <input id="input-draft-varopt-price-${idx}" value="${vr.priceStr}" oninput="window.__mepedeStore.draft.varOpts[${idx}].priceStr = this.value;" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
+                        <input id="input-draft-varopt-price-${idx}" value="${vr.priceStr}" oninput="this.value = window.__mepedeStore.cleanMoneyStr(this.value); window.__mepedeStore.draft.varOpts[${idx}].priceStr = this.value;" onblur="this.value = window.__mepedeStore.formatMoneyBlur(this.value); window.__mepedeStore.draft.varOpts[${idx}].priceStr = this.value;" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
                       </div>
                       <div onclick="if(window.__mepedeStore.draft.varOpts.length > 1){ window.__mepedeStore.draft.varOpts = window.__mepedeStore.draft.varOpts.filter((_,j) => j !== ${idx}); window.__mepedeStore.notify(); }" style="width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-400)">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
@@ -3052,40 +3096,96 @@ ${msgWhats}
                 <div style="font-size:13px; color:var(--gray-500); margin-top:2px">Extras que o cliente escolhe, como adicionais ou ponto da carne.</div>
               </div>
 
-              ${linkedGroups.map((lg, i) => `
-                <div style="display:flex; align-items:center; gap:12px; border:1px solid var(--gray-100); border-radius:12px; padding:12px 14px">
-                  <div style="flex:1; min-width:0">
-                    <div style="display:flex; align-items:center; gap:8px">
-                      <span style="font-size:14px; font-weight:600">${lg.name}</span>
-                      <span style="height:20px; padding:0 8px; border-radius:10px; background:${lg.min > 0 ? '#FFF1E8' : '#F1F2F5'}; color:${lg.min > 0 ? '#E85700' : '#4A5160'}; font-size:10px; font-weight:600; display:flex; align-items:center">${lg.min > 0 ? 'OBRIGATÓRIO' : 'OPCIONAL'}</span>
+              ${linkedGroups.map((lg, i) => {
+                d.expandedGroups = d.expandedGroups || {};
+                const isExpanded = d.expandedGroups[lg.id] !== false;
+                return `
+                  <div style="border:1px solid #ECEEF2; border-radius:14px; background:#fff; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.02)">
+                    <div style="display:flex; align-items:center; gap:10px; padding:12px 14px; background:#FAFBFD; border-bottom:${isExpanded ? '1px solid #ECEEF2' : 'none'}">
+                      <div style="flex:1; min-width:0">
+                        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+                          <span style="font-size:14px; font-weight:700; color:#14171F">${lg.name}</span>
+                          <span style="height:20px; padding:0 8px; border-radius:10px; background:${lg.min > 0 ? '#FFF1E8' : '#F1F2F5'}; color:${lg.min > 0 ? '#E85700' : '#4A5160'}; font-size:10px; font-weight:700; display:inline-flex; align-items:center">
+                            ${lg.min > 0 ? 'OBRIGATÓRIO' : 'OPCIONAL'}
+                          </span>
+                          <span style="font-size:11.5px; color:var(--gray-500); font-weight:500">(${lg.options.length} ${lg.options.length === 1 ? 'adicional' : 'adicionais'})</span>
+                        </div>
+                        <div style="font-size:12px; color:var(--gray-500); margin-top:3px">
+                          ${ruleText(lg)}
+                        </div>
+                      </div>
+
+                      <div style="display:flex; align-items:center; gap:6px; flex:none">
+                        <button type="button" onclick="
+                          window.__mepedeStore.draft.expandedGroups = window.__mepedeStore.draft.expandedGroups || {};
+                          window.__mepedeStore.draft.expandedGroups['${lg.id}'] = !${isExpanded};
+                          window.__mepedeStore.notify();
+                        " style="height:30px; padding:0 10px; border-radius:8px; border:1px solid var(--gray-200); background:#fff; font-size:11.5px; font-weight:600; color:var(--gray-700); cursor:pointer; display:inline-flex; align-items:center; gap:5px">
+                          <span>${isExpanded ? 'Ocultar' : 'Ver adicionais'}</span>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="transform:${isExpanded ? 'rotate(180deg)' : 'none'}; transition:transform .15s ease"><path d="m6 9 6 6 6-6"></path></svg>
+                        </button>
+
+                        <button type="button" onclick="window.__mepedeStore.openGroup(window.__mepedeStore.data.groups.find(x => x.id === '${lg.id}'))" title="Editar este grupo de complementos" style="height:30px; padding:0 8px; border-radius:8px; border:1px solid var(--gray-200); background:#fff; font-size:11.5px; font-weight:500; color:var(--gray-700); cursor:pointer; display:inline-flex; align-items:center; gap:4px">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+                          <span>Editar</span>
+                        </button>
+
+                        ${linkedGroups.length > 1 ? `
+                          <div style="display:flex; border:1px solid var(--gray-200); border-radius:8px; overflow:hidden; background:#fff">
+                            <button type="button" onclick="const a = window.__mepedeStore.draft.groupIds.slice(); if(${i} > 0){ [a[${i}], a[${i}-1]] = [a[${i}-1], a[${i}]]; window.__mepedeStore.draft.groupIds = a; window.__mepedeStore.notify(); }" title="Subir ordem" ${i === 0 ? 'disabled style="opacity:0.3; cursor:not-allowed"' : ''} style="width:26px; height:28px; border:none; background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-700)">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m18 15-6-6-6 6"></path></svg>
+                            </button>
+                            <button type="button" onclick="const a = window.__mepedeStore.draft.groupIds.slice(); if(${i} < a.length - 1){ [a[${i}], a[${i}+1]] = [a[${i}+1], a[${i}]]; window.__mepedeStore.draft.groupIds = a; window.__mepedeStore.notify(); }" title="Descer ordem" ${i === linkedGroups.length - 1 ? 'disabled style="opacity:0.3; cursor:not-allowed"' : ''} style="width:26px; height:28px; border:none; border-left:1px solid var(--gray-200); background:transparent; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-700)">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
+                            </button>
+                          </div>
+                        ` : ''}
+
+                        <button type="button" onclick="window.__mepedeStore.draft.groupIds = window.__mepedeStore.draft.groupIds.filter(x => x !== '${lg.id}'); window.__mepedeStore.notify()" title="Desvincular deste produto" style="width:28px; height:28px; border-radius:8px; border:1px solid #FEECEB; background:#FFF5F5; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--red)">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+                        </button>
+                      </div>
                     </div>
-                    <div style="font-size:12px; color:var(--gray-400); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${ruleText(lg)} · ${lg.options.map(o => o.name).join(', ')}</div>
+
+                    ${isExpanded ? `
+                      <div style="padding:10px 14px; background:#fff">
+                        <div style="font-size:11px; font-weight:700; color:var(--gray-400); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px">
+                          Todos os adicionais disponíveis neste grupo:
+                        </div>
+                        <div style="display:flex; flex-wrap:wrap; gap:6px">
+                          ${lg.options.map(o => `
+                            <div style="display:inline-flex; align-items:center; gap:6px; background:#F8F9FA; border:1px solid #E5E7EB; border-radius:8px; padding:4px 10px; font-size:12px">
+                              ${o.img ? `<img src="${o.img}" alt="" style="width:16px; height:16px; border-radius:4px; object-fit:cover; display:block">` : ''}
+                              <span style="font-weight:600; color:#1F2937">${o.name}</span>
+                              <span style="color:#00B368; font-weight:700; font-size:11px; background:#E8F7EE; padding:1px 6px; border-radius:5px">
+                                ${o.price > 0 ? '+ ' + money(o.price) : 'Grátis'}
+                              </span>
+                            </div>
+                          `).join('')}
+                        </div>
+                      </div>
+                    ` : ''}
                   </div>
-                  <div onclick="const a = window.__mepedeStore.draft.groupIds.slice(); if(i > 0){ [a[i], a[i-1]] = [a[i-1], a[i]]; window.__mepedeStore.draft.groupIds = a; window.__mepedeStore.notify(); }" title="Subir" style="width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-700)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m18 15-6-6-6 6"></path></svg>
-                  </div>
-                  <div onclick="const a = window.__mepedeStore.draft.groupIds.slice(); if(i < a.length - 1){ [a[i], a[i+1]] = [a[i+1], a[i]]; window.__mepedeStore.draft.groupIds = a; window.__mepedeStore.notify(); }" title="Descer" style="width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-700)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg>
-                  </div>
-                  <div onclick="window.__mepedeStore.draft.groupIds = window.__mepedeStore.draft.groupIds.filter(x => x !== '${lg.id}'); window.__mepedeStore.notify()" title="Desvincular" style="width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--red)">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
-                  </div>
-                </div>
-              `).join('')}
+                `;
+              }).join('')}
 
               ${d.libOpen ? `
                 <div style="border:1px solid var(--gray-100); border-radius:14px; padding:10px; background:#FAFBFC">
                   <div style="font-size:12px; color:var(--gray-400); padding:4px 8px">Da sua biblioteca — clique para vincular</div>
                   ${libGroups.map(lb => `
-                    <div onclick="window.__mepedeStore.draft.groupIds.push('${lb.id}'); window.__mepedeStore.notify()" style="display:flex; align-items:center; gap:12px; padding:10px 8px; border-radius:10px; cursor:pointer; background:#fff; margin-top:4px">
-                      <span style="width:22px; height:22px; border-radius:11px; background:#FFF1E8; color:#FF6100; display:flex; align-items:center; justify-content:center">
+                    <div onclick="window.__mepedeStore.draft.groupIds.push('${lb.id}'); window.__mepedeStore.notify()" style="display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; cursor:pointer; background:#fff; margin-top:4px; border:1px solid var(--gray-200)">
+                      <span style="width:24px; height:24px; border-radius:12px; background:#FFF1E8; color:#FF6100; display:flex; align-items:center; justify-content:center; flex:none">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
                       </span>
                       <div style="flex:1; min-width:0">
-                        <div style="font-size:13px; font-weight:500">${lb.name}</div>
-                        <div style="font-size:12px; color:var(--gray-400); overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${lb.options.map(o => o.name).join(', ')}</div>
+                        <div style="display:flex; align-items:center; gap:8px">
+                          <span style="font-size:13.5px; font-weight:600">${lb.name}</span>
+                          <span style="font-size:10.5px; font-weight:700; color:${lb.min > 0 ? '#E85700' : '#4A5160'}; background:${lb.min > 0 ? '#FFF1E8' : '#F1F2F5'}; padding:1px 6px; border-radius:6px">${lb.min > 0 ? 'OBRIGATÓRIO' : 'OPCIONAL'}</span>
+                        </div>
+                        <div style="font-size:12px; color:var(--gray-500); margin-top:2px">
+                          ${lb.options.map(o => o.name + (o.price ? ' (+' + money(o.price) + ')' : '')).join(' · ')}
+                        </div>
                       </div>
-                      <span style="font-size:11px; color:var(--gray-400)">${lb.min > 0 ? 'Obrigatório' : 'Opcional'}</span>
                     </div>
                   `).join('')}
                   ${!libGroups.length ? `<div style="font-size:13px; color:var(--gray-500); padding:8px">Todos os grupos já estão vinculados.</div>` : ''}
@@ -3420,7 +3520,7 @@ ${msgWhats}
                   <input id="input-gd-row-name-${i}" value="${r.name}" oninput="window.__mepedeStore.gd.rows[${i}].name = this.value;" placeholder="Opção. Ex: Bacon crocante" style="height:40px; padding:0 12px; border:1px solid var(--gray-200); border-radius:10px; font-size:14px; outline:none; background:#fff">
                   <div style="display:flex; align-items:center; height:40px; border:1px solid var(--gray-200); border-radius:10px; padding:0 10px; gap:6px; background:#fff">
                     <span style="font-size:13px; font-weight:600; color:var(--gray-700)">+R$</span>
-                    <input id="input-gd-row-price-${i}" value="${r.priceStr}" oninput="window.__mepedeStore.gd.rows[${i}].priceStr = this.value;" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
+                    <input id="input-gd-row-price-${i}" value="${r.priceStr}" oninput="this.value = window.__mepedeStore.cleanMoneyStr(this.value); window.__mepedeStore.gd.rows[${i}].priceStr = this.value;" onblur="this.value = window.__mepedeStore.formatMoneyBlur(this.value); window.__mepedeStore.gd.rows[${i}].priceStr = this.value;" inputmode="decimal" placeholder="0,00" style="flex:1; min-width:0; border:none; outline:none; font-size:14px">
                   </div>
                   <div onclick="if(window.__mepedeStore.gd.rows.length > 1){ window.__mepedeStore.gd.rows = window.__mepedeStore.gd.rows.filter((_,j) => j !== ${i}); window.__mepedeStore.notify(); }" style="width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-400)">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
