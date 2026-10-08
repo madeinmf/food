@@ -299,9 +299,11 @@
   // Estado da Aplicação
   class Store {
     constructor() {
-      this.data = loadData();
+      // Sempre que acessar o link, inicia direto no tour guiado com dados limpos!
+      this.data = emptyData();
+      try { localStorage.removeItem(LS_KEY); } catch (e) {}
       this.tab = 'menu'; // 'menu' | 'groups' | 'settings'
-      this.menuId = this.data.menus[0] ? this.data.menus[0].id : null;
+      this.menuId = null;
       this.selCat = 'all';
       this.search = '';
       this.drawer = null; // null | 'product' | 'category' | 'menu' | 'group' | 'pick'
@@ -318,7 +320,8 @@
       this.hideCheck = {};
       this.qrOpen = false;
       this.orderModalOpen = false;
-      this.tutorialStep = this.data.menus.length === 0 ? 1 : null; // Se vazio, começa no passo 1!
+      this.docModalOpen = false;
+      this.tutorialStep = 1; // SEMPRE começa no passo 1 do tour guiado!
       this.showTutorialCard = false; // Não exibe card flutuante, apenas o "Clique aqui"!
 
       // Estado do Celular
@@ -334,6 +337,16 @@
       };
 
       this.listeners = [];
+    }
+
+    openDocModal() {
+      this.docModalOpen = true;
+      this.notify();
+    }
+
+    closeDocModal() {
+      this.docModalOpen = false;
+      this.notify();
     }
 
     startTutorial(forceEmpty = true) {
@@ -1165,10 +1178,10 @@
 
         <div style="flex:1"></div>
 
-        <a href="Sistema de cardápio para foodtruck/O que mudou.dc.html" class="doc-banner">
+        <div onclick="window.__mepedeStore.openDocModal()" class="doc-banner" style="cursor:pointer">
           <div style="font-size:13px; font-weight:600; color:var(--dark)">O que mudou neste painel</div>
           <div style="font-size:12px; color:var(--orange); margin-top:2px; font-weight:500">Ver documentação →</div>
-        </a>
+        </div>
 
         <div class="user-profile">
           <div class="user-avatar">EH</div>
@@ -1715,37 +1728,39 @@
       phProductsHtml = activePhCat.prods.map((p, idx) => {
         const disc = discOf(p);
         const isFirst = idx === 0;
+        const tagInfo = p.badge ? getTagInfo(p.badge) : null;
         return `
-          <div ${isFirst ? 'id="tut-phone-product-card"' : ''} onclick="window.__mepedeStore.setPhone({ pid: '${p.id}', view: 'home', qty: 1 }); if(window.__mepedeStore.tutorialStep === 7) window.__mepedeStore.nextTutorial();" style="border:1px solid #ECEEF2; border-radius:18px; background:#fff; padding:11px; display:flex; flex-direction:column; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.03); cursor:pointer; position:relative">
-            ${p.badge ? `
-              <div style="align-self:flex-start">
-                ${renderBadgeHtml(p.badge, 'font-size:9.5px; padding:2px 7px; border-radius:10px')}
+          <div ${isFirst ? 'id="tut-phone-product-card"' : ''} onclick="window.__mepedeStore.setPhone({ pid: '${p.id}', view: 'home', qty: 1 }); if(window.__mepedeStore.tutorialStep === 7) window.__mepedeStore.nextTutorial();" style="position:relative; margin-top:${tagInfo ? '14px' : '2px'}; border:1px solid #FFE7D6; border-radius:18px; background:#fff; padding:12px 10px; box-shadow:0 2px 8px rgba(0,0,0,0.02); cursor:pointer; display:flex; gap:10px; align-items:flex-start">
+            ${tagInfo ? `
+              <div style="position:absolute; top:-11px; left:14px; z-index:3; pointer-events:none">
+                <span class="product-tag-pill" style="display:inline-flex; align-items:center; gap:4px; background:${tagInfo.bg}; color:${tagInfo.color}; border:1px solid ${tagInfo.color}55; padding:2.5px 9px; border-radius:9999px; font-size:10.5px; font-weight:700; line-height:1.2; box-shadow:0 1px 4px rgba(0,0,0,0.06); user-select:none">
+                  <span style="font-size:12px; line-height:1">${tagInfo.emoji}</span>
+                  <span>${tagInfo.label}</span>
+                </span>
               </div>
             ` : ''}
-            <div style="display:flex; gap:10px; align-items:center">
-              <div style="width:84px; height:84px; flex:none; border-radius:14px; overflow:hidden; background:#F8F9FA">
-                ${p.img ? `<img src="${p.img}" alt="" style="width:100%; height:100%; object-fit:cover; display:block">` : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:24px; color:#FF5B00; background:#FFF1E8">🍔</div>`}
+            <div style="width:86px; height:86px; min-width:86px; max-width:86px; aspect-ratio:1/1; border-radius:14px; overflow:hidden; flex:none; background:#F8F9FA">
+              ${p.img ? `<img src="${p.img}" alt="" style="width:100%; height:100%; object-fit:cover; display:block">` : `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:24px; color:#FF5B00; background:#FFF1E8">🍔</div>`}
+            </div>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:space-between; min-height:86px">
+              <div>
+                <div style="font-size:13px; font-weight:700; color:#1E293B; line-height:1.25; margin:0 0 3px 0; word-break:break-word">${p.name}</div>
+                <div style="font-size:10.5px; color:#8A9CAE; line-height:1.35; margin:0 0 6px 0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden">${p.desc || ''}</div>
               </div>
-              <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:space-between; min-height:84px">
-                <div>
-                  <div style="font-size:12px; font-weight:700; color:#14171F; line-height:1.25">${p.name}</div>
-                  <div style="font-size:9.5px; color:#8F95A3; line-height:1.35; margin-top:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden">${p.desc || ''}</div>
+              <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:6px; margin-top:auto">
+                <div style="min-width:0">
+                  ${disc ? `
+                    <div style="display:flex; align-items:center; gap:4px; line-height:1; margin-bottom:2px">
+                      <span style="font-size:10px; color:#94A3B8; text-decoration:line-through">${money(p.orig)}</span>
+                      <span style="background:#00B368; color:#fff; border-radius:5px; padding:1px 4.5px; font-size:8.5px; font-weight:700; line-height:1">${disc}</span>
+                    </div>
+                  ` : ''}
+                  <div style="font-size:15.5px; font-weight:800; color:#00B368; line-height:1.1; letter-spacing:-0.2px">${priceOf(p)}</div>
                 </div>
-                <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-top:4px">
-                  <div>
-                    ${disc ? `
-                      <div style="display:flex; align-items:center; gap:4px">
-                        <span style="font-size:9.5px; color:#A0A6B2; text-decoration:line-through">${money(p.orig)}</span>
-                        <span style="background:#00B050; color:#fff; border-radius:5px; padding:0 4px; font-size:8px; font-weight:700">${disc}</span>
-                      </div>
-                    ` : ''}
-                    <div style="font-size:14px; font-weight:800; color:#00B050; line-height:1.2">${priceOf(p)}</div>
-                  </div>
-                  <button style="border:none; background:#FF5B00; color:#fff; border-radius:16px; padding:5px 10px; font-size:10px; font-weight:700; display:flex; align-items:center; gap:4px; cursor:pointer; box-shadow:0 2px 6px rgba(255,91,0,0.25)">
-                    Add carrinho
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-                  </button>
-                </div>
+                <button type="button" style="border:none; background:#FF5800; color:#fff; border-radius:14px; padding:6.5px 11px; font-size:10.5px; font-weight:700; display:inline-flex; align-items:center; gap:5px; cursor:pointer; white-space:nowrap; flex:none; box-shadow:0 3px 10px rgba(255,88,0,0.28); line-height:1">
+                  <span>Add carrinho</span>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 10h16l-2 10H6L4 10z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/><line x1="9" y1="13" x2="9" y2="16"/><line x1="12" y1="13" x2="12" y2="16"/><line x1="15" y1="13" x2="15" y2="16"/></svg>
+                </button>
               </div>
             </div>
           </div>
@@ -2149,7 +2164,7 @@
               </div>
 
               <!-- Product Cards List -->
-              <div style="display:flex; flex-direction:column; gap:10px; padding:6px 14px 20px">
+              <div style="display:flex; flex-direction:column; gap:14px; padding:10px 14px 24px">
                 ${phProductsHtml}
               </div>
             </div>
@@ -2302,6 +2317,232 @@ ${msgWhats}
       `;
     }
 
+    // Modal de Documentação "O que mudou no painel: Antes e Depois"
+    if (S.docModalOpen) {
+      html += `
+        <div class="modal-overlay" style="z-index:99999; background:rgba(15,23,42,0.65); backdrop-filter:blur(5px); padding:20px; display:flex; align-items:center; justify-content:center" onclick="window.__mepedeStore.closeDocModal()">
+          <div class="modal-box" style="width:1040px; max-width:96vw; max-height:92vh; padding:0; display:flex; flex-direction:column; overflow:hidden; border-radius:24px; box-shadow:0 25px 60px rgba(0,0,0,0.35); text-align:left; background:#F8F9FA" onclick="event.stopPropagation()">
+            <!-- Topbar Modal Header -->
+            <div style="flex:none; display:flex; align-items:center; justify-content:space-between; padding:20px 28px; background:#fff; border-bottom:1px solid #ECEEF2">
+              <div>
+                <div style="font-size:12px; font-weight:700; color:#FF6100; text-transform:uppercase; letter-spacing:0.5px">mepede.ai · Painel de Cardápio · Redesign 2026</div>
+                <div style="font-size:22px; font-weight:800; color:#14171F; margin-top:2px">O que mudou no painel: Antes e Depois</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px">
+                <a href="documentacao.html" target="_blank" class="btn-outline" style="height:36px; padding:0 14px; font-size:12px; font-weight:600; display:inline-flex; align-items:center; gap:6px; text-decoration:none; color:var(--dark)">
+                  <span>Abrir em tela cheia</span>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+                <div onclick="window.__mepedeStore.closeDocModal()" style="width:36px; height:36px; border-radius:18px; border:1px solid #ECEEF2; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#6B7280; font-size:16px; font-weight:700; transition:all .15s ease" title="Fechar (Esc)">✕</div>
+              </div>
+            </div>
+
+            <!-- Scrollable Content Body -->
+            <div style="flex:1; overflow-y:auto; padding:28px; display:flex; flex-direction:column; gap:20px">
+              <!-- Intro Banner -->
+              <div style="background:#fff; border:1px solid #ECEEF2; border-radius:20px; padding:22px 24px">
+                <p style="font-size:14px; color:#4A5160; line-height:1.6; margin:0">
+                  O cardápio mobile ficou igual. O painel foi completamente refeito para o dono do foodtruck montar o cardápio sem se perder: menos telas, menos janelas e prévia interativa ao vivo no celular em tempo real.
+                </p>
+              </div>
+
+              <!-- Stats Grid -->
+              <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px">
+                <div style="background:#fff; border:1px solid #ECEEF2; border-radius:16px; padding:18px">
+                  <div style="font-size:28px; font-weight:700; color:#FF6100; line-height:1.1">6 → 1</div>
+                  <div style="font-size:12.5px; color:#555A68; margin-top:4px">telas para criar um produto (tipo + 4–5 etapas → formulário único com rolagem)</div>
+                </div>
+                <div style="background:#fff; border:1px solid #ECEEF2; border-radius:16px; padding:18px">
+                  <div style="font-size:28px; font-weight:700; color:#FF6100; line-height:1.1">0</div>
+                  <div style="font-size:12.5px; color:#555A68; margin-top:4px">janelas por cima de janelas (antes: modal sobreposto por gaveta lateral)</div>
+                </div>
+                <div style="background:#fff; border:1px solid #ECEEF2; border-radius:16px; padding:18px">
+                  <div style="font-size:28px; font-weight:700; color:#FF6100; line-height:1.1">Sempre</div>
+                  <div style="font-size:12.5px; color:#555A68; margin-top:4px">prévia do celular visível e interativa, inclusive durante a edição do lanche</div>
+                </div>
+                <div style="background:#fff; border:1px solid #ECEEF2; border-radius:16px; padding:18px">
+                  <div style="font-size:28px; font-weight:700; color:#FF6100; line-height:1.1">Desfazer</div>
+                  <div style="font-size:12.5px; color:#555A68; margin-top:4px">em toda exclusão, no lugar de modais punitivos de “não pode ser desfeito”</div>
+                </div>
+              </div>
+
+              <!-- 01 ESTRUTURA -->
+              <section style="background:#fff; border:1px solid #ECEEF2; border-radius:20px; padding:24px; display:grid; grid-template-columns:minmax(0,320px) minmax(0,1fr); gap:24px; align-items:start">
+                <div>
+                  <img src="assets/ref/tela-inicial.png" alt="Tela original: Cardápio Digital" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                </div>
+                <div>
+                  <div style="font-size:11.5px; font-weight:700; color:#8A91A0; letter-spacing:.5px">01 · ESTRUTURA</div>
+                  <h2 style="font-size:18px; font-weight:700; margin:4px 0 12px; color:#14171F">Uma tela de trabalho, não uma lista de cardápios</h2>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#E5352B; background:#FEECEB; padding:2px 8px; border-radius:6px; margin-bottom:4px">✕ Antes</div>
+                  <ul style="margin:4px 0 14px; padding-left:18px; font-size:13px; color:#555A68; line-height:1.6">
+                    <li>Entrar em “Cardápio Digital”, depois abrir o cardápio, depois escolher entre 4–5 abas desconexas.</li>
+                    <li>Link, QR Code e WhatsApp ficavam restritos apenas à primeira tela.</li>
+                    <li>Botão “Novo Cardápio” desabilitado sem explicação do motivo.</li>
+                  </ul>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#12A150; background:#E6F7EC; padding:2px 8px; border-radius:6px; margin-bottom:4px">✓ Agora</div>
+                  <ul style="margin:4px 0 0; padding-left:18px; font-size:13px; color:#2D313A; line-height:1.6">
+                    <li>Abre direto no cardápio de trabalho. As abas viraram o menu lateral principal: <b>Cardápio</b>, <b>Complementos</b>, <b>Loja e link</b>.</li>
+                    <li>Link com 1-clique para copiar, QR Code instantâneo e botão WhatsApp fixos no topo em qualquer tela.</li>
+                    <li>Interruptor “Loja aberta / fechada” direto no menu lateral — reflete no smartphone no mesmo segundo.</li>
+                    <li>Checklist com progresso visual clicável: cada etapa pendente leva direto à ação correspondente.</li>
+                  </ul>
+                </div>
+              </section>
+
+              <!-- 02 CATEGORIAS E PRODUTOS -->
+              <section style="background:#fff; border:1px solid #ECEEF2; border-radius:20px; padding:24px; display:grid; grid-template-columns:minmax(0,320px) minmax(0,1fr); gap:24px; align-items:start">
+                <div style="display:flex; flex-direction:column; gap:10px">
+                  <img src="assets/ref/categorias.png" alt="Tela original: Categorias" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                  <img src="assets/ref/todos-produtos.png" alt="Tela original: Todos os produtos" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                </div>
+                <div>
+                  <div style="font-size:11.5px; font-weight:700; color:#8A91A0; letter-spacing:.5px">02 · CATEGORIAS E PRODUTOS</div>
+                  <h2 style="font-size:18px; font-weight:700; margin:4px 0 12px; color:#14171F">Categorias e produtos unificados na mesma tela</h2>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#E5352B; background:#FEECEB; padding:2px 8px; border-radius:6px; margin-bottom:4px">✕ Antes</div>
+                  <ul style="margin:4px 0 14px; padding-left:18px; font-size:13px; color:#555A68; line-height:1.6">
+                    <li>Duas abas separadas (“Categorias” e “Todos os produtos”) para gerenciar os mesmos dados.</li>
+                    <li>Lista em tabela fria, sem fotos grandes — difícil identificar itens sem imagem ou sem descrição.</li>
+                    <li>Prévia do celular estática e presente apenas na aba Categorias.</li>
+                  </ul>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#12A150; background:#E6F7EC; padding:2px 8px; border-radius:6px; margin-bottom:4px">✓ Agora</div>
+                  <ul style="margin:4px 0 0; padding-left:18px; font-size:13px; color:#2D313A; line-height:1.6">
+                    <li>Barra de categorias em chips dinâmicos (“Todos” + cada categoria com contagem e status). Clicar filtra os produtos na grade e navega o celular simultaneamente.</li>
+                    <li>Produtos em cards modernos com foto grande, preço, desconto, complementos e interruptor “Visível”.</li>
+                    <li>Itens sem foto ganham botão de destaque “Adicionar foto”; itens sem categoria avisam com clareza que estão ocultos do cliente.</li>
+                    <li>Reordenação intuitiva de categorias (← →), busca instantânea e produto associável a múltiplas categorias.</li>
+                  </ul>
+                </div>
+              </section>
+
+              <!-- 03 CRIAR CATEGORIA -->
+              <section style="background:#fff; border:1px solid #ECEEF2; border-radius:20px; padding:24px; display:grid; grid-template-columns:minmax(0,320px) minmax(0,1fr); gap:24px; align-items:start">
+                <div style="display:flex; flex-direction:column; gap:10px">
+                  <img src="assets/ref/criar-categoria.png" alt="Tela original: Nova categoria" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                  <img src="assets/ref/excluir-categoria.png" alt="Tela original: Excluir categoria" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                </div>
+                <div>
+                  <div style="font-size:11.5px; font-weight:700; color:#8A91A0; letter-spacing:.5px">03 · CRIAR CATEGORIA</div>
+                  <h2 style="font-size:18px; font-weight:700; margin:4px 0 12px; color:#14171F">Criar categoria em um passo simplificado</h2>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#E5352B; background:#FEECEB; padding:2px 8px; border-radius:6px; margin-bottom:4px">✕ Antes</div>
+                  <ul style="margin:4px 0 14px; padding-left:18px; font-size:13px; color:#555A68; line-height:1.6">
+                    <li>Modal burocrático com nome + 3 opções de disponibilidade já no primeiro instante.</li>
+                    <li>“Não disponível no momento” duplicava a função do interruptor “Ativar”.</li>
+                    <li>Exclusão bloqueava a tela com mensagem intimidadora de “Essa ação não pode ser desfeita”.</li>
+                  </ul>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#12A150; background:#E6F7EC; padding:2px 8px; border-radius:6px; margin-bottom:4px">✓ Agora</div>
+                  <ul style="margin:4px 0 0; padding-left:18px; font-size:13px; color:#2D313A; line-height:1.6">
+                    <li>“+ Nova categoria”: digite o nome e aperte Enter. No cardápio vazio, sugestões inteligentes de 1 clique (Lanches, Bebidas, Combos, Sobremesas).</li>
+                    <li>Horários de atendimento configurados em aba dedicada: <b>Sempre</b> ou <b>Dias e horários</b> com status em tempo real.</li>
+                    <li>Exclusão simplificada que mantém os produtos salvos e permite <b>Desfazer</b> imediatamente via toast.</li>
+                  </ul>
+                </div>
+              </section>
+
+              <!-- 04 CRIAR PRODUTO -->
+              <section style="background:#fff; border:1px solid #ECEEF2; border-radius:20px; padding:24px; display:grid; grid-template-columns:minmax(0,320px) minmax(0,1fr); gap:24px; align-items:start">
+                <div style="display:flex; flex-direction:column; gap:10px">
+                  <img src="assets/ref/tipo-produto.png" alt="Tela original: Tipo de produto" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                  <img src="assets/ref/wizard-dados.png" alt="Tela original: Etapas do produto" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                </div>
+                <div>
+                  <div style="font-size:11.5px; font-weight:700; color:#8A91A0; letter-spacing:.5px">04 · CRIAR PRODUTO</div>
+                  <h2 style="font-size:18px; font-weight:700; margin:4px 0 12px; color:#14171F">De assistente em etapas para formulário com prévia ao vivo</h2>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#E5352B; background:#FEECEB; padding:2px 8px; border-radius:6px; margin-bottom:4px">✕ Antes</div>
+                  <ul style="margin:4px 0 14px; padding-left:18px; font-size:13px; color:#555A68; line-height:1.6">
+                    <li>Obrigatoriedade de escolher “Simples” ou “Com variação” antes de tudo — mudando arbitrariamente o número de passos (3 ou 4 etapas).</li>
+                    <li>Navegação de vai-e-volta entre etapas; o resultado final só podia ser conferido ao salvar.</li>
+                    <li>Modal centralizado cobria completamente a tela do celular.</li>
+                  </ul>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#12A150; background:#E6F7EC; padding:2px 8px; border-radius:6px; margin-bottom:4px">✓ Agora</div>
+                  <ul style="margin:4px 0 0; padding-left:18px; font-size:13px; color:#2D313A; line-height:1.6">
+                    <li>Gaveta lateral elegante com 4 seções contínuas: <b>Básico</b>, <b>Preço</b>, <b>Complementos</b> e <b>Visibilidade</b>.</li>
+                    <li>Tipo de produto simplificado: <b>Preço único</b> ou <b>Varia por tamanho/tipo</b> alternável com 1 clique a qualquer instante.</li>
+                    <li>Prévia imediata no smartphone: a foto, selo/destaque, preço e complementos são renderizados no iPhone ao vivo conforme você digita.</li>
+                    <li>Cálculo automático de porcentagem de desconto com base no preço de comparação.</li>
+                    <li>Validação visual amigável que aponta exatamente os campos pendentes.</li>
+                  </ul>
+                </div>
+              </section>
+
+              <!-- 05 COMPLEMENTOS -->
+              <section style="background:#fff; border:1px solid #ECEEF2; border-radius:20px; padding:24px; display:grid; grid-template-columns:minmax(0,320px) minmax(0,1fr); gap:24px; align-items:start">
+                <div style="display:flex; flex-direction:column; gap:10px">
+                  <img src="assets/ref/wizard-complemento.png" alt="Tela original: Criar complemento" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                  <img src="assets/ref/grupos.png" alt="Tela original: Grupo de complementos" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                </div>
+                <div>
+                  <div style="font-size:11.5px; font-weight:700; color:#8A91A0; letter-spacing:.5px">05 · COMPLEMENTOS</div>
+                  <h2 style="font-size:18px; font-weight:700; margin:4px 0 12px; color:#14171F">Complementos sem janela dentro de janela</h2>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#E5352B; background:#FEECEB; padding:2px 8px; border-radius:6px; margin-bottom:4px">✕ Antes</div>
+                  <ul style="margin:4px 0 14px; padding-left:18px; font-size:13px; color:#555A68; line-height:1.6">
+                    <li>Criar uma opção abria um painel lateral empilhado em cima do modal do produto.</li>
+                    <li>Terminologia técnica fria (“Qtde mínima / máxima”) sem clareza do que o cliente leria.</li>
+                    <li>Lista interminável de complementos misturados.</li>
+                  </ul>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#12A150; background:#E6F7EC; padding:2px 8px; border-radius:6px; margin-bottom:4px">✓ Agora</div>
+                  <ul style="margin:4px 0 0; padding-left:18px; font-size:13px; color:#2D313A; line-height:1.6">
+                    <li>No próprio produto: “Usar da biblioteca” ou “Criar novo grupo” com opções diretas em linhas de nome + valor.</li>
+                    <li>Regras em linguagem natural: <b>Opcional / Obrigatório</b> com a frase exata que o cliente lê na tela.</li>
+                    <li>Reorganização de ordem com setas e biblioteca centralizada com contagem de produtos vinculados.</li>
+                    <li>O smartphone simula as regras fielmente: valida escolhas mínimas e calcula o subtotal instantaneamente.</li>
+                  </ul>
+                </div>
+              </section>
+
+              <!-- 06 VÁRIOS CARDÁPIOS -->
+              <section style="background:#fff; border:1px solid #ECEEF2; border-radius:20px; padding:24px; display:grid; grid-template-columns:minmax(0,320px) minmax(0,1fr); gap:24px; align-items:start">
+                <div>
+                  <img src="assets/ref/tela-inicial.png" alt="Tela original: Lista de cardápios" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                </div>
+                <div>
+                  <div style="font-size:11.5px; font-weight:700; color:#8A91A0; letter-spacing:.5px">06 · VÁRIOS CARDÁPIOS</div>
+                  <h2 style="font-size:18px; font-weight:700; margin:4px 0 12px; color:#14171F">Múltiplos cardápios sem troca de contexto</h2>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#E5352B; background:#FEECEB; padding:2px 8px; border-radius:6px; margin-bottom:4px">✕ Antes</div>
+                  <ul style="margin:4px 0 14px; padding-left:18px; font-size:13px; color:#555A68; line-height:1.6">
+                    <li>Tela isolada exclusiva para listagem de cardápios.</li>
+                    <li>Falta de transparência sobre qual cardápio ficava visível em cada turno ou dia.</li>
+                  </ul>
+                  <div style="display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; color:#12A150; background:#E6F7EC; padding:2px 8px; border-radius:6px; margin-bottom:4px">✓ Agora</div>
+                  <ul style="margin:4px 0 0; padding-left:18px; font-size:13px; color:#2D313A; line-height:1.6">
+                    <li>Cards “Seus cardápios” no topo do painel com horário de vigência, status e contagem de itens. Clicar troca o cardápio em edição e a prévia do celular em tempo real.</li>
+                    <li>Criação flexível: começar do zero ou duplicar a estrutura de categorias existente.</li>
+                    <li>Selo visual indicativo de qual cardápio está no ar agora no link único do foodtruck.</li>
+                  </ul>
+                </div>
+              </section>
+
+              <!-- 07 PRÉVIA E DETALHES -->
+              <section style="background:#fff; border:1px solid #ECEEF2; border-radius:20px; padding:24px; display:grid; grid-template-columns:minmax(0,320px) minmax(0,1fr); gap:24px; align-items:start">
+                <div>
+                  <img src="assets/ref/existente.png" alt="Tela original: Adicionar produto existente" style="width:100%; border-radius:12px; border:1px solid #ECEEF2; display:block">
+                </div>
+                <div>
+                  <div style="font-size:11.5px; font-weight:700; color:#8A91A0; letter-spacing:.5px">07 · PRÉVIA E DETALHES</div>
+                  <h2 style="font-size:18px; font-weight:700; margin:4px 0 12px; color:#14171F">Smartphone 100% interativo e simulação real de pedidos</h2>
+                  <ul style="margin:4px 0 0; padding-left:18px; font-size:13px; color:#2D313A; line-height:1.6">
+                    <li><b>Smartphone funcional:</b> alterne abas, clique no lanche, personalize complementos, ajuste a quantidade, adicione à sacola e simule a finalização de pedido direto para o WhatsApp.</li>
+                    <li>Gestão de loja com taxa de entrega, tempo estimado e pedido mínimo refletidos no cabeçalho do smartphone.</li>
+                    <li>Suporte completo para iniciar do zero no tour guiado interativo ou restaurar dados de exemplo a qualquer momento.</li>
+                  </ul>
+                </div>
+              </section>
+            </div>
+
+            <!-- Modal Footer -->
+            <div style="flex:none; padding:16px 28px; background:#fff; border-top:1px solid #ECEEF2; display:flex; justify-content:flex-end; gap:10px">
+              <a href="documentacao.html" target="_blank" class="btn-outline" style="height:40px; padding:0 20px; font-size:13px; text-decoration:none; display:inline-flex; align-items:center; gap:6px; color:var(--dark)">
+                Abrir em nova aba ↗
+              </a>
+              <button class="btn-orange" style="height:40px; padding:0 24px; font-size:13px" onclick="window.__mepedeStore.closeDocModal()">
+                Entendi, voltar para o painel
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     // Drawer de Produto
     if (S.drawer === 'product' && S.draft) {
       const d = S.draft;
@@ -2334,12 +2575,12 @@ ${msgWhats}
 
           <div id="drawer-scroll" style="flex:1; overflow-y:auto; padding:24px 28px 32px; display:flex; flex-direction:column; gap:24px">
             <div id="tut-quickfill-product" onclick="
-              window.__mepedeStore.draft.name = 'Batatas + Detroid Burguer';
-              window.__mepedeStore.draft.desc = 'Blend 180g, peso de 350g, queijo cheddar, alface, tomate e maionese da casa';
-              window.__mepedeStore.draft.priceStr = '34,90';
-              window.__mepedeStore.draft.origStr = '60,00';
-              window.__mepedeStore.draft.img = 'assets/detroid_hero.png';
-              window.__mepedeStore.draft.badge = 'Promoção';
+              window.__mepedeStore.draft.name = 'X-Burguer Clássico + Coca-cola Zero';
+              window.__mepedeStore.draft.desc = 'Blend 180g, queijo cheddar, alface, tomate e maionese da casa';
+              window.__mepedeStore.draft.priceStr = '32,90';
+              window.__mepedeStore.draft.origStr = '49,90';
+              window.__mepedeStore.draft.img = 'assets/burger.png';
+              window.__mepedeStore.draft.badge = 'mais pedido';
               window.__mepedeStore.draft.groupIds = ['g0', 'g2'];
               if (!window.__mepedeStore.draft.catIds.length && window.__mepedeStore.data.categories.length) {
                 window.__mepedeStore.draft.catIds = [window.__mepedeStore.data.categories[0].id];
@@ -2347,11 +2588,11 @@ ${msgWhats}
               window.__mepedeStore.notify();
               window.__mepedeStore.setToast('✨ Dados do burger preenchidos com sucesso!');
               if (window.__mepedeStore.tutorialStep === 5) window.__mepedeStore.nextTutorial();
-            " id="tut-quickfill-product" style="background:#FFF1E8; border:1.5px dashed #FF6100; border-radius:14px; padding:12px 16px; display:flex; align-items:center; gap:12px; cursor:pointer">
+            " style="background:#FFF1E8; border:1.5px dashed #FF6100; border-radius:14px; padding:12px 16px; display:flex; align-items:center; gap:12px; cursor:pointer">
               <div style="font-size:22px">✨</div>
               <div style="flex:1">
                 <div style="font-size:13px; font-weight:700; color:#E85700">Preencher Burger Artesanal (Auto-preenchimento)</div>
-                <div style="font-size:11px; color:var(--gray-700)">Adiciona foto, nome, ingredientes, valor e desconto de -42% automaticamente.</div>
+                <div style="font-size:11px; color:var(--gray-700)">Adiciona foto, nome, ingredientes, valor e desconto de -50% automaticamente.</div>
               </div>
               <button class="btn-orange" style="height:32px; padding:0 12px; font-size:12px">Preencher agora</button>
             </div>
@@ -3140,7 +3381,7 @@ ${msgWhats}
     function loop() {
       updateTutorialSpotlight();
       const S = window.__mepedeStore;
-      if (S && S.tutorialStep && !S.orderModalOpen) {
+      if (S && S.tutorialStep && !S.orderModalOpen && !S.docModalOpen) {
         tutTrackingRaf = requestAnimationFrame(loop);
       } else {
         tutTrackingRaf = null;
@@ -3153,7 +3394,7 @@ ${msgWhats}
     const S = window.__mepedeStore;
     let spotlight = document.getElementById('tutorial-spotlight');
 
-    if (!S || !S.tutorialStep || S.orderModalOpen) {
+    if (!S || !S.tutorialStep || S.orderModalOpen || S.docModalOpen) {
       if (spotlight) {
         spotlight.style.opacity = '0';
         spotlight.style.display = 'none';
@@ -3273,11 +3514,18 @@ ${msgWhats}
 
   window.addEventListener('resize', () => { startTutorialTracking(); });
   window.addEventListener('scroll', () => { startTutorialTracking(); }, true);
+  window.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && store.docModalOpen) {
+      store.closeDocModal();
+    }
+  });
 
   // Parâmetros de URL para testes e atalhos de usabilidade
   try {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('action') === 'newProduct') {
+    if (params.get('action') === 'doc' || params.get('doc') === '1') {
+      store.openDocModal();
+    } else if (params.get('action') === 'newProduct') {
       store.openProduct(null);
     } else if (params.get('action') === 'phoneSheet') {
       store.setPhone({ pid: store.data.products[0].id });

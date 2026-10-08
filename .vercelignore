@@ -1,12 +1,14 @@
 # Servidor local de desenvolvimento e scripts de teste
 dev-server.js
 test_full_tour.js
+test_verify_all.js
 iniciar.sh
 
 # Imagens de referência de design do figma/mockup local (assets utilizados ficam em /assets/)
 /Cardápio*.png
 /Perfil*.png
 /Sistema de cardápio para foodtruck
+/mockup celular-carrinho e pagamento
 
 # Arquivos do sistema
 .DS_Store
