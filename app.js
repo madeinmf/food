@@ -2016,26 +2016,37 @@
           </div>
         </div>
 
-        <!-- Member Tier -->
-        <div class="sidebar-member-badge">
-          <div style="display:flex; align-items:center; gap:8px">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-            <span>Member</span>
+        <!-- Member Tier (100% igual ao Figma) -->
+        <div style="padding:12px 2px; border-top:1px solid #ECEEF2; border-bottom:1px solid #ECEEF2; margin-top:14px">
+          <div style="display:flex; align-items:center; justify-content:space-between">
+            <div style="display:flex; align-items:center; gap:8px">
+              <div style="width:26px; height:26px; border-radius:13px; display:flex; align-items:center; justify-content:center; flex:none">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8A9CAE" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10.5" stroke-width="1.4"/>
+                  <path d="M11.8 20.5V11" stroke-width="1.5"/>
+                  <path d="M11.8 11.2C11.8 7.8 13.8 6.2 15.8 6.2C16.6 8.5 15 11.2 11.8 11.2Z" stroke-width="1.3"/>
+                  <path d="M11.8 13.2C9.8 11.2 7.6 10.8 6.5 12C6.8 14.2 9.5 14.5 11.8 13.2Z" stroke-width="1.3"/>
+                </svg>
+              </div>
+              <span style="font-size:14.5px; font-weight:700; color:#1E293B; letter-spacing:-0.2px">Member</span>
+            </div>
+            <a href="#" onclick="event.preventDefault(); window.__mepedeStore.setTab('dashboard'); window.__mepedeStore.setToast('Nível Member ativo!')" style="font-size:12px; color:#8A9CAE; font-weight:500; text-decoration:none">Ver</a>
           </div>
-          <a href="#" onclick="event.preventDefault(); window.__mepedeStore.setToast('Nível Member ativo!')" style="font-size:11.5px; color:var(--gray-400); text-decoration:none">Ver</a>
+          <div style="height:3.5px; background:#E2E8F0; border-radius:2px; overflow:hidden; margin-top:8px; margin-left:34px">
+            <div style="width:28%; height:100%; background:#1E293B; border-radius:2px"></div>
+          </div>
         </div>
 
-        <!-- User Profile -->
-        <div class="user-profile">
-          <div class="user-avatar" style="overflow:hidden">
-            <img src="assets/ref/perfil.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" style="width:100%; height:100%; object-fit:cover; display:block">
-            <span style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-weight:700">EH</span>
+        <!-- Perfil do Usuário Enzo Hirrata (100% igual ao Figma) -->
+        <div class="user-profile" style="display:flex; align-items:center; gap:10px; padding:12px 2px 0; border:none; margin-top:4px">
+          <div class="user-avatar" style="width:36px; height:36px; border-radius:18px; overflow:hidden; flex:none; border:2px solid #14171F">
+            <img src="assets/enzo_avatar.png" alt="Enzo Hirrata" style="width:100%; height:100%; object-fit:cover; display:block">
           </div>
           <div style="flex:1; min-width:0">
-            <div style="font-size:13px; font-weight:600; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Enzo Hirrata</div>
-            <div style="font-size:11px; color:var(--gray-400); white-space:nowrap; overflow:hidden; text-overflow:ellipsis">enzohirata@gmail.com</div>
+            <div style="font-size:13px; font-weight:700; color:#1E293B; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Enzo Hirrata</div>
+            <div style="font-size:11px; color:#64748B; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">enzohirata@gmail.com</div>
           </div>
-          <div style="color:var(--gray-400); cursor:pointer; font-size:16px; font-weight:bold; padding:2px 4px">
+          <div style="color:#94A3B8; cursor:pointer; font-size:16px; font-weight:bold; padding:2px 4px" onclick="window.__mepedeStore.setToast('Perfil de Enzo Hirrata')">
             ···
           </div>
         </div>
@@ -2080,11 +2091,23 @@
             </div>
           ` : ''}
         </div>
-        <div style="display:flex; align-items:center; gap:10px; flex:none">
-          <!-- Help Button & Dropdown -->
+        <div style="display:flex; align-items:center; gap:8px; flex:none">
+          <!-- Botões Visíveis e Rápidos: Tour Guiado e Demo -->
+          <button class="btn-outline" style="background:#FFF6F0; border:1px solid #FFD3B5; color:#E85700; font-weight:600; display:flex; align-items:center; gap:6px; height:34px; padding:0 12px; border-radius:8px; font-size:12.5px; cursor:pointer" onclick="window.__mepedeStore.startTutorial(true)" title="Iniciar tour guiado passo a passo">
+            <span style="font-size:13px">🎓</span> <span>Tour Guiado</span>
+          </button>
+          <button class="btn-outline" style="background:#F8FAFC; border:1px solid #E2E8F0; color:#475569; font-weight:600; display:flex; align-items:center; gap:5px; height:34px; padding:0 10px; border-radius:8px; font-size:12px; cursor:pointer" onclick="window.__mepedeStore.loadSeedData()" title="Carregar cardápio demonstrativo completo">
+            <span style="font-size:13px">⚡</span> <span>Demo</span>
+          </button>
+
+          <!-- Help Chat Bubble Button & Dropdown (Figma [?]) -->
           <div style="position:relative">
-            <button class="header-icon-btn" onclick="window.__mepedeStore.toggleHelpMenu()" title="Ajuda, Tour e Demo">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            <button class="header-icon-btn" onclick="window.__mepedeStore.toggleHelpMenu()" title="Ajuda, Tour e Suporte">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                <path d="M12 7.5a2 2 0 0 1 2 2c0 1.2-1.5 1.5-1.5 2.5"></path>
+                <line x1="12" y1="15" x2="12.01" y2="15" stroke-width="2.5"></line>
+              </svg>
             </button>
 
             ${S.helpMenuOpen ? `
