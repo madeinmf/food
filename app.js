@@ -203,12 +203,13 @@
 
     return {
       store: {
-        name: "Me pede ai Burguer's",
+        name: 'Saborê Hamburgueria',
         open: true,
         eta: '35-45 min',
         fee: 0,
         min: 60,
-        slug: 'mepedeburguers'
+        slug: 'cardapiosaborehamburgueria',
+        plan: 'Plano PRO'
       },
       menus,
       categories,
@@ -220,12 +221,13 @@
   function emptyData() {
     return {
       store: {
-        name: "Me pede ai Burguer's",
+        name: 'Saborê Hamburgueria',
         open: true,
         eta: '35-45 min',
         fee: 0,
         min: 60,
-        slug: 'mepedeburguers'
+        slug: 'cardapiosaborehamburgueria',
+        plan: 'Plano PRO'
       },
       menus: [],
       categories: [],
@@ -334,7 +336,21 @@
       // Sempre que acessar o link, inicia direto no tour guiado com dados limpos!
       this.data = emptyData();
       try { localStorage.removeItem(LS_KEY); } catch (e) {}
-      this.tab = 'menu'; // 'menu' | 'groups' | 'settings'
+      this.tab = 'menu'; // 'dashboard' | 'orders' | 'menu' | 'reports' | 'finance' | 'settings' | 'groups'
+      this.menuSubTab = 'catalog'; // 'catalog' | 'groups' | 'settings'
+      this.reportSub = 'clients'; // 'general' | 'clients' | 'catalog' | 'discounts' | 'compare'
+      this.reportTab = 'analysis'; // 'analysis' | 'base'
+      this.sidebarMenuExpanded = true;
+      this.sidebarReportsExpanded = true;
+      this.profilePopoverOpen = false;
+      this.dashboardMode = 'auto'; // 'auto' | 'onboarding' | 'active'
+      this.demoOrders = [
+        { id: '31231321', item: 'Box - Burguer Salada + Coca-cola Zero', img: 'assets/burger.png', customer: 'Henrique Lazarin Juema', qty: 2, address: 'Zona 05', deliveryFee: 5, total: 64.9, status: 'novo' },
+        { id: '31231322', item: 'Box - Burguer Salada + Coca-cola Zero', img: 'assets/burger.png', customer: 'Victor Cardoso Capivara', qty: 1, address: 'Zona 05', deliveryFee: 5, total: 64.9, status: 'preparando' },
+        { id: '31231323', item: 'Box - Burguer Salada + Coca-cola Zero', img: 'assets/burger.png', customer: 'Enzo Helicóptero', qty: 1, address: 'Zona 03', deliveryFee: 5, total: 64.9, status: 'pronto' },
+        { id: '31231324', item: 'Box - Burguer Salada + Coca-cola Zero', img: 'assets/burger.png', customer: 'Enzo Helicóptero', qty: 3, address: 'Zona 05', deliveryFee: 0, total: 64.9, status: 'entrega' }
+      ];
+
       this.menuId = null;
       this.selCat = 'all';
       this.search = '';
@@ -374,6 +390,35 @@
       this.listeners = [];
     }
 
+    toggleStoreOpen() {
+      this.data.store.open = !this.data.store.open;
+      this.setToast(this.data.store.open ? 'Loja aberta com sucesso!' : 'Loja fechada.');
+      if (this.tutorialStep === 1) this.nextTutorial();
+      this.notify();
+    }
+
+    toggleProfilePopover() {
+      this.profilePopoverOpen = !this.profilePopoverOpen;
+      this.notify();
+    }
+
+    setTab(t, sub) {
+      this.tab = t;
+      if (t === 'menu' && sub) this.menuSubTab = sub;
+      if (t === 'reports' && sub) this.reportSub = sub;
+      this.profilePopoverOpen = false;
+      this.notify();
+    }
+
+    acceptOrder(id) {
+      const o = this.demoOrders.find(x => x.id === id);
+      if (o) {
+        o.status = 'preparando';
+        this.setToast('Pedido #' + id + ' aceito com sucesso! Movido para preparo.');
+        this.notify();
+      }
+    }
+
     openDocModal() {
       this.docModalOpen = true;
       this.notify();
@@ -391,6 +436,7 @@
       this.tutorialStep = 1;
       this.showTutorialCard = false;
       this.tab = 'menu';
+      this.menuSubTab = 'catalog';
       this.drawer = null;
       this.menuId = this.data.menus[0] ? this.data.menus[0].id : null;
       this.selCat = 'all';
@@ -413,6 +459,7 @@
       this.tutorialStep = null;
       this.showTutorialCard = false;
       this.tab = 'menu';
+      this.menuSubTab = 'catalog';
       this.drawer = null;
       this.menuId = this.data.menus[0] ? this.data.menus[0].id : null;
       this.selCat = 'all';
@@ -435,6 +482,7 @@
       this.tutorialStep = 1;
       this.showTutorialCard = false;
       this.tab = 'menu';
+      this.menuSubTab = 'catalog';
       this.drawer = null;
       this.menuId = null;
       this.selCat = 'all';
@@ -1227,6 +1275,570 @@
   window.__mepedeStore = store;
   window.store = store;
 
+  // Helpers de Renderização do Novo Padrão de Design
+  function renderSaboreLogoSvg(size = 32) {
+    return `
+      <svg width="${size}" height="${size}" viewBox="0 0 100 100" style="border-radius:50%; flex:none; display:block">
+        <circle cx="50" cy="50" r="48" fill="#FFF6F0" stroke="#FF6100" stroke-width="3"/>
+        <path d="M26 44 C26 28, 74 28, 74 44 Z" fill="#FF6100"/>
+        <circle cx="42" cy="36" r="1.8" fill="#fff"/>
+        <circle cx="52" cy="34" r="1.8" fill="#fff"/>
+        <circle cx="60" cy="38" r="1.8" fill="#fff"/>
+        <path d="M22 47 Q35 44 50 47 Q65 50 78 47" stroke="#00B368" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+        <rect x="25" y="52" width="50" height="8" rx="4" fill="#6B3410"/>
+        <polygon points="26,60 74,60 50,68" fill="#FFA500"/>
+        <rect x="28" y="66" width="44" height="8" rx="4" fill="#FF6100"/>
+        <path id="curveTop-${size}" d="M 18,50 A 32,32 0 0,1 82,50" fill="none"/>
+        <text font-family="'Poppins', sans-serif" font-size="8.5" font-weight="800" fill="#FF6100">
+          <textPath href="#curveTop-${size}" startOffset="50%" text-anchor="middle">SABORÊ</textPath>
+        </text>
+        <path id="curveBot-${size}" d="M 82,50 A 32,32 0 0,1 18,50" fill="none"/>
+        <text font-family="'Poppins', sans-serif" font-size="6.2" font-weight="700" fill="#FF6100" letter-spacing="0.5">
+          <textPath href="#curveBot-${size}" startOffset="50%" text-anchor="middle">HAMBURGUERIA</textPath>
+        </text>
+      </svg>
+    `;
+  }
+
+  function renderEmptyOrdersSvg() {
+    return `
+      <svg width="130" height="130" viewBox="0 0 160 160" fill="none" style="margin:0 auto; display:block">
+        <rect x="80" y="22" width="54" height="96" rx="12" fill="#FF833A"/>
+        <rect x="85" y="30" width="44" height="80" rx="8" fill="#FFFFFF"/>
+        <circle cx="107" cy="26" r="2.5" fill="#E85700"/>
+        <path d="M12 110 L68 96 L82 106 L60 122 Z" fill="#FADBC8"/>
+        <path d="M46 64 C46 48, 72 48, 72 64" stroke="#E85700" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M32 66 L86 66 L80 136 L38 136 Z" fill="#FF6100"/>
+        <path d="M32 66 L46 80 L72 80 L86 66 Z" fill="#E85700"/>
+        <path d="M78 66 L86 66 L80 136 L72 136 Z" fill="#D94F00"/>
+      </svg>
+    `;
+  }
+
+  function renderSparklineSvg() {
+    return `
+      <div style="position:relative; width:100%; height:130px; margin-top:14px">
+        <svg width="100%" height="100%" viewBox="0 0 600 120" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#FF6100" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="#FF6100" stop-opacity="0.0"/>
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="100" x2="600" y2="100" stroke="#F1F2F5" stroke-width="1"/>
+          <line x1="0" y1="60" x2="600" y2="60" stroke="#F1F2F5" stroke-width="1" stroke-dasharray="4 4"/>
+          <line x1="0" y1="20" x2="600" y2="20" stroke="#F1F2F5" stroke-width="1" stroke-dasharray="4 4"/>
+          <path d="M 0 85 C 60 85, 90 70, 150 72 C 210 74, 230 92, 290 85 C 330 60, 360 48, 410 46 L 410 100 L 0 100 Z" fill="url(#sparkGrad)"/>
+          <path d="M 0 85 C 60 85, 90 70, 150 72 C 210 74, 230 92, 290 85 C 330 60, 360 48, 410 46" fill="none" stroke="#FF6100" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="410" cy="46" r="4.5" fill="#FF6100" stroke="#fff" stroke-width="2"/>
+          <line x1="410" y1="46" x2="410" y2="100" stroke="#FF6100" stroke-width="1" stroke-dasharray="2 2"/>
+        </svg>
+        <div style="display:flex; justify-content:space-between; font-size:11px; color:#8A91A0; margin-top:4px">
+          <span>00:00</span>
+          <span style="color:#FF6100; font-weight:700">Now, 12:00</span>
+          <span>23:59</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderDonutSvg(percent = 0, centerText = '-') {
+    return `
+      <div style="position:relative; width:130px; height:130px; margin:0 auto">
+        <svg width="130" height="130" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="#F1F3F6" stroke-width="14"/>
+          ${percent > 0 ? `
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#FF6100" stroke-width="14" stroke-dasharray="${percent * 2.39} 239" stroke-dashoffset="60" stroke-linecap="round"/>
+          ` : ''}
+        </svg>
+        <div style="position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center">
+          <span style="font-size:17px; font-weight:700; color:#14171F">${centerText}</span>
+          <span style="font-size:10.5px; color:#8A91A0">pedidos</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderDashboardHtml(S, data) {
+    const isMockData = S.dashboardMode === 'active' || (S.dashboardMode === 'auto' && data.products.length > 0);
+
+    return `
+      <div style="display:flex; flex-direction:column; gap:24px; padding-bottom:40px">
+        <!-- Dashboard Top Switcher -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px">
+          <div>
+            <h1 style="font-size:22px; font-weight:700; color:#14171F; margin:0">
+              ${isMockData ? 'Hoje' : 'Primeiros passos'}
+            </h1>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px">
+            <span style="font-size:12px; color:var(--gray-500)">Visualização:</span>
+            <div style="display:flex; background:#F1F2F5; padding:3px; border-radius:10px">
+              <button type="button" onclick="window.__mepedeStore.dashboardMode = 'onboarding'; window.__mepedeStore.notify()" style="padding:5px 12px; border-radius:8px; border:none; font-size:12px; font-weight:600; cursor:pointer; background:${!isMockData ? '#fff' : 'transparent'}; color:${!isMockData ? '#FF6100' : '#6B7280'}; box-shadow:${!isMockData ? '0 1px 3px rgba(0,0,0,0.06)' : 'none'}">
+                Onboarding
+              </button>
+              <button type="button" onclick="window.__mepedeStore.dashboardMode = 'active'; window.__mepedeStore.notify()" style="padding:5px 12px; border-radius:8px; border:none; font-size:12px; font-weight:600; cursor:pointer; background:${isMockData ? '#fff' : 'transparent'}; color:${isMockData ? '#FF6100' : '#6B7280'}; box-shadow:${isMockData ? '0 1px 3px rgba(0,0,0,0.06)' : 'none'}">
+                Métricas Reais
+              </button>
+            </div>
+          </div>
+        </div>
+
+        ${!isMockData ? `
+          <!-- ONBOARDING FLOW (Dashboard - Onboarding.png) -->
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:16px; padding:22px 24px">
+            <div style="font-size:15px; font-weight:600; color:#14171F; margin-bottom:16px">
+              Complete pra começar a receber pedidos
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:12px">
+              <!-- Step 1: Criar sua conta -->
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#EAF7EE; border:1px solid #C6EBD4; border-radius:12px">
+                <div style="display:flex; align-items:center; gap:12px">
+                  <div style="width:24px; height:24px; border-radius:12px; background:#00B368; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold">✓</div>
+                  <span style="font-size:13.5px; font-weight:600; color:#0A5C36">Criar sua conta</span>
+                </div>
+                <span style="font-size:12px; font-weight:700; color:#00B368">Feito</span>
+              </div>
+
+              <!-- Step 2: Monte o seu cardápio -->
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#FFF9F5; border:1.5px solid #FF6100; border-radius:12px">
+                <div style="display:flex; align-items:center; gap:12px">
+                  <span style="font-size:22px">🖼</span>
+                  <div>
+                    <div style="font-size:14px; font-weight:700; color:#14171F">Monte o seu cardápio</div>
+                    <div style="font-size:12px; color:var(--gray-500); margin-top:1px">Adicione pelo menos 1 produto pra começar</div>
+                  </div>
+                </div>
+                <button type="button" class="btn-orange" onclick="window.__mepedeStore.setTab('menu', 'catalog')" style="height:38px; padding:0 20px; font-size:13px; font-weight:700">
+                  Começar
+                </button>
+              </div>
+
+              <!-- Step 3: Configure a entrega -->
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#FAFBFC; border:1px solid #ECEEF2; border-radius:12px; opacity:0.85">
+                <div style="display:flex; align-items:center; gap:12px">
+                  <span style="font-size:22px; filter:grayscale(1)">🛵</span>
+                  <div>
+                    <div style="font-size:14px; font-weight:600; color:var(--gray-500)">Configure a entrega</div>
+                    <div style="font-size:12px; color:var(--gray-400); margin-top:1px">Bairros que você atende, taxa e tempo</div>
+                  </div>
+                </div>
+                <span style="font-size:12px; color:var(--gray-400)">Em breve</span>
+              </div>
+
+              <!-- Step 4: Ative os pagamentos -->
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:14px 16px; background:#FAFBFC; border:1px solid #ECEEF2; border-radius:12px; opacity:0.85">
+                <div style="display:flex; align-items:center; gap:12px">
+                  <span style="font-size:22px; filter:grayscale(1)">💳</span>
+                  <div>
+                    <div style="font-size:14px; font-weight:600; color:var(--gray-500)">Ative os pagamentos</div>
+                    <div style="font-size:12px; color:var(--gray-400); margin-top:1px">Conecte pra receber PIX e cartão direto na conta</div>
+                  </div>
+                </div>
+                <span style="font-size:12px; color:var(--gray-400)">Em breve</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Últimos Pedidos Empty Card -->
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:16px; padding:44px 24px; text-align:center">
+            <div style="font-size:15px; font-weight:700; color:#14171F; text-align:left; margin-bottom:16px">Últimos Pedidos</div>
+            ${renderEmptyOrdersSvg()}
+            <div style="font-size:17px; font-weight:700; color:#14171F; margin-top:16px">Nenhum pedido ainda</div>
+            <div style="font-size:13px; color:var(--gray-500); max-width:440px; margin:6px auto 0; line-height:1.5">
+              Quando o primeiro pedido chegar, ele aparece aqui em tempo real, com alerta sonoro.
+            </div>
+          </div>
+        ` : `
+          <!-- ACTIVE DASHBOARD (Dashboard - Profile.png) -->
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:16px; padding:22px 24px; display:flex; flex-wrap:wrap; gap:24px">
+            <!-- Left Chart Area -->
+            <div style="flex:2; min-width:320px">
+              <div style="display:flex; align-items:baseline; justify-content:space-between">
+                <div>
+                  <div style="display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:var(--gray-700)">
+                    <span>Faturamento</span>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                  </div>
+                  <div style="font-size:26px; font-weight:800; color:#14171F; margin-top:4px">R$ 15.452,25</div>
+                  <div style="font-size:11px; color:var(--gray-400); margin-top:2px">12:00</div>
+                </div>
+                <div style="text-align:right">
+                  <div style="font-size:12px; color:var(--gray-500)">Ontem ⌵</div>
+                  <div style="font-size:15px; font-weight:600; color:var(--gray-700); margin-top:4px">R$ 31.253,61</div>
+                </div>
+              </div>
+              ${renderSparklineSvg()}
+            </div>
+
+            <!-- Right Vertical KPI Cards -->
+            <div style="flex:1; min-width:240px; display:flex; flex-direction:column; gap:12px; justify-content:center; border-left:1px solid #F1F2F5; padding-left:20px">
+              <div style="background:#FAFBFD; border:1px solid #ECEEF2; border-radius:12px; padding:14px 16px">
+                <div style="font-size:12px; color:var(--gray-500); font-weight:500">À Caminho</div>
+                <div style="font-size:18px; font-weight:800; color:#14171F; margin-top:4px">R$ 13.520,00</div>
+                <div style="font-size:10.5px; color:#00B368; margin-top:4px; font-weight:600">● Atualizado agora</div>
+              </div>
+              <div style="background:#FAFBFD; border:1px solid #ECEEF2; border-radius:12px; padding:14px 16px">
+                <div style="font-size:12px; color:var(--gray-500); font-weight:500">A Receber</div>
+                <div style="font-size:18px; font-weight:800; color:#14171F; margin-top:4px">R$ 114.300,00</div>
+                <div style="font-size:10.5px; color:var(--gray-400); margin-top:4px">Disponível em 2 dias</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Últimos Pedidos Table (Dashboard - Profile.png) -->
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:16px; padding:22px 24px">
+            <div style="font-size:16px; font-weight:700; color:#14171F; margin-bottom:16px">Últimos Pedidos</div>
+            <div style="overflow-x:auto">
+              <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13px">
+                <thead>
+                  <tr style="border-bottom:1px solid #ECEEF2; color:var(--gray-400); font-size:11.5px; font-weight:600">
+                    <th style="padding:10px 12px">ITEM</th>
+                    <th style="padding:10px 12px">CLIENTE</th>
+                    <th style="padding:10px 12px">ENDEREÇO</th>
+                    <th style="padding:10px 12px">ENTREGA</th>
+                    <th style="padding:10px 12px">TOTAL</th>
+                    <th style="padding:10px 12px; text-align:center">STATUS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${S.demoOrders.map(o => `
+                    <tr style="border-bottom:1px solid #F6F7F9">
+                      <td style="padding:12px; display:flex; align-items:center; gap:10px">
+                        <img src="${o.img}" alt="" style="width:38px; height:38px; border-radius:8px; object-fit:cover">
+                        <div>
+                          <div style="font-weight:600; color:#14171F">${o.item}</div>
+                          <div style="font-size:11px; color:var(--gray-400)">Pedido #${o.id}</div>
+                        </div>
+                      </td>
+                      <td style="padding:12px">
+                        <div style="font-weight:600; color:#14171F">${o.customer}</div>
+                        <div style="font-size:11px; color:var(--gray-400)">${o.qty} ${o.qty === 1 ? 'item' : 'itens'}</div>
+                      </td>
+                      <td style="padding:12px; color:var(--gray-700)">${o.address}</td>
+                      <td style="padding:12px; font-weight:600; color:${o.deliveryFee > 0 ? '#14171F' : '#00B368'}">
+                        ${o.deliveryFee > 0 ? 'R$' + o.deliveryFee.toFixed(2).replace('.', ',') : 'Grátis'}
+                      </td>
+                      <td style="padding:12px; font-weight:700; color:#14171F">R$ ${o.total.toFixed(2).replace('.', ',')}</td>
+                      <td style="padding:12px; text-align:center">
+                        ${o.status === 'novo' ? `
+                          <button type="button" class="btn-orange" onclick="window.__mepedeStore.acceptOrder('${o.id}')" style="height:32px; padding:0 16px; border-radius:8px; font-size:12px; font-weight:700">
+                            Aceitar
+                          </button>
+                        ` : o.status === 'preparando' ? `
+                          <span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:12px; background:#EFF6FF; color:#2563EB; font-size:11.5px; font-weight:600">
+                            ● Preparando
+                          </span>
+                        ` : o.status === 'pronto' ? `
+                          <span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:12px; background:#F5F3FF; color:#7C3AED; font-size:11.5px; font-weight:600">
+                            ● Pronto
+                          </span>
+                        ` : `
+                          <span style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:12px; background:#F0FDFA; color:#0D9488; font-size:11.5px; font-weight:600">
+                            ● A caminho
+                          </span>
+                        `}
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+            <div style="text-align:center; margin-top:14px">
+              <a href="#" onclick="event.preventDefault(); window.__mepedeStore.setTab('orders')" style="font-size:13px; font-weight:600; color:#FF6100; text-decoration:none">
+                Ver todos os pedidos →
+              </a>
+            </div>
+          </div>
+        `}
+
+        <!-- 3 KPI Cards Row -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px">
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:14px; padding:18px 20px">
+            <div style="font-size:12px; color:var(--gray-500); display:flex; align-items:center; gap:4px">
+              <span>Ticket médio</span>
+              <span style="color:var(--gray-400)">ℹ</span>
+            </div>
+            <div style="font-size:24px; font-weight:800; color:#14171F; margin-top:8px">${isMockData ? 'R$ 67,40' : '-'}</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:14px; padding:18px 20px">
+            <div style="font-size:12px; color:var(--gray-500); display:flex; align-items:center; gap:4px">
+              <span>Horário de pico</span>
+              <span style="color:var(--gray-400)">ℹ</span>
+            </div>
+            <div style="font-size:24px; font-weight:800; color:#14171F; margin-top:8px">${isMockData ? '20h às 22h' : '-'}</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:14px; padding:18px 20px">
+            <div style="font-size:12px; color:var(--gray-500); display:flex; align-items:center; gap:4px">
+              <span>${isMockData ? 'Pedidos médio semanal' : 'Tempo média de entrega'}</span>
+              <span style="color:var(--gray-400)">ℹ</span>
+            </div>
+            <div style="font-size:24px; font-weight:800; color:#14171F; margin-top:8px">${isMockData ? '400' : '-'}</div>
+          </div>
+        </div>
+
+        <!-- Row with Formas de Pagamento Donut & Level Card -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px">
+          <!-- Member Level Card -->
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:14px; padding:20px">
+            <div style="font-size:13.5px; font-weight:700; color:#14171F">Você está no nível: Member</div>
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-top:14px">
+              <span style="font-size:22px; font-weight:800; color:#14171F">${isMockData ? 'R$ 15.452,25' : 'R$ 00,00'}</span>
+              <span style="font-size:13px; font-weight:700; color:#FF6100">${isMockData ? '15%' : '0%'}</span>
+            </div>
+            <div style="height:6px; background:#F1F2F5; border-radius:3px; margin-top:8px; overflow:hidden">
+              <div style="height:100%; width:${isMockData ? '15%' : '0%'}; background:#FF6100; border-radius:3px"></div>
+            </div>
+            <div style="font-size:11px; color:var(--gray-400); text-align:right; margin-top:6px">
+              Próximo nível R$100.000,00
+            </div>
+          </div>
+
+          <!-- Formas de Pagamento Donut -->
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:14px; padding:20px; display:flex; flex-direction:column; justify-content:space-between">
+            <div style="display:flex; justify-content:space-between; align-items:center">
+              <div style="font-size:13.5px; font-weight:700; color:#14171F">Formas de pagamento</div>
+              <div style="font-size:11px; color:var(--gray-400)">Últimos 30 dias</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:20px; margin-top:14px">
+              ${renderDonutSvg(isMockData ? 65 : 0, isMockData ? '24' : '-')}
+              <div style="display:flex; flex-direction:column; gap:6px; font-size:11.5px; color:var(--gray-500)">
+                <div><span style="color:#00B368">●</span> PIX ${isMockData ? '58%' : '-'}</div>
+                <div><span style="color:#2563EB">●</span> Cartão ${isMockData ? '32%' : '-'}</div>
+                <div><span style="color:#FF6100">●</span> Carteiras ${isMockData ? '6%' : '-'}</div>
+                <div><span style="color:#14171F">●</span> Dinheiro ${isMockData ? '4%' : '-'}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderReportsHtml(S, data) {
+    return `
+      <div style="display:flex; flex-direction:column; gap:20px; padding-bottom:40px">
+        <!-- Sub Tabs (Análise / Base de Clientes) -->
+        <div style="display:flex; border-bottom:1px solid #ECEEF2; gap:28px">
+          <button type="button" onclick="window.__mepedeStore.reportTab = 'analysis'; window.__mepedeStore.notify()" style="border:none; background:transparent; font-size:14px; font-weight:${S.reportTab === 'analysis' ? '700' : '500'}; color:${S.reportTab === 'analysis' ? '#FF6100' : 'var(--gray-500)'}; padding:10px 0; border-bottom:${S.reportTab === 'analysis' ? '2.5px solid #FF6100' : 'none'}; cursor:pointer; font-family:inherit">
+            Análise
+          </button>
+          <button type="button" onclick="window.__mepedeStore.reportTab = 'base'; window.__mepedeStore.notify()" style="border:none; background:transparent; font-size:14px; font-weight:${S.reportTab === 'base' ? '700' : '500'}; color:${S.reportTab === 'base' ? '#FF6100' : 'var(--gray-500)'}; padding:10px 0; border-bottom:${S.reportTab === 'base' ? '2.5px solid #FF6100' : 'none'}; cursor:pointer; font-family:inherit">
+            Base de Clientes
+          </button>
+        </div>
+
+        <!-- Period Filter Bar (Clientes ✅.png) -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
+            <select style="height:36px; padding:0 12px; border:1px solid var(--gray-200); border-radius:8px; font-size:13px; background:#fff; color:var(--dark); outline:none; cursor:pointer">
+              <option>Últimos 30 dias</option>
+              <option>Últimos 7 dias</option>
+              <option>Últimos 90 dias</option>
+              <option>Este ano</option>
+            </select>
+            <div style="display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 12px; border:1px solid var(--gray-200); border-radius:8px; background:#fff; font-size:12.5px; color:var(--gray-700)">
+              <span>📅</span>
+              <span>1 Ago 2025 - 1 Ago 2026</span>
+            </div>
+            <span style="font-size:12px; color:var(--gray-400)">comparado com</span>
+            <select style="height:36px; padding:0 12px; border:1px solid var(--gray-200); border-radius:8px; font-size:13px; background:#fff; color:var(--dark); outline:none; cursor:pointer">
+              <option>Período anterior</option>
+              <option>Mesmo período ano passado</option>
+            </select>
+          </div>
+          <button type="button" onclick="window.__mepedeStore.setToast('Exportando relatório em CSV...')" style="display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 14px; border:1px solid var(--gray-200); border-radius:8px; background:#fff; font-size:13px; font-weight:500; color:var(--gray-700); cursor:pointer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <span>Exportar</span>
+          </button>
+        </div>
+
+        <!-- 4 KPI Cards (Clientes ✅.png) -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px">
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:12px; padding:18px">
+            <div style="display:flex; align-items:center; gap:5px; font-size:12px; color:var(--gray-500); font-weight:500">
+              <span>Taxa de conversão</span>
+              <span style="color:var(--gray-400)">ℹ</span>
+            </div>
+            <div style="font-size:22px; font-weight:800; color:#14171F; margin-top:8px">-</div>
+            <div style="font-size:11px; color:var(--gray-400); margin-top:4px">Período anterior: -</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:12px; padding:18px">
+            <div style="display:flex; align-items:center; gap:5px; font-size:12px; color:var(--gray-500); font-weight:500">
+              <span>Pedidos por cliente</span>
+              <span style="color:var(--gray-400)">ℹ</span>
+            </div>
+            <div style="font-size:22px; font-weight:800; color:#14171F; margin-top:8px">-</div>
+            <div style="font-size:11px; color:var(--gray-400); margin-top:4px">Período anterior: -</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:12px; padding:18px">
+            <div style="display:flex; align-items:center; gap:5px; font-size:12px; color:var(--gray-500); font-weight:500">
+              <span>Taxa de fidelidade</span>
+              <span style="color:var(--gray-400)">ℹ</span>
+            </div>
+            <div style="font-size:22px; font-weight:800; color:#14171F; margin-top:8px">-</div>
+            <div style="font-size:11px; color:var(--gray-400); margin-top:4px">Período anterior: -</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:12px; padding:18px">
+            <div style="display:flex; align-items:center; gap:5px; font-size:12px; color:var(--gray-500); font-weight:500">
+              <span>Novos clientes</span>
+              <span style="color:var(--gray-400)">ℹ</span>
+            </div>
+            <div style="font-size:22px; font-weight:800; color:#14171F; margin-top:8px">-</div>
+            <div style="font-size:11px; color:var(--gray-400); margin-top:4px">Período anterior: -</div>
+          </div>
+        </div>
+
+        <!-- Pedidos por Tipo de Cliente (Clientes ✅.png) -->
+        <div style="background:#fff; border:1px solid #ECEEF2; border-radius:14px; padding:22px">
+          <div style="font-size:14.5px; font-weight:700; color:#14171F; margin-bottom:18px">Pedidos por tipo de cliente</div>
+          <div style="display:flex; align-items:center; flex-wrap:wrap; gap:32px">
+            <div style="flex:1; min-width:200px; text-align:center">
+              ${renderDonutSvg(0, '-')}
+            </div>
+            <div style="flex:2; min-width:300px">
+              <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left">
+                <thead>
+                  <tr style="border-bottom:1px solid #F1F2F5; color:var(--gray-400); font-size:11.5px">
+                    <th style="padding:8px">Tipo de cliente</th>
+                    <th style="padding:8px">Faturamento</th>
+                    <th style="padding:8px">Pedidos</th>
+                    <th style="padding:8px">Ticket médio</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="border-bottom:1px solid #FAFBFC">
+                    <td style="padding:10px 8px; color:var(--gray-700)">● Recorrentes</td>
+                    <td style="padding:10px 8px; color:var(--gray-400)">-</td>
+                    <td style="padding:10px 8px; color:var(--gray-400)">-</td>
+                    <td style="padding:10px 8px; color:var(--gray-400)">-</td>
+                  </tr>
+                  <tr style="border-bottom:1px solid #FAFBFC">
+                    <td style="padding:10px 8px; color:var(--gray-700)">● Novos</td>
+                    <td style="padding:10px 8px; color:var(--gray-400)">-</td>
+                    <td style="padding:10px 8px; color:var(--gray-400)">-</td>
+                    <td style="padding:10px 8px; color:var(--gray-400)">-</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:10px 8px; color:var(--gray-700)">● Sem identificação</td>
+                    <td style="padding:10px 8px; color:var(--gray-400)">-</td>
+                    <td style="padding:10px 8px; color:var(--gray-400)">-</td>
+                    <td style="padding:10px 8px; color:var(--gray-400)">-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visitantes do Cardápio (Clientes ✅.png) -->
+        <div style="background:#fff; border:1px solid #ECEEF2; border-radius:14px; padding:22px">
+          <div style="font-size:14.5px; font-weight:700; color:#14171F">Visitantes do Cardápio</div>
+          <div style="font-size:32px; font-weight:800; color:#14171F; margin-top:8px">0</div>
+          <div style="display:flex; align-items:center; gap:16px; font-size:11.5px; color:var(--gray-500); margin-top:8px">
+            <div><span style="color:#FF6100">●</span> Período Atual</div>
+            <div><span style="color:#9CA3AF">●</span> Período anterior</div>
+          </div>
+          <!-- Grid chart representation -->
+          <div style="position:relative; height:180px; margin-top:20px; border-left:1px solid #ECEEF2; border-bottom:1px solid #ECEEF2; padding-left:10px">
+            ${[500, 400, 300, 200, 100, 0].map((v, i) => `
+              <div style="position:absolute; left:0; right:0; top:${i * 28}px; border-top:1px dashed #F1F2F5; display:flex; align-items:center">
+                <span style="position:absolute; left:-36px; font-size:10.5px; color:#8A91A0">${v}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderOrdersHtml(S, data) {
+    return `
+      <div style="display:flex; flex-direction:column; gap:20px; padding-bottom:40px">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <h2 style="font-size:18px; font-weight:700; color:#14171F; margin:0">Gerenciador de Pedidos</h2>
+          <span style="font-size:12px; color:var(--gray-500)">Tempo real · Alerta sonoro ativo</span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px">
+          <!-- Novos -->
+          <div style="background:#FAFBFD; border:1px solid #ECEEF2; border-radius:14px; padding:16px">
+            <div style="font-size:13px; font-weight:700; color:#FF6100; margin-bottom:12px">NOVOS PEDIDOS (${S.demoOrders.filter(o => o.status === 'novo').length})</div>
+            ${S.demoOrders.filter(o => o.status === 'novo').map(o => `
+              <div style="background:#fff; border:1px solid #ECEEF2; border-radius:12px; padding:14px; margin-bottom:10px; box-shadow:0 2px 6px rgba(0,0,0,0.02)">
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--gray-400)">
+                  <span>Pedido #${o.id}</span>
+                  <span>12:04</span>
+                </div>
+                <div style="font-weight:700; color:#14171F; margin-top:6px">${o.customer}</div>
+                <div style="font-size:12px; color:var(--gray-700); margin-top:4px">${o.item} (${o.qty}x)</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px">
+                  <span style="font-weight:700; color:#14171F">R$ ${o.total.toFixed(2).replace('.', ',')}</span>
+                  <button type="button" class="btn-orange" onclick="window.__mepedeStore.acceptOrder('${o.id}')" style="height:32px; padding:0 14px; font-size:12px; border-radius:8px">Aceitar</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Em Preparo -->
+          <div style="background:#FAFBFD; border:1px solid #ECEEF2; border-radius:14px; padding:16px">
+            <div style="font-size:13px; font-weight:700; color:#2563EB; margin-bottom:12px">EM PREPARO (${S.demoOrders.filter(o => o.status === 'preparando').length})</div>
+            ${S.demoOrders.filter(o => o.status === 'preparando').map(o => `
+              <div style="background:#fff; border:1px solid #ECEEF2; border-radius:12px; padding:14px; margin-bottom:10px">
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--gray-400)">
+                  <span>Pedido #${o.id}</span>
+                  <span>Na chapa</span>
+                </div>
+                <div style="font-weight:700; color:#14171F; margin-top:6px">${o.customer}</div>
+                <div style="font-size:12px; color:var(--gray-700); margin-top:4px">${o.item}</div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:12px">
+                  <span style="font-weight:700; color:#14171F">R$ ${o.total.toFixed(2).replace('.', ',')}</span>
+                  <button type="button" class="btn-outline" onclick="o.status='pronto'; window.__mepedeStore.notify()" style="height:32px; padding:0 12px; font-size:12px; border-radius:8px">Marcar Pronto</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Prontos / Entrega -->
+          <div style="background:#FAFBFD; border:1px solid #ECEEF2; border-radius:14px; padding:16px">
+            <div style="font-size:13px; font-weight:700; color:#00B368; margin-bottom:12px">PRONTO / ENTREGA (${S.demoOrders.filter(o => o.status === 'pronto' || o.status === 'entrega').length})</div>
+            ${S.demoOrders.filter(o => o.status === 'pronto' || o.status === 'entrega').map(o => `
+              <div style="background:#fff; border:1px solid #ECEEF2; border-radius:12px; padding:14px; margin-bottom:10px">
+                <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--gray-400)">
+                  <span>Pedido #${o.id}</span>
+                  <span style="color:#00B368; font-weight:600">${o.status === 'pronto' ? 'Pronto p/ retirada' : 'Saiu para entrega'}</span>
+                </div>
+                <div style="font-weight:700; color:#14171F; margin-top:6px">${o.customer}</div>
+                <div style="font-size:12px; color:var(--gray-700); margin-top:4px">${o.item}</div>
+                <div style="margin-top:10px; font-weight:700; color:#14171F">R$ ${o.total.toFixed(2).replace('.', ',')}</div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderFinanceHtml(S, data) {
+    return `
+      <div style="display:flex; flex-direction:column; gap:20px; padding-bottom:40px">
+        <h2 style="font-size:18px; font-weight:700; color:#14171F; margin:0">Financeiro & Extrato</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:16px">
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:14px; padding:20px">
+            <div style="font-size:12px; color:var(--gray-500)">Saldo Disponível</div>
+            <div style="font-size:24px; font-weight:800; color:#00B368; margin-top:6px">R$ 13.520,00</div>
+            <div style="font-size:11px; color:var(--gray-400); margin-top:4px">Liberado para transferência via PIX</div>
+          </div>
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:14px; padding:20px">
+            <div style="font-size:12px; color:var(--gray-500)">A Receber (Cartão / Parcelado)</div>
+            <div style="font-size:24px; font-weight:800; color:#14171F; margin-top:6px">R$ 114.300,00</div>
+            <div style="font-size:11px; color:var(--gray-400); margin-top:4px">Previsão em até 30 dias</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   // Renderizador da Interface
   function render() {
     const activeEl = document.activeElement;
@@ -1275,87 +1887,290 @@
 
     const sidebarHtml = `
       <aside class="sidebar">
-        <div class="brand" style="padding: 0 4px; margin-bottom: 4px;">
-          <img src="assets/logo.png" alt="mepede.ai" style="height: 28px; max-width: 160px; object-fit: contain; display: block;">
-        </div>
-
-        <div class="store-status-card" style="background:${storeStatusBg}; border:1px solid ${storeStatusBorder}">
-          <div style="flex:1; min-width:0">
-            <div style="font-size:14px; font-weight:600; color:${storeStatusFg}">${data.store.open ? 'Loja aberta' : 'Loja fechada'}</div>
-            <div style="font-size:12px; color:var(--gray-500)">${data.store.open ? 'Recebendo pedidos' : 'Clientes só visualizam'}</div>
-          </div>
-          <div id="tut-store-toggle" class="toggle-switch" style="background:${storeSwitchBg}" onclick="window.__mepedeStore.mut(d => { d.store.open = !d.store.open; }, '${data.store.open ? 'Loja fechada' : 'Loja aberta'}'); if(window.__mepedeStore.tutorialStep === 1) window.__mepedeStore.nextTutorial();">
-            <div class="toggle-knob" style="left:${storeKnobLeft}"></div>
+        <!-- Logo -->
+        <div class="brand" style="padding:0 4px; margin-bottom:4px; display:flex; align-items:center; gap:8px">
+          <div style="font-size:22px; font-weight:700; color:#FF6100; letter-spacing:-0.5px; font-family:'Poppins', sans-serif">
+            mepede<span style="color:#14171F">.ai</span>
           </div>
         </div>
 
-        <div class="menu-label">MENU</div>
-        <div style="display:flex; flex-direction:column; gap:4px">
-          <div class="nav-item ${S.tab === 'menu' ? 'active' : ''}" onclick="window.__mepedeStore.tab='menu'; window.__mepedeStore.notify()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4Z"></path><path d="M8 9h8M8 13h6"></path></svg>
-            <span style="flex:1">Cardápio</span>
-            <span class="nav-badge">${data.products.length}</span>
+        <!-- Tenant Selector Card -->
+        <div class="tenant-selector-card" onclick="window.__mepedeStore.toggleProfilePopover()" title="Saborê Hamburgueria · Plano PRO">
+          <div class="tenant-avatar">
+            ${renderSaboreLogoSvg(32)}
           </div>
-          <div class="nav-item ${S.tab === 'groups' ? 'active' : ''}" onclick="window.__mepedeStore.tab='groups'; window.__mepedeStore.notify()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5Z"></path><path d="m3 13 9 5 9-5"></path></svg>
-            <span style="flex:1">Complementos</span>
-            <span class="nav-badge">${data.groups.length}</span>
+          <div class="tenant-info">
+            <div class="tenant-name">${data.store.name}</div>
+            <div class="tenant-plan">${data.store.plan || 'Plano PRO'}</div>
           </div>
-          <div class="nav-item ${S.tab === 'settings' ? 'active' : ''}" onclick="window.__mepedeStore.tab='settings'; window.__mepedeStore.notify()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>
-            <span style="flex:1">Loja e link</span>
+          <div style="color:#9CA3AF; font-size:12px; margin-left:2px">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></svg>
+          </div>
+        </div>
+
+        <!-- Navigation items -->
+        <div style="display:flex; flex-direction:column; gap:3px">
+          <!-- Dashboard -->
+          <div class="nav-item ${S.tab === 'dashboard' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('dashboard')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span style="flex:1">Dashboard</span>
+          </div>
+
+          <!-- Pedidos -->
+          <div class="nav-item ${S.tab === 'orders' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('orders')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 12h6M9 16h6"></path></svg>
+            <span style="flex:1">Pedidos</span>
+          </div>
+
+          <!-- Cardápio (Expandable) -->
+          <div>
+            <div class="nav-item ${S.tab === 'menu' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('menu', 'catalog'); window.__mepedeStore.sidebarMenuExpanded = !window.__mepedeStore.sidebarMenuExpanded; window.__mepedeStore.notify()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4Z"></path><path d="M8 9h8M8 13h6"></path></svg>
+              <span style="flex:1">Cardápio</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="transform:${S.sidebarMenuExpanded ? 'rotate(180deg)' : 'none'}; transition:transform .15s"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            ${S.sidebarMenuExpanded ? `
+              <div style="display:flex; flex-direction:column; gap:2px; margin-top:2px; margin-bottom:4px">
+                <div class="nav-subitem ${S.tab === 'menu' && (S.menuSubTab === 'catalog' || !S.menuSubTab) ? 'active' : ''}" onclick="window.__mepedeStore.setTab('menu', 'catalog')">
+                  <span>geral</span>
+                </div>
+                <div class="nav-subitem ${S.tab === 'menu' && S.menuSubTab === 'groups' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('menu', 'groups')">
+                  <span>complementos</span>
+                </div>
+                <div class="nav-subitem ${S.tab === 'menu' && S.menuSubTab === 'settings' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('menu', 'settings')">
+                  <span>loja e link</span>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Relatórios (Expandable - matches Clientes ✅.png) -->
+          <div>
+            <div class="nav-item ${S.tab === 'reports' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('reports', 'clients'); window.__mepedeStore.sidebarReportsExpanded = !window.__mepedeStore.sidebarReportsExpanded; window.__mepedeStore.notify()">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+              <span style="flex:1">Relatórios</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="transform:${S.sidebarReportsExpanded ? 'rotate(180deg)' : 'none'}; transition:transform .15s"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+            ${S.sidebarReportsExpanded ? `
+              <div style="display:flex; flex-direction:column; gap:2px; margin-top:2px; margin-bottom:4px">
+                <div class="nav-subitem ${S.tab === 'reports' && S.reportSub === 'general' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('reports', 'general')">
+                  <span style="font-size:11px">✧</span>
+                  <span>geral</span>
+                </div>
+                <div class="nav-subitem ${S.tab === 'reports' && S.reportSub === 'clients' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('reports', 'clients')">
+                  <span style="font-size:11px; color:#FF6100">✧</span>
+                  <span style="font-weight:600">clientes</span>
+                </div>
+                <div class="nav-subitem ${S.tab === 'reports' && S.reportSub === 'catalog' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('reports', 'catalog')">
+                  <span style="font-size:11px">✧</span>
+                  <span>catálogo</span>
+                </div>
+                <div class="nav-subitem ${S.tab === 'reports' && S.reportSub === 'discounts' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('reports', 'discounts')">
+                  <span style="font-size:11px">✧</span>
+                  <span>descontos</span>
+                </div>
+                <div class="nav-subitem ${S.tab === 'reports' && S.reportSub === 'compare' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('reports', 'compare')">
+                  <span style="font-size:11px">✧</span>
+                  <span>comparativo</span>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Financeiro -->
+          <div class="nav-item ${S.tab === 'finance' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('finance')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h10M7 16h6"/></svg>
+            <span style="flex:1">Financeiro</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+
+          <!-- Configurações -->
+          <div class="nav-item ${S.tab === 'settings' ? 'active' : ''}" onclick="window.__mepedeStore.setTab('settings')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            <span style="flex:1">Configurações</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
           </div>
         </div>
 
         <div style="flex:1"></div>
 
+        <!-- Bottom Link Box -->
+        <div style="margin-top:16px">
+          <div style="font-size:11px; font-weight:500; color:var(--gray-500); margin-bottom:4px">
+            ${data.store.open ? 'Link do Cardápio' : 'Seu link vai aparecer aqui'}
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; height:36px; padding:0 8px 0 10px; border:1px solid var(--gray-200); border-radius:8px; background:${data.store.open ? '#fff' : '#FAFBFC'}; font-size:12px; color:${data.store.open ? '#374151' : '#9CA3AF'}">
+            <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:160px">
+              ${data.store.open ? 'mepede.ai/' + (data.store.slug || '') : 'Assim que abrir a loja'}
+            </span>
+            <button type="button" onclick="navigator.clipboard.writeText('https://mepede.ai/' + (window.__mepedeStore.data.store.slug || '')); window.__mepedeStore.setToast('Link copiado!')" title="Copiar link" style="border:none; background:transparent; cursor:pointer; color:var(--gray-500); display:flex; align-items:center; padding:2px">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Member Tier -->
+        <div class="sidebar-member-badge">
+          <div style="display:flex; align-items:center; gap:8px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>Member</span>
+          </div>
+          <a href="#" onclick="event.preventDefault(); window.__mepedeStore.setToast('Nível Member ativo!')" style="font-size:11.5px; color:var(--gray-400); text-decoration:none">Ver</a>
+        </div>
+
+        <!-- User Profile -->
         <div class="user-profile">
-          <div class="user-avatar">EH</div>
-          <div style="min-width:0">
-            <div style="font-size:13px; font-weight:600">Enzo Hirrata</div>
-            <div style="font-size:11px; color:var(--gray-400); overflow:hidden; text-overflow:ellipsis">enzohirrata@gmail.com</div>
+          <div class="user-avatar" style="overflow:hidden">
+            <img src="assets/ref/perfil.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" style="width:100%; height:100%; object-fit:cover; display:block">
+            <span style="display:none; width:100%; height:100%; align-items:center; justify-content:center; font-weight:700">EH</span>
+          </div>
+          <div style="flex:1; min-width:0">
+            <div style="font-size:13px; font-weight:600; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis">Enzo Hirrata</div>
+            <div style="font-size:11px; color:var(--gray-400); white-space:nowrap; overflow:hidden; text-overflow:ellipsis">enzohirata@gmail.com</div>
+          </div>
+          <div style="color:var(--gray-400); cursor:pointer; font-size:16px; font-weight:bold; padding:2px 4px">
+            ···
           </div>
         </div>
       </aside>
     `;
 
-    // Header Principal
-    const pageKicker = S.tab === 'menu' ? (data.menus.length > 1 ? data.menus.length + ' cardápios · editando este' : data.menus.length === 1 ? 'Categorias e produtos' : 'Início') : S.tab === 'groups' ? 'Biblioteca de grupos' : 'Configurações do cardápio';
-    const pageTitle = S.tab === 'menu' ? (curMenu ? curMenu.name : 'Cardápios') : S.tab === 'groups' ? 'Complementos' : 'Loja e link';
+    // Header Principal (Padrão 100% fiel às imagens)
+    let pageTitle = 'Cardápio';
+    let breadcrumbText = '';
+    if (S.tab === 'dashboard') {
+      pageTitle = 'Dashboard';
+      breadcrumbText = '';
+    } else if (S.tab === 'orders') {
+      pageTitle = 'Pedidos';
+      breadcrumbText = 'Pedidos em tempo real';
+    } else if (S.tab === 'reports') {
+      pageTitle = 'Relatórios';
+      breadcrumbText = 'Relatórios / ' + (S.reportSub === 'clients' ? 'Clientes' : S.reportSub);
+    } else if (S.tab === 'finance') {
+      pageTitle = 'Financeiro';
+      breadcrumbText = 'Extrato e saldos';
+    } else if (S.tab === 'groups' || (S.tab === 'menu' && S.menuSubTab === 'groups')) {
+      pageTitle = 'Complementos';
+      breadcrumbText = 'Cardápio / Grupos de adicionais';
+    } else if (S.tab === 'settings' || (S.tab === 'menu' && S.menuSubTab === 'settings')) {
+      pageTitle = 'Loja e link';
+      breadcrumbText = 'Cardápio / Configurações da loja';
+    } else {
+      pageTitle = 'Cardápio';
+      breadcrumbText = curMenu ? curMenu.name + ' · Categorias e produtos' : 'Categorias e produtos';
+    }
 
     const headerHtml = `
-      <header class="top-header">
+      <header class="top-header" style="height:64px; padding:0 32px; display:flex; align-items:center; justify-content:space-between; background:#fff; border-bottom:1px solid var(--gray-100); position:relative">
         <div style="flex:1; min-width:200px">
-          <div style="font-size:12px; color:var(--gray-400)">${pageKicker}</div>
-          <div style="font-size:22px; font-weight:600; letter-spacing:-0.3px">${pageTitle}</div>
+          <div style="font-size:22px; font-weight:700; color:#14171F; letter-spacing:-0.3px">${pageTitle}</div>
+          ${breadcrumbText ? `
+            <div style="font-size:11.5px; color:var(--gray-400); display:flex; align-items:center; gap:5px; margin-top:2px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
+              <span>/</span>
+              <span>${breadcrumbText}</span>
+            </div>
+          ` : ''}
         </div>
-        <div style="display:flex; align-items:center; gap:8px; flex:none">
-          <button class="btn-outline" style="background:#FFF6F0; border-color:#FFB98C; color:#E85700; font-weight:600; display:flex; align-items:center; gap:6px" onclick="window.__mepedeStore.startTutorial(true)" title="Iniciar tour guiado">
+        <div style="display:flex; align-items:center; gap:10px; flex:none">
+          <button class="btn-outline" style="background:#FFF6F0; border-color:#FFB98C; color:#E85700; font-weight:600; display:flex; align-items:center; gap:6px; height:38px; border-radius:8px" onclick="window.__mepedeStore.startTutorial(true)" title="Iniciar tour guiado">
             <span>🎓</span> Tour Guiado
           </button>
-          <button class="btn-outline" style="font-size:12px; padding:0 10px; color:var(--gray-500)" onclick="window.__mepedeStore.loadSeedData()" title="Carregar cardápio de exemplo completo">
+          <button class="btn-outline" style="font-size:12px; padding:0 10px; color:var(--gray-500); height:38px; border-radius:8px" onclick="window.__mepedeStore.loadSeedData()" title="Carregar cardápio de exemplo completo">
             <span>⚡ Demo</span>
           </button>
-          <button class="btn-link-copy" onclick="navigator.clipboard.writeText('${storeUrl}'); window.__mepedeStore.setToast('Link copiado para a área de transferência!')">
-            <span>mepede.ai/${data.store.slug || ''}</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>
+
+          <!-- Help Button -->
+          <button class="header-icon-btn" onclick="window.__mepedeStore.setToast('Central de ajuda: suporte@mepede.ai')" title="Ajuda e suporte">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
           </button>
-          <button class="btn-dark" onclick="window.__mepedeStore.qrOpen = true; window.__mepedeStore.notify()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h3v3h-3zM17 20h4v-3"></path></svg>
-            QR Code
+
+          <!-- Notification Bell -->
+          <button class="header-icon-btn" onclick="window.__mepedeStore.setToast('Nenhuma notificação nova no momento.')" title="Notificações">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <span style="position:absolute; top:8px; right:8px; width:7px; height:7px; border-radius:4px; background:#E02424"></span>
           </button>
-          <button class="btn-whatsapp" onclick="window.open('https://wa.me/?text=' + encodeURIComponent('Confira nosso cardápio: ${storeUrl}'), '_blank')">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.4A8.5 8.5 0 1 1 21 12Z"></path></svg>
-            WhatsApp
-          </button>
+
+          <!-- Store Profile Pill -->
+          <div id="tut-store-header-pill" class="store-header-pill" onclick="window.__mepedeStore.toggleProfilePopover()" title="Ver detalhes da loja">
+            <div style="width:30px; height:30px; border-radius:15px; overflow:hidden">
+              ${renderSaboreLogoSvg(30)}
+            </div>
+            <div style="display:flex; flex-direction:column; line-height:1.2">
+              <div style="display:flex; align-items:center; gap:4px">
+                <span style="font-size:13px; font-weight:600; color:#14171F">${data.store.name}</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+              </div>
+              <div style="font-size:11px; font-weight:600; color:${data.store.open ? '#00B368' : '#E02424'}">
+                ● ${data.store.open ? 'Loja aberta' : 'Loja fechada'}
+              </div>
+            </div>
+          </div>
         </div>
+
+        <!-- Store Profile Popover Modal (matches Dashboard - Profile.png) -->
+        ${S.profilePopoverOpen ? `
+          <div style="position:fixed; inset:0; z-index:998; background:transparent" onclick="window.__mepedeStore.profilePopoverOpen = false; window.__mepedeStore.notify()"></div>
+          <div class="profile-popover" onclick="event.stopPropagation()">
+            <div style="display:flex; flex-direction:column; align-items:center; text-align:center">
+              <div style="width:68px; height:68px; border-radius:34px; margin-bottom:10px">
+                ${renderSaboreLogoSvg(68)}
+              </div>
+              <div style="font-size:16px; font-weight:700; color:#14171F">${data.store.name}</div>
+              <div style="font-size:12px; color:var(--gray-500); margin-top:2px">${data.store.plan || 'Plano PRO'}</div>
+            </div>
+
+            <div style="height:1px; background:var(--gray-100); margin:16px 0"></div>
+
+            <!-- Store Status Toggle -->
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 0">
+              <div style="display:flex; align-items:center; gap:8px">
+                <span style="font-size:18px">🏪</span>
+                <span style="font-size:13.5px; font-weight:600; color:#14171F">Loja aberta</span>
+              </div>
+              <div id="tut-store-toggle" class="toggle-switch" style="background:${data.store.open ? '#00B368' : '#D5D9E0'}" onclick="window.__mepedeStore.toggleStoreOpen()">
+                <div class="toggle-knob" style="left:${data.store.open ? '19px' : '3px'}"></div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:8px; margin-top:14px">
+              <div onclick="window.__mepedeStore.setTab('settings'); window.__mepedeStore.profilePopoverOpen = false; window.__mepedeStore.notify()" style="display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500; color:var(--gray-700); cursor:pointer; padding:8px; border-radius:8px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Configurar minha Loja</span>
+              </div>
+              <div onclick="window.__mepedeStore.setToast('Horário de funcionamento: Seg a Dom, 18h às 23h30'); window.__mepedeStore.profilePopoverOpen = false; window.__mepedeStore.notify()" style="display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500; color:var(--gray-700); cursor:pointer; padding:8px; border-radius:8px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                <span>Horário de funcionamento</span>
+              </div>
+            </div>
+
+            <!-- Link Box inside popover -->
+            <div style="margin-top:14px; display:flex; align-items:center; justify-content:space-between; height:38px; padding:0 8px 0 10px; border:1px solid var(--gray-200); border-radius:8px; background:#FAFBFC; font-size:12px; color:#4B5563">
+              <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:180px">
+                mepede.ai/${data.store.slug || ''}
+              </span>
+              <button type="button" onclick="navigator.clipboard.writeText('https://mepede.ai/' + (window.__mepedeStore.data.store.slug || '')); window.__mepedeStore.setToast('Link copiado!')" title="Copiar link" style="border:none; background:transparent; cursor:pointer; color:var(--gray-500); display:flex; align-items:center; padding:2px">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>
+              </button>
+            </div>
+          </div>
+        ` : ''}
       </header>
     `;
 
-    // Conteúdo da Aba Cardápio
+    // Conteúdo da Aba
     let bodyHtml = '';
 
-    if (S.tab === 'menu') {
+    if (S.tab === 'dashboard') {
+      bodyHtml = renderDashboardHtml(S, data);
+    } else if (S.tab === 'reports') {
+      bodyHtml = renderReportsHtml(S, data);
+    } else if (S.tab === 'orders') {
+      bodyHtml = renderOrdersHtml(S, data);
+    } else if (S.tab === 'finance') {
+      bodyHtml = renderFinanceHtml(S, data);
+    } else if (S.tab === 'menu' && (!S.menuSubTab || S.menuSubTab === 'catalog')) {
       // Cards de Cardápios
       const menuCardsHtml = data.menus.length ? data.menus.map(m => {
         const isCur = m.id === curMid;
@@ -1697,7 +2512,7 @@
           ` : ''}
         </div>
       `;
-    } else if (S.tab === 'groups') {
+    } else if (S.tab === 'groups' || (S.tab === 'menu' && S.menuSubTab === 'groups')) {
       // Aba de Complementos
       const groupCardsHtml = data.groups.map(g => {
         const used = data.products.filter(p => p.groupIds.includes(g.id));
@@ -1753,7 +2568,7 @@
           </div>
         </div>
       `;
-    } else if (S.tab === 'settings') {
+    } else if (S.tab === 'settings' || (S.tab === 'menu' && S.menuSubTab === 'settings')) {
       // Aba Loja e Link
       bodyHtml = `
         <div style="display:flex; flex-direction:column; gap:16px; max-width:760px">
@@ -2462,15 +3277,16 @@
     `;
 
     // Renderiza o esqueleto principal
+    const showPhone = S.tab === 'menu' && (!S.menuSubTab || S.menuSubTab === 'catalog');
     root.innerHTML = `
       ${sidebarHtml}
       <main class="main-content">
         ${headerHtml}
-        <div class="scrollable-body">
+        <div class="scrollable-body" style="${!showPhone ? 'max-width:1440px; margin:0 auto; width:100%' : ''}">
           ${bodyHtml}
         </div>
       </main>
-      ${phoneSectionHtml}
+      ${showPhone ? phoneSectionHtml : ''}
     `;
 
     // Renderiza Drawers e Modais
