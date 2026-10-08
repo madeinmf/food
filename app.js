@@ -343,6 +343,7 @@
       this.sidebarMenuExpanded = true;
       this.sidebarReportsExpanded = true;
       this.profilePopoverOpen = false;
+      this.helpMenuOpen = false;
       this.dashboardMode = 'auto'; // 'auto' | 'onboarding' | 'active'
       this.demoOrders = [
         { id: '31231321', item: 'Box - Burguer Salada + Coca-cola Zero', img: 'assets/burger.png', customer: 'Henrique Lazarin Juema', qty: 2, address: 'Zona 05', deliveryFee: 5, total: 64.9, status: 'novo' },
@@ -399,6 +400,13 @@
 
     toggleProfilePopover() {
       this.profilePopoverOpen = !this.profilePopoverOpen;
+      this.helpMenuOpen = false;
+      this.notify();
+    }
+
+    toggleHelpMenu() {
+      this.helpMenuOpen = !this.helpMenuOpen;
+      this.profilePopoverOpen = false;
       this.notify();
     }
 
@@ -407,6 +415,7 @@
       if (t === 'menu' && sub) this.menuSubTab = sub;
       if (t === 'reports' && sub) this.reportSub = sub;
       this.profilePopoverOpen = false;
+      this.helpMenuOpen = false;
       this.notify();
     }
 
@@ -1289,11 +1298,11 @@
         <polygon points="26,60 74,60 50,68" fill="#FFA500"/>
         <rect x="28" y="66" width="44" height="8" rx="4" fill="#FF6100"/>
         <path id="curveTop-${size}" d="M 18,50 A 32,32 0 0,1 82,50" fill="none"/>
-        <text font-family="'Poppins', sans-serif" font-size="8.5" font-weight="800" fill="#FF6100">
+        <text font-family="'Inter', sans-serif" font-size="8.5" font-weight="800" fill="#FF6100">
           <textPath href="#curveTop-${size}" startOffset="50%" text-anchor="middle">SABORÊ</textPath>
         </text>
         <path id="curveBot-${size}" d="M 82,50 A 32,32 0 0,1 18,50" fill="none"/>
-        <text font-family="'Poppins', sans-serif" font-size="6.2" font-weight="700" fill="#FF6100" letter-spacing="0.5">
+        <text font-family="'Inter', sans-serif" font-size="6.2" font-weight="700" fill="#FF6100" letter-spacing="0.5">
           <textPath href="#curveBot-${size}" startOffset="50%" text-anchor="middle">HAMBURGUERIA</textPath>
         </text>
       </svg>
@@ -1888,10 +1897,8 @@
     const sidebarHtml = `
       <aside class="sidebar">
         <!-- Logo -->
-        <div class="brand" style="padding:0 4px; margin-bottom:4px; display:flex; align-items:center; gap:8px">
-          <div style="font-size:22px; font-weight:700; color:#FF6100; letter-spacing:-0.5px; font-family:'Poppins', sans-serif">
-            mepede<span style="color:#14171F">.ai</span>
-          </div>
+        <div class="brand" style="padding:0 4px; margin-bottom:4px;">
+          <img src="assets/logo.png" alt="mepede.ai" style="height:28px; max-width:160px; object-fit:contain; display:block;">
         </div>
 
         <!-- Tenant Selector Card -->
@@ -2074,17 +2081,28 @@
           ` : ''}
         </div>
         <div style="display:flex; align-items:center; gap:10px; flex:none">
-          <button class="btn-outline" style="background:#FFF6F0; border-color:#FFB98C; color:#E85700; font-weight:600; display:flex; align-items:center; gap:6px; height:38px; border-radius:8px" onclick="window.__mepedeStore.startTutorial(true)" title="Iniciar tour guiado">
-            <span>🎓</span> Tour Guiado
-          </button>
-          <button class="btn-outline" style="font-size:12px; padding:0 10px; color:var(--gray-500); height:38px; border-radius:8px" onclick="window.__mepedeStore.loadSeedData()" title="Carregar cardápio de exemplo completo">
-            <span>⚡ Demo</span>
-          </button>
+          <!-- Help Button & Dropdown -->
+          <div style="position:relative">
+            <button class="header-icon-btn" onclick="window.__mepedeStore.toggleHelpMenu()" title="Ajuda, Tour e Demo">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </button>
 
-          <!-- Help Button -->
-          <button class="header-icon-btn" onclick="window.__mepedeStore.setToast('Central de ajuda: suporte@mepede.ai')" title="Ajuda e suporte">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-          </button>
+            ${S.helpMenuOpen ? `
+              <div style="position:fixed; inset:0; z-index:997; background:transparent" onclick="window.__mepedeStore.helpMenuOpen = false; window.__mepedeStore.notify()"></div>
+              <div style="position:absolute; top:46px; right:0; background:#fff; border:1px solid var(--gray-200); border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,0.12); padding:6px; z-index:998; min-width:220px; display:flex; flex-direction:column; gap:2px">
+                <div onclick="window.__mepedeStore.helpMenuOpen = false; window.__mepedeStore.startTutorial(true)" style="display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:8px; font-size:13px; font-weight:600; color:#14171F; cursor:pointer" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='transparent'">
+                  <span>🎓</span> Reiniciar Tour Guiado
+                </div>
+                <div onclick="window.__mepedeStore.helpMenuOpen = false; window.__mepedeStore.loadSeedData()" style="display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:8px; font-size:13px; font-weight:600; color:#14171F; cursor:pointer" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='transparent'">
+                  <span>⚡</span> Carregar Cardápio Demo
+                </div>
+                <div style="height:1px; background:#ECEEF2; margin:4px 0"></div>
+                <div onclick="window.__mepedeStore.helpMenuOpen = false; window.__mepedeStore.setToast('Suporte: suporte@mepede.ai')" style="display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:8px; font-size:12.5px; color:var(--gray-700); cursor:pointer">
+                  <span>✉️</span> suporte@mepede.ai
+                </div>
+              </div>
+            ` : ''}
+          </div>
 
           <!-- Notification Bell -->
           <button class="header-icon-btn" onclick="window.__mepedeStore.setToast('Nenhuma notificação nova no momento.')" title="Notificações">
@@ -2171,94 +2189,62 @@
     } else if (S.tab === 'finance') {
       bodyHtml = renderFinanceHtml(S, data);
     } else if (S.tab === 'menu' && (!S.menuSubTab || S.menuSubTab === 'catalog')) {
-      // Cards de Cardápios
-      const menuCardsHtml = data.menus.length ? data.menus.map(m => {
-        const isCur = m.id === curMid;
-        const st = S.catStatus(m);
-        const cats = data.categories.filter(c => c.menuId === m.id);
-        const prods = data.products.filter(p => p.catIds.some(c => cats.some(x => x.id === c)));
-        const thumb = prods.find(p => p.img);
-        const isLive = liveMenu && liveMenu.id === m.id;
-        const statusLabel = !m.active ? 'Desligado' : isLive ? 'No ar agora' : st.live ? 'No horário · outro cardápio ativo' : st.label;
-        const statusColor = !m.active ? '#6B7280' : isLive ? '#12A150' : '#B45309';
-
-        return `
-          <div class="menu-card ${isCur ? 'active' : ''}" onclick="window.__mepedeStore.selectMenu('${m.id}')">
-            <div class="menu-thumb" style="opacity:${m.active ? '1' : '0.5'}">
-              ${thumb ? `<img src="${thumb.img}" alt="">` : `<span>${m.name[0] || 'C'}</span>`}
+      // Cabeçalho Limpo do Cardápio Ativo (sem poluição visual)
+      let menuHeaderHtml = '';
+      if (!data.menus.length) {
+        menuHeaderHtml = `
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:44px 24px; background:#fff; border:1.5px dashed #ECEEF2; border-radius:16px; text-align:center; margin-bottom:20px">
+            <div style="width:48px; height:48px; border-radius:24px; background:var(--orange-subtle); color:var(--orange); display:flex; align-items:center; justify-content:center; margin-bottom:12px">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
             </div>
-            <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px">
-              <div style="display:flex; align-items:center; gap:6px">
-                <span style="font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${m.name}</span>
-                ${isCur ? `<span style="font-size:10px; font-weight:600; color:#fff; background:#14171F; border-radius:6px; padding:1px 6px">EDITANDO</span>` : ''}
-              </div>
-              <div style="display:flex; align-items:center; gap:5px; font-size:12px; font-weight:500; color:${statusColor}">
-                <span style="width:6px; height:6px; border-radius:3px; background:${statusColor}; flex:none"></span>
-                <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap">${statusLabel}</span>
-              </div>
-              <div style="font-size:11px; color:var(--gray-400); overflow:hidden; text-overflow:ellipsis; white-space:nowrap">
-                ${S.schedText(m)} · ${cats.length} ${cats.length === 1 ? 'cat.' : 'cats.'}
-              </div>
-            </div>
-            <div style="display:flex; align-items:center; gap:4px; flex:none" onclick="event.stopPropagation()">
-              <div onclick="window.__mepedeStore.openMenu(window.__mepedeStore.data.menus.find(x => x.id === '${m.id}'))" title="Editar nome e horários" style="width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--gray-500); cursor:pointer">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
-              </div>
-              <div class="toggle-switch" style="width:38px; height:22px; background:${m.active ? '#FF6100' : '#D5D9E0'}" onclick="window.__mepedeStore.mut(d => { const x = d.menus.find(y => y.id === '${m.id}'); if(x) x.active = !x.active; }, '${m.active ? '“' + m.name + '” desligado' : '“' + m.name + '” ligado'}')">
-                <div class="toggle-knob" style="width:18px; height:18px; top:2px; left:${m.active ? '17px' : '3px'}"></div>
-              </div>
-            </div>
+            <div style="font-size:16px; font-weight:700; color:#14171F">Comece criando seu cardápio</div>
+            <div style="font-size:13px; color:var(--gray-500); margin-top:4px; max-width:340px">Defina os horários e organize as categorias e produtos da sua loja.</div>
+            <button id="tut-btn-new-menu" class="btn-orange" style="margin-top:16px; padding:0 24px; height:40px; font-weight:600; border-radius:10px" onclick="window.__mepedeStore.openMenu(null); if(window.__mepedeStore.tutorialStep === 1) window.__mepedeStore.nextTutorial();">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+              Criar cardápio
+            </button>
           </div>
         `;
-      }).join('') : `
-        <div style="grid-column: 1 / -1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 20px; background:#FAFAFA; border:2px dashed #ECEEF2; border-radius:16px; text-align:center">
-          <div style="width:48px; height:48px; border-radius:24px; background:var(--orange-subtle); color:var(--orange); display:flex; align-items:center; justify-content:center; margin-bottom:10px">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
-          </div>
-          <div style="font-size:15px; font-weight:700; color:var(--dark)">Comece criando seu cardápio</div>
-          <div style="font-size:13px; color:var(--gray-500); margin-top:4px; max-width:360px">Defina horários e monte as categorias e produtos da sua loja.</div>
-          <button id="tut-btn-new-menu" class="btn-orange" style="margin-top:16px; padding:0 22px; height:40px; font-weight:600" onclick="window.__mepedeStore.openMenu(null); if(window.__mepedeStore.tutorialStep === 1) window.__mepedeStore.nextTutorial();">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
-            Criar cardápio
-          </button>
-        </div>
-      `;
-
-      // Barra de Cardápio Ativo
-      const liveBarText = data.menus.length > 1
-        ? (liveMenu ? `<span style="display:inline-flex; align-items:center; gap:6px; height:24px; padding:0 10px; border-radius:12px; background:#E8F7EE; color:#12A150; font-size:12px; font-weight:500"><span style="width:6px; height:6px; border-radius:3px; background:#12A150"></span>Agora o cliente vê: ${liveMenu.name}</span>` : `<span style="display:inline-flex; align-items:center; gap:6px; height:24px; padding:0 10px; border-radius:12px; background:#FFF4E0; color:#B45309; font-size:12px; font-weight:500"><span style="width:6px; height:6px; border-radius:3px; background:#B45309"></span>Nenhum cardápio no horário agora</span>`)
-        : '';
-
-      // Checklist HTML
-      let checklistHtml = '';
-      if (showChecklist) {
-        const stepItems = steps.map((s, i) => {
-          const isCurStep = i === nextIdx;
-          const bg = s.done ? '#E8F7EE' : isCurStep ? '#FF6100' : '#F1F2F5';
-          const fg = s.done ? '#12A150' : isCurStep ? '#fff' : '#8A91A0';
-          const markBg = s.done ? '#12A150' : isCurStep ? '#fff' : '#C9CED8';
-          const markFg = isCurStep ? '#FF6100' : '#fff';
-          const mark = s.done ? '✓' : String(i + 1);
-
-          return `
-            <div ${i === 1 ? 'id="tut-checklist-prod"' : ''} class="check-step" style="background:${bg}; color:${fg}; cursor:pointer" onclick="window.__mepedeStore.runChecklistStep(${i}); if(window.__mepedeStore.tutorialStep === 4 && ${i === 1}) window.__mepedeStore.nextTutorial();">
-              <span class="check-step-mark" style="background:${markBg}; color:${markFg}">${mark}</span>
-              ${s.label} ${isCurStep ? '→' : ''}
+      } else {
+        const curThumb = mProds.find(p => p.img);
+        menuHeaderHtml = `
+          <div style="background:#fff; border:1px solid #ECEEF2; border-radius:14px; padding:12px 18px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:18px">
+            <div style="display:flex; align-items:center; gap:12px; min-width:240px">
+              <div style="width:42px; height:42px; border-radius:10px; background:#FFF1E8; overflow:hidden; display:flex; align-items:center; justify-content:center; flex:none; border:1px solid #FFD2B5">
+                ${curThumb ? `<img src="${curThumb.img}" alt="" style="width:100%; height:100%; object-fit:cover">` : `<span style="font-weight:700; color:#FF6100; font-size:16px">${curMenu.name[0] || 'C'}</span>`}
+              </div>
+              <div style="display:flex; flex-direction:column">
+                <div style="display:flex; align-items:center; gap:8px">
+                  <span style="font-size:15px; font-weight:700; color:#14171F">${curMenu.name}</span>
+                  <span style="font-size:11px; font-weight:600; padding:2px 8px; border-radius:6px; background:${curMenu.active ? '#E8F7EE' : '#F3F4F6'}; color:${curMenu.active ? '#00B368' : '#6B7280'}; display:inline-flex; align-items:center; gap:4px">
+                    <span style="width:5px; height:5px; border-radius:3px; background:${curMenu.active ? '#00B368' : '#6B7280'}"></span>
+                    ${curMenu.active ? 'No ar agora' : 'Desligado'}
+                  </span>
+                </div>
+                <div style="font-size:12px; color:var(--gray-500); margin-top:2px">
+                  ${S.schedText(curMenu)} · ${mCats.length} ${mCats.length === 1 ? 'categoria' : 'categorias'} · ${mProds.length} ${mProds.length === 1 ? 'produto' : 'produtos'}
+                </div>
+              </div>
             </div>
-          `;
-        }).join('');
 
-        checklistHtml = `
-          <div class="checklist-bar">
-            <div style="min-width:180px">
-              <div style="font-size:15px; font-weight:600">“${curMenu ? curMenu.name : 'Cardápio'}” está quase pronto</div>
-              <div style="font-size:12px; color:var(--gray-400); margin-top:2px">Passo ${nextIdx + 1} de 4 · ${steps[nextIdx] ? steps[nextIdx].label : ''}</div>
-            </div>
-            <div style="flex:1; display:flex; gap:8px; flex-wrap:wrap">
-              ${stepItems}
-            </div>
-            <div style="cursor:pointer; color:var(--gray-400); padding:6px" title="Ocultar checklist" onclick="window.__mepedeStore.hideCheck['${curMid}'] = true; window.__mepedeStore.notify()">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+            <div style="display:flex; align-items:center; gap:10px">
+              ${data.menus.length > 1 ? `
+                <select onchange="window.__mepedeStore.selectMenu(this.value)" style="height:36px; padding:0 10px; border-radius:8px; border:1px solid #ECEEF2; font-size:12.5px; outline:none; background:#fff; color:#14171F">
+                  ${data.menus.map(m => `<option value="${m.id}" ${m.id === curMid ? 'selected' : ''}>${m.name}</option>`).join('')}
+                </select>
+              ` : ''}
+              <button type="button" class="btn-outline" style="height:36px; padding:0 12px; font-size:12.5px; border-radius:8px; display:flex; align-items:center; gap:6px" onclick="window.__mepedeStore.openMenu(window.__mepedeStore.data.menus.find(x => x.id === '${curMenu.id}'))" title="Editar nome e horários">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+                Horários
+              </button>
+              <div class="toggle-switch" style="width:38px; height:22px; background:${curMenu.active ? '#00B368' : '#D5D9E0'}" onclick="window.__mepedeStore.mut(d => { const x = d.menus.find(y => y.id === '${curMenu.id}'); if(x) x.active = !x.active; }, '${curMenu.active ? 'Cardápio desligado' : 'Cardápio no ar'}')">
+                <div class="toggle-knob" style="width:18px; height:18px; top:2px; left:${curMenu.active ? '17px' : '3px'}"></div>
+              </div>
+              <div style="width:1px; height:22px; background:#ECEEF2; margin:0 4px"></div>
+              <button id="tut-btn-new-menu-top" class="btn-outline" style="height:36px; padding:0 12px; font-size:12.5px; border-radius:8px; display:flex; align-items:center; gap:6px" onclick="window.__mepedeStore.openMenu(null); if(window.__mepedeStore.tutorialStep === 1) window.__mepedeStore.nextTutorial();">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+                Novo cardápio
+              </button>
             </div>
           </div>
         `;
@@ -2272,7 +2258,6 @@
         const st = S.catStatus(c);
         return `
           <div class="chip ${isActive ? 'active' : ''}" onclick="window.__mepedeStore.selCat = '${c.id}'; window.__mepedeStore.ph.cat = '${c.id}'; window.__mepedeStore.notify()">
-            <span class="chip-dot" style="background:${st.dot}"></span>
             <span>${c.name}</span>
             <span class="chip-count">${cnt}</span>
           </div>
@@ -2480,27 +2465,11 @@
 
       bodyHtml = `
         <div style="display:flex; flex-direction:column; width:100%">
-          <!-- Gerenciador de Cardápios -->
-          <div class="card-box" style="padding:16px">
-            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap">
-              <span style="font-size:15px; font-weight:600">Cardápios</span>
-              ${liveBarText}
-              <div style="flex:1"></div>
-              <button id="tut-btn-new-menu-top" class="btn-outline" style="height:36px; padding:0 12px" onclick="window.__mepedeStore.openMenu(null); if(window.__mepedeStore.tutorialStep === 1) window.__mepedeStore.nextTutorial();">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
-                Novo cardápio
-              </button>
-            </div>
-            <div class="menu-cards-container">
-              ${menuCardsHtml}
-            </div>
-          </div>
-
-          ${checklistHtml}
+          ${menuHeaderHtml}
           ${emptyCatsBanner}
 
           ${mCats.length ? `
-            <div class="chips-bar">
+            <div class="chips-bar" style="margin-top:0; margin-bottom:18px">
               <div class="chip ${S.selCat === 'all' ? 'active' : ''}" onclick="window.__mepedeStore.selCat = 'all'; window.__mepedeStore.notify()">
                 <span>Todos</span>
                 <span class="chip-count">${allCount}</span>
