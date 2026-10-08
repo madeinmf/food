@@ -332,6 +332,9 @@
         qty: 1,
         cart: [],
         view: 'home', // 'home' | 'cart'
+        coupon: '',
+        couponCode: '',
+        discountVal: 0,
         msg: '',
         msgTimer: null
       };
@@ -514,20 +517,26 @@
             {
               id: uid(),
               name: pName,
-              detail: 'Ao ponto, Bacon crocante (+R$ 5,00), Cheddar cremoso (+R$ 5,00)',
-              qty: 1,
-              total: 44.90
+              detail: 'Blend 180g, queijo cheddar, alface, tomate e maionese da casa',
+              qty: 2,
+              total: 79.80,
+              unitPrice: 39.90,
+              img: (p && p.img) ? p.img : 'assets/detroid_combo.png'
             }
           ]
         });
         this.phSay('Item adicionado ao carrinho!');
         this.nextTutorial();
       } else if (step === 9) {
-        // Conclui tutorial e abre simulação do pedido via WhatsApp
-        this.tutorialStep = null;
+        // Carrinho aberto, usuário vê o resumo e clica em Continuar
+        this.setPhone({ view: 'cart', pid: null });
+        this.notify();
+        startTutorialTracking();
+      } else if (step === 10) {
+        // Modal de WhatsApp aberto, usuário clica no botão de fechar para concluir o tour
         this.orderModalOpen = true;
         this.notify();
-        this.setToast('🎉 Pedido pronto para envio no WhatsApp!');
+        startTutorialTracking();
       }
     }
 
@@ -647,27 +656,112 @@
           name: sp.name,
           detail: detailOpts || 'Sem adicionais',
           qty: ph.qty,
-          total: sheetTotal
+          total: sheetTotal,
+          unitPrice: sheetTotal / ph.qty,
+          img: sp.img || 'assets/detroid_combo.png'
         })
       });
 
       this.phSay('Adicionado ao carrinho!');
       if (this.tutorialStep === 8) {
-        this.nextTutorial();
+        this.tutorialStep = 9;
+        this.notify();
+        startTutorialTracking();
       }
     }
 
+    addPecaTambem(key) {
+      const itemsMap = {
+        maionese: { name: 'Maionese extra', detail: 'Porção artesanal 50g', price: 5.00, img: 'assets/peca_maionese.png' },
+        sorvete: { name: 'Sorvete no pote', detail: 'Pote 200ml chocolate belga', price: 25.00, img: 'assets/peca_sorvete.png' },
+        coca: { name: 'Coca Zero', detail: 'Lata 350ml bem gelada', price: 5.00, img: 'assets/peca_coca.png' },
+        batata: { name: 'Batata crocante', detail: 'Porção individual 120g', price: 15.00, img: 'assets/detroid_combo.png' }
+      };
+      const def = itemsMap[key];
+      if (!def) return;
+
+      const existing = this.ph.cart.find(x => x.name === def.name);
+      if (existing) {
+        existing.qty += 1;
+        existing.total = existing.qty * def.price;
+      } else {
+        this.ph.cart.push({
+          id: uid(),
+          name: def.name,
+          detail: def.detail,
+          qty: 1,
+          total: def.price,
+          unitPrice: def.price,
+          img: def.img
+        });
+      }
+      this.phSay(def.name + ' adicionado!');
+      this.notify();
+    }
+
+    changeCartItemQty(id, delta) {
+      const item = this.ph.cart.find(x => x.id === id);
+      if (!item) return;
+      const unit = item.unitPrice || (item.total / item.qty) || item.price || 0;
+      if (delta < 0 && item.qty <= 1) {
+        this.ph.cart = this.ph.cart.filter(x => x.id !== id);
+        this.phSay('Item removido do carrinho');
+      } else {
+        item.qty += delta;
+        item.unitPrice = unit;
+        item.total = item.qty * unit;
+      }
+      this.notify();
+    }
+
+    clearPhoneCart() {
+      this.ph.cart = [];
+      this.ph.coupon = '';
+      this.ph.discountVal = 0;
+      this.phSay('Carrinho limpo');
+      this.notify();
+    }
+
+    applyPhoneCoupon() {
+      const inp = document.getElementById('ph-coupon-input');
+      const val = (inp && inp.value ? inp.value.trim() : (this.ph.couponCode || 'PRIMEIRACOMPRA')).toUpperCase();
+      this.ph.coupon = val || 'PROMO10';
+      this.ph.discountVal = 5.00;
+      this.phSay('Cupom aplicado: -R$ 5,00!');
+      this.notify();
+    }
+
+    removePhoneCoupon() {
+      this.ph.coupon = '';
+      this.ph.discountVal = 0;
+      this.phSay('Cupom removido');
+      this.notify();
+    }
+
+    finishTourFromModal() {
+      this.orderModalOpen = false;
+      this.tutorialStep = null;
+      this.setPhone({ cart: [], view: 'home', pid: null });
+      this.notify();
+      this.setToast('🎉 Parabéns! Você concluiu o tour guiado completo do Me Pede Aí!');
+      updateTutorialSpotlight();
+    }
+
     checkoutPhone() {
-      if (!this.ph.cart.length) return;
+      if (!this.ph.cart.length) {
+        this.phSay('Adicione itens ao carrinho');
+        return;
+      }
       if (!this.data.store.open) {
         this.phSay('A loja está fechada no momento');
         return;
       }
       const cartSub = this.ph.cart.reduce((a, c) => a + c.total, 0);
       if (this.tutorialStep === 9) {
-        this.tutorialStep = null;
         this.orderModalOpen = true;
+        this.tutorialStep = 10;
         this.notify();
+        startTutorialTracking();
         return;
       }
       if (cartSub < (this.data.store.min || 0)) {
@@ -2061,40 +2155,170 @@
       `;
     }
 
-    // Carrinho no Celular
+    // Carrinho no Celular (Design iPhone-22.png & Novo Padrão)
     const cartSub = ph.cart.reduce((a, c) => a + c.total, 0);
     const minOk = cartSub >= (data.store.min || 0);
-    const cartTotal = cartSub + (ph.cart.length ? (data.store.fee || 0) : 0);
+    const discount = ph.discountVal || 0;
+    const fee = data.store.fee || 0;
+    const serviceFee = ph.cart.length ? 0.99 : 0;
+    const cartTotal = Math.max(0, cartSub + (ph.cart.length ? (fee + serviceFee - discount) : 0));
+    const cartQty = ph.cart.reduce((a, c) => a + c.qty, 0);
 
     const phCartHtml = ph.view === 'cart' && !selProd ? `
-      <div style="position:absolute; inset:0; bottom:72px; background:#fff; z-index:30; display:flex; flex-direction:column; padding:44px 16px 12px">
-        <div style="display:flex; align-items:center; justify-content:space-between">
-          <div style="font-size:17px; font-weight:700; color:#14171F">Carrinho</div>
-          <span style="font-size:11px; color:#8F95A3">${ph.cart.length} item(ns)</span>
+      <div style="position:absolute; inset:0; background:#FAFAFB; z-index:40; display:flex; flex-direction:column; overflow:hidden">
+        <!-- Top bar: Chevron down (voltar ao início) e Limpar -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:38px 14px 10px; background:#FAFAFB; flex:none">
+          <div onclick="window.__mepedeStore.setPhone({ view: 'home' })" style="cursor:pointer; width:32px; height:32px; border-radius:16px; background:#fff; border:1px solid #ECEEF2; display:flex; align-items:center; justify-content:center; color:#FF5800; box-shadow:0 1px 4px rgba(0,0,0,0.04)" title="Voltar ao cardápio">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+          <div onclick="window.__mepedeStore.clearPhoneCart()" style="font-size:12.5px; font-weight:700; color:#FF5800; cursor:pointer; padding:6px 4px" title="Limpar carrinho">Limpar</div>
         </div>
-        <div style="flex:1; overflow-y:auto; margin-top:12px; display:flex; flex-direction:column; gap:8px">
+
+        <!-- Store Info Pill Header -->
+        <div style="display:flex; align-items:center; gap:10px; padding:0 14px 12px; background:#FAFAFB; flex:none; border-bottom:1px solid #ECEEF2">
+          <div style="width:38px; height:38px; border-radius:19px; background:#FF5800; display:flex; align-items:center; justify-content:center; flex:none; box-shadow:0 3px 10px rgba(255,88,0,0.25)">
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
+              <rect x="3" y="3" width="26" height="22" rx="7" fill="#fff"></rect>
+              <path d="M12 25 L8 30 L9 25 Z" fill="#fff"></path>
+              <path d="M12 9 v5 m8 -5 v5 m-4 -5 v8 m0 0 v4" stroke="#FF5800" stroke-width="2.2" stroke-linecap="round"></path>
+            </svg>
+          </div>
+          <div style="flex:1; min-width:0">
+            <div style="font-size:14px; font-weight:800; color:#14171F; letter-spacing:-0.2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${data.store.name || 'Me Pede Burguer Ai!'}</div>
+            <div style="font-size:10.5px; color:#8F95A3; margin-top:1px">${data.store.eta || '35-45 min'} • <span style="color:#00B368; font-weight:700">${data.store.fee ? money(data.store.fee) : 'Grátis'}</span></div>
+          </div>
+        </div>
+
+        <!-- Scrollable Cart Body -->
+        <div style="flex:1; overflow-y:auto; padding:12px 14px 18px; -webkit-overflow-scrolling:touch; scrollbar-width:none">
+          <!-- Cart Items List -->
           ${ph.cart.map(c => `
-            <div style="display:flex; gap:10px; padding:10px; border:1px solid #ECEEF2; border-radius:14px; background:#FAFAFB">
+            <div style="background:#FFFFFF; border:1px solid #ECEEF2; border-radius:18px; padding:12px; display:flex; gap:12px; align-items:center; box-shadow:0 2px 10px rgba(20,23,31,0.03); margin-bottom:12px">
+              <img src="${c.img || 'assets/detroid_combo.png'}" alt="${c.name}" style="width:64px; height:64px; border-radius:14px; object-fit:cover; flex:none; background:#F6F7F9; border:1px solid #F0F1F4">
               <div style="flex:1; min-width:0">
-                <div style="font-size:12px; font-weight:700; color:#14171F">${c.qty}× ${c.name}</div>
-                <div style="font-size:9.5px; color:#8F95A3; margin-top:1px">${c.detail}</div>
-              </div>
-              <div style="text-align:right">
-                <div style="font-size:12px; font-weight:700; color:#00B050">${money(c.total)}</div>
-                <div onclick="window.__mepedeStore.setPhone({ cart: window.__mepedeStore.ph.cart.filter(x => x.id !== '${c.id}') })" style="font-size:9.5px; color:var(--red); cursor:pointer; margin-top:3px; font-weight:600">Remover</div>
+                <div style="font-size:13px; font-weight:700; color:#14171F; line-height:1.25">${c.name}</div>
+                <div style="font-size:10px; color:#8F95A3; margin-top:2px; line-height:1.3; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden">${c.detail || 'Sem adicionais'}</div>
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-top:6px">
+                  <span style="font-size:13.5px; font-weight:800; color:#14171F">${money(c.total)}</span>
+                  <div style="border:1px solid #ECEEF2; border-radius:10px; background:#FAFAFB; padding:3px 8px; display:flex; align-items:center; gap:8px">
+                    <span onclick="window.__mepedeStore.changeCartItemQty('${c.id}', -1)" style="font-size:14px; font-weight:700; color:#FF5800; cursor:pointer; user-select:none; width:14px; text-align:center" title="Diminuir">−</span>
+                    <span style="font-size:11.5px; font-weight:800; color:#14171F; min-width:14px; text-align:center">${c.qty}</span>
+                    <span onclick="window.__mepedeStore.changeCartItemQty('${c.id}', 1)" style="font-size:14px; font-weight:700; color:#FF5800; cursor:pointer; user-select:none; width:14px; text-align:center" title="Aumentar">+</span>
+                  </div>
+                </div>
               </div>
             </div>
           `).join('')}
-          ${!ph.cart.length ? `<div style="text-align:center; font-size:12px; color:var(--gray-400); padding:40px 0">Seu carrinho está vazio</div>` : ''}
+
+          ${!ph.cart.length ? `
+            <div style="text-align:center; padding:32px 14px; background:#fff; border-radius:18px; border:1px dashed #ECEEF2; margin:8px 0 16px">
+              <div style="font-size:32px">🛒</div>
+              <div style="font-size:13px; font-weight:700; color:#14171F; margin-top:8px">Seu carrinho está vazio</div>
+              <div style="font-size:11px; color:#8F95A3; margin-top:4px">Escolha itens no cardápio ou veja as sugestões abaixo!</div>
+              <button onclick="window.__mepedeStore.setPhone({ view: 'home' })" class="btn-orange" style="margin:12px auto 0; font-size:11.5px; height:34px; border-radius:10px; padding:0 16px">Ver cardápio</button>
+            </div>
+          ` : ''}
+
+          <!-- Peça Também Section -->
+          <div style="margin:16px 0 14px">
+            <div style="font-size:14px; font-weight:800; color:#14171F; margin-bottom:10px; letter-spacing:-0.2px">Peça também</div>
+            <div style="display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; -webkit-overflow-scrolling:touch; scrollbar-width:none">
+              ${[
+                { key: 'maionese', name: 'Maionese extra', price: 5.00, img: 'assets/peca_maionese.png' },
+                { key: 'sorvete', name: 'Sorvete no pote', price: 25.00, img: 'assets/peca_sorvete.png' },
+                { key: 'coca', name: 'Coca Zero', price: 5.00, img: 'assets/peca_coca.png' },
+                { key: 'batata', name: 'Batata crocante', price: 15.00, img: 'assets/detroid_combo.png' }
+              ].map(item => `
+                <div onclick="window.__mepedeStore.addPecaTambem('${item.key}')" style="width:86px; flex:none; cursor:pointer; display:flex; flex-direction:column">
+                  <div style="width:86px; height:86px; border-radius:14px; overflow:hidden; position:relative; border:1px solid #ECEEF2; background:#F6F7F9">
+                    <img src="${item.img}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover; display:block">
+                    <div style="position:absolute; right:5px; bottom:5px; width:26px; height:26px; border-radius:13px; background:#FF5800; color:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 8px rgba(255,88,0,0.4); font-weight:800; font-size:15px">+</div>
+                  </div>
+                  <div style="font-size:11.5px; font-weight:800; color:#14171F; margin-top:6px">${money(item.price)}</div>
+                  <div style="font-size:10px; color:#8F95A3; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${item.name}</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Cupom de Desconto -->
+          <div style="margin:14px 0">
+            <div style="font-size:13px; font-weight:700; color:#14171F; margin-bottom:6px">Cupom de desconto:</div>
+            <div style="display:flex; gap:8px">
+              <input id="ph-coupon-input" type="text" placeholder="DIGITE O CUPOM" value="${ph.coupon || ''}" onkeydown="if(event.key==='Enter') window.__mepedeStore.applyPhoneCoupon()" style="flex:1; height:42px; border:1.5px solid #ECEEF2; border-radius:12px; padding:0 12px; font-size:11.5px; font-weight:700; text-transform:uppercase; outline:none; background:#FFFFFF; color:#14171F; letter-spacing:0.5px">
+              <button onclick="window.__mepedeStore.applyPhoneCoupon()" style="height:42px; padding:0 18px; border-radius:12px; background:#FF5800; color:#fff; font-size:12px; font-weight:700; border:none; cursor:pointer; flex:none; box-shadow:0 3px 10px rgba(255,88,0,0.25)">Aplicar</button>
+            </div>
+            ${ph.coupon ? `
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-top:6px; background:#E8F7EE; border:1px solid #B7EBCE; border-radius:10px; padding:6px 10px; font-size:11px; color:#00B368; font-weight:700">
+                <span>✓ Cupom ${ph.coupon} aplicado (-${money(ph.discountVal || 5)})</span>
+                <span onclick="window.__mepedeStore.removePhoneCoupon()" style="cursor:pointer; color:#8F95A3; font-weight:700; font-size:13px">✕</span>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Forma de Pagamento (Padrão PIX) -->
+          <div style="margin:16px 0 14px">
+            <div style="font-size:13px; font-weight:700; color:#14171F; margin-bottom:8px">Forma de pagamento:</div>
+            <div class="ph-pix-badge" style="border:1.5px solid #00B368; border-radius:14px; background:#FFFFFF; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 2px 8px rgba(0,0,0,0.02)">
+              <div style="display:flex; align-items:center; gap:10px">
+                <div style="width:34px; height:34px; border-radius:10px; background:#E8F7EE; display:flex; align-items:center; justify-content:center; flex:none">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L6 8l6 6 6-6-6-6z" fill="#00B368"/>
+                    <path d="M12 10l-6 6 6 6 6-6-6-6z" fill="#00B368" opacity="0.8"/>
+                  </svg>
+                </div>
+                <div>
+                  <div style="font-size:12.5px; font-weight:700; color:#14171F">Pix</div>
+                  <div style="font-size:10px; color:#8F95A3; margin-top:1px">Aprovação automática</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px">
+                <span style="background:#E8F7EE; color:#00B368; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px">PIX</span>
+                <div style="width:18px; height:18px; border-radius:9px; background:#00B368; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:800">✓</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Resumo de Valores -->
+          <div style="margin:16px 0 10px">
+            <div style="font-size:13.5px; font-weight:800; color:#14171F; margin-bottom:8px">Resumo de valores</div>
+            <div style="background:#FFFFFF; border:1px solid #ECEEF2; border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:6px; font-size:11.5px">
+              <div style="display:flex; justify-content:space-between">
+                <span style="color:#8F95A3">Subtotal</span>
+                <span style="font-weight:600; color:#14171F">${money(cartSub)}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between">
+                <span style="color:#8F95A3">Taxa de entrega</span>
+                <span style="font-weight:700; color:#00B368">${data.store.fee ? money(data.store.fee) : 'Grátis'}</span>
+              </div>
+              <div style="display:flex; justify-content:space-between">
+                <span style="color:#8F95A3">Taxa de serviço</span>
+                <span style="font-weight:600; color:#14171F">R$ 0,99</span>
+              </div>
+              ${ph.coupon ? `
+                <div style="display:flex; justify-content:space-between">
+                  <span style="color:#00B368; font-weight:600">Desconto (${ph.coupon})</span>
+                  <span style="font-weight:700; color:#00B368">-${money(discount)}</span>
+                </div>
+              ` : ''}
+              <div style="display:flex; justify-content:space-between; font-size:14.5px; font-weight:800; color:#14171F; margin-top:6px; padding-top:8px; border-top:1px dashed #ECEEF2">
+                <span>Total</span>
+                <span>${money(cartTotal)}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div style="border-top:1px solid #ECEEF2; padding-top:10px; font-size:11.5px; display:flex; flex-direction:column; gap:4px">
-          <div style="display:flex"><span style="flex:1; color:#8F95A3">Subtotal</span><span style="font-weight:600">${money(cartSub)}</span></div>
-          <div style="display:flex"><span style="flex:1; color:#8F95A3">Entrega</span><span style="font-weight:600; color:#00B050">${data.store.fee ? money(data.store.fee) : 'Grátis'}</span></div>
-          <div style="display:flex; font-size:13.5px; font-weight:800; margin-top:2px; color:#14171F"><span style="flex:1">Total</span><span>${money(cartTotal)}</span></div>
-          <div onclick="window.__mepedeStore.checkoutPhone()" id="tut-phone-checkout" style="margin-top:8px; height:44px; border-radius:14px; background:${(ph.cart.length && minOk && data.store.open) || S.tutorialStep === 9 ? '#FF6100' : '#FFB98C'}; color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; cursor:${(ph.cart.length && minOk && data.store.open) || S.tutorialStep === 9 ? 'pointer' : 'not-allowed'}; box-shadow:${(ph.cart.length && minOk && data.store.open) || S.tutorialStep === 9 ? '0 4px 12px rgba(255,91,0,0.3)' : 'none'}">
-            ${S.tutorialStep === 9 ? 'Fazer pedido (Simular WhatsApp)' : !ph.cart.length ? 'Adicione itens' : !data.store.open ? 'Loja fechada agora' : !minOk ? 'Mínimo de ' + money(data.store.min) : 'Fazer pedido'}
+        <!-- Sticky Bottom Checkout Bar -->
+        <div style="flex:none; background:#FFFFFF; border-top:1px solid #ECEEF2; padding:12px 14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; box-shadow:0 -4px 16px rgba(0,0,0,0.03)">
+          <div>
+            <div style="font-size:10px; color:#8F95A3; font-weight:500">Total com entrega grátis</div>
+            <div style="font-size:14px; font-weight:800; color:#14171F; margin-top:1px">${money(cartTotal)} <span style="font-size:10.5px; font-weight:600; color:#8F95A3">/ ${cartQty} ${cartQty === 1 ? 'item' : 'itens'}</span></div>
           </div>
+          <button id="tut-phone-checkout" onclick="window.__mepedeStore.checkoutPhone()" style="height:44px; padding:0 24px; border-radius:14px; background:${(ph.cart.length && minOk && data.store.open) || S.tutorialStep === 9 ? '#FF5800' : '#FFB98C'}; color:#fff; font-size:13px; font-weight:700; border:none; cursor:${(ph.cart.length && minOk && data.store.open) || S.tutorialStep === 9 ? 'pointer' : 'not-allowed'}; box-shadow:${(ph.cart.length && minOk && data.store.open) || S.tutorialStep === 9 ? '0 4px 14px rgba(255,88,0,0.35)' : 'none'}; display:flex; align-items:center; justify-content:center; gap:6px">
+            <span>Continuar</span>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
         </div>
       </div>
     ` : '';
@@ -2264,7 +2488,9 @@
       const cart = S.ph.cart;
       const sub = cart.reduce((a, c) => a + c.total, 0);
       const fee = data.store.fee || 0;
-      const total = sub + fee;
+      const discount = S.ph.discountVal || 0;
+      const service = cart.length ? 0.99 : 0;
+      const total = Math.max(0, sub + fee + service - discount);
 
       let msgWhats = `*Novo Pedido - ${data.store.name}*\n`;
       msgWhats += `-------------------------------\n`;
@@ -2277,38 +2503,56 @@
       msgWhats += `-------------------------------\n`;
       msgWhats += `Subtotal: ${money(sub)}\n`;
       msgWhats += `Entrega: ${fee ? money(fee) : 'Grátis'}\n`;
+      msgWhats += `Taxa de serviço: ${money(service)}\n`;
+      if (discount) msgWhats += `Cupom (${S.ph.coupon || 'PROMO'}): -${money(discount)}\n`;
       msgWhats += `*Total: ${money(total)}*\n`;
+      msgWhats += `Forma de pagamento: PIX (Aprovação automática)\n`;
 
       html += `
-        <div class="modal-overlay" onclick="window.__mepedeStore.orderModalOpen = false; window.__mepedeStore.notify()">
-          <div class="modal-box" style="width:440px; text-align:left" onclick="event.stopPropagation()">
+        <div class="modal-overlay" onclick="window.__mepedeStore.finishTourFromModal()">
+          <div class="modal-box" style="width:450px; text-align:left; position:relative" onclick="event.stopPropagation()">
+            <div onclick="window.__mepedeStore.finishTourFromModal()" style="position:absolute; top:16px; right:16px; width:30px; height:30px; border-radius:15px; background:#F6F7F9; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#8F95A3; font-weight:700" title="Fechar">✕</div>
+
             <div style="display:flex; align-items:center; gap:10px">
-              <div style="width:36px; height:36px; border-radius:18px; background:#E8F7EE; color:var(--green); display:flex; align-items:center; justify-content:center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>
+              <div style="width:38px; height:38px; border-radius:19px; background:#E8F7EE; color:var(--green); display:flex; align-items:center; justify-content:center">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>
               </div>
-              <div style="font-size:18px; font-weight:600">Simulação de Pedido</div>
+              <div>
+                <div style="font-size:17px; font-weight:700; color:#14171F">Simulação de Pedido</div>
+                <div style="font-size:11px; color:#8F95A3">Pedido pronto para entrega e WhatsApp</div>
+              </div>
             </div>
 
             <div style="background:linear-gradient(135deg, #FFF1E8 0%, #FFE7D6 100%); border:1px solid #FFD2B5; border-radius:14px; padding:12px 14px; margin-top:14px; display:flex; align-items:center; gap:10px">
               <span style="font-size:24px">🎉</span>
               <div style="flex:1">
-                <div style="font-size:13px; font-weight:700; color:#E85700">Tour Concluído com Sucesso!</div>
-                <div style="font-size:11px; color:var(--gray-700)">Você montou o cardápio e concluiu o pedido ponta a ponta!</div>
+                <div style="font-size:13px; font-weight:700; color:#E85700">Tour Guiado Concluído!</div>
+                <div style="font-size:11px; color:var(--gray-700)">Você montou o cardápio e concluiu a experiência do cliente de ponta a ponta!</div>
               </div>
             </div>
 
-            <div style="background:#F6F7F9; border-radius:12px; padding:14px; margin-top:14px; font-size:12px; line-height:1.6; max-height:220px; overflow-y:auto; white-space:pre-wrap; font-family:monospace">
+            <!-- Badge Forma de Pagamento Pix -->
+            <div style="background:#FFFFFF; border:1.5px solid #00B368; border-radius:12px; padding:10px 14px; margin-top:12px; display:flex; align-items:center; justify-content:space-between">
+              <div style="display:flex; align-items:center; gap:8px">
+                <span style="font-size:16px">⚡</span>
+                <span style="font-size:12px; font-weight:700; color:#14171F">Pagamento via Pix</span>
+              </div>
+              <span style="background:#E8F7EE; color:#00B368; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:6px">Aprovação Automática</span>
+            </div>
+
+            <div style="background:#F6F7F9; border:1px solid #ECEEF2; border-radius:12px; padding:14px; margin-top:12px; font-size:11.5px; line-height:1.6; max-height:200px; overflow-y:auto; white-space:pre-wrap; font-family:monospace">
 ${msgWhats}
             </div>
 
-            <div style="font-size:12px; color:var(--gray-500); margin-top:12px">
+            <div style="font-size:11.5px; color:var(--gray-500); margin-top:10px">
               O cliente envia esse pedido formatado automaticamente para o seu WhatsApp!
             </div>
 
-            <div style="display:flex; gap:8px; margin-top:18px">
-              <button class="btn-outline" style="flex:1; font-size:12px" onclick="window.__mepedeStore.orderModalOpen = false; window.__mepedeStore.setPhone({ cart: [], view: 'home' }); window.__mepedeStore.notify()">Novo pedido</button>
-              <button class="btn-outline" style="font-size:12px; border-color:#FFB98C; color:#E85700" onclick="window.__mepedeStore.orderModalOpen = false; window.__mepedeStore.startTutorial(true);" title="Reiniciar do zero">🔁 Reiniciar Tour</button>
-              <button class="btn-whatsapp" style="flex:1; justify-content:center; font-size:12px" onclick="window.open('https://wa.me/?text=' + encodeURIComponent(\`${msgWhats}\`), '_blank'); window.__mepedeStore.orderModalOpen = false; window.__mepedeStore.setPhone({ cart: [], view: 'home' }); window.__mepedeStore.notify()">
+            <div style="display:flex; gap:10px; margin-top:18px">
+              <button id="tut-btn-finish-tour" class="btn-orange" style="flex:1.2; justify-content:center; font-size:13px; font-weight:700; height:44px; box-shadow:0 4px 14px rgba(255,88,0,0.35); border-radius:12px" onclick="window.__mepedeStore.finishTourFromModal()">
+                Fechar e Concluir Tour
+              </button>
+              <button class="btn-whatsapp" style="flex:1; justify-content:center; font-size:12.5px; height:44px; border-radius:12px" onclick="window.open('https://wa.me/?text=' + encodeURIComponent(\`${msgWhats}\`), '_blank'); window.__mepedeStore.finishTourFromModal()">
                 WhatsApp
               </button>
             </div>
@@ -3256,14 +3500,14 @@ ${msgWhats}
     if (S.tutorialStep && S.showTutorialCard) {
       const step = S.tutorialStep;
       const curTut = TUTORIAL_STEPS_CONFIG.find(x => x.num === step) || TUTORIAL_STEPS_CONFIG[0];
-      const progPct = (step / 9) * 100;
+      const progPct = (step / 10) * 100;
 
       const isLeft = step >= 5;
       html += `
         <div class="tutorial-floating-card ${isLeft ? 'pos-left' : 'pos-right'}">
           <div style="display:flex; align-items:center; gap:8px">
             <span style="font-size:11px; font-weight:700; color:#E85700; background:#FFF1E8; padding:3px 8px; border-radius:6px; letter-spacing:0.5px">🎓 TOUR GUIADO</span>
-            <span style="font-size:12px; color:var(--gray-400); font-weight:500">Passo ${step} de 9</span>
+            <span style="font-size:12px; color:var(--gray-400); font-weight:500">Passo ${step} de 10</span>
             <div style="flex:1"></div>
             <div onclick="window.__mepedeStore.showTutorialCard = false; window.__mepedeStore.notify()" style="width:28px; height:28px; border-radius:14px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--gray-400)" title="Fechar card">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
@@ -3288,7 +3532,7 @@ ${msgWhats}
             <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px">
               <button class="btn-outline" style="height:34px; padding:0 12px; font-size:12px" onclick="window.__mepedeStore.prevTutorial()" ${step === 1 ? 'disabled style="opacity:0.4; cursor:not-allowed"' : ''}>← Anterior</button>
               <button class="btn-dark" style="height:34px; padding:0 16px; font-size:12px" onclick="window.__mepedeStore.nextTutorial()">
-                ${step === 9 ? 'Concluir Tutorial ✓' : 'Próximo →'}
+                ${step === 10 ? 'Concluir Tour ✓' : 'Próximo →'}
               </button>
             </div>
           </div>
@@ -3366,11 +3610,19 @@ ${msgWhats}
     },
     {
       num: 9,
-      title: 'Pedido Pronto para o WhatsApp!',
+      title: 'Carrinho e Continuar Pedido',
       targetSelector: '#tut-phone-checkout',
-      desc: 'Clique em “Fazer pedido” para simular o recebimento do pedido pronto direto no WhatsApp!',
-      tip: 'Experiência ponta a ponta 100% concluída!',
-      btn: 'Finalizar Pedido no WhatsApp'
+      desc: 'Veja os detalhes do carrinho completo com adicionais, cupom e total. Clique em “Continuar”!',
+      tip: 'Clique no botão laranja Continuar indicado no rodapé do carrinho.',
+      btn: 'Continuar Pedido'
+    },
+    {
+      num: 10,
+      title: 'Finalizar Tour Guiado',
+      targetSelector: '#tut-btn-finish-tour',
+      desc: 'Pedido simulado com sucesso! Clique em Fechar para concluir o tour guiado do Me Pede Aí.',
+      tip: 'Clique no botão indicado para finalizar o tour guiado!',
+      btn: 'Finalizar Tour'
     }
   ];
 
@@ -3381,7 +3633,7 @@ ${msgWhats}
     function loop() {
       updateTutorialSpotlight();
       const S = window.__mepedeStore;
-      if (S && S.tutorialStep && !S.orderModalOpen && !S.docModalOpen) {
+      if (S && S.tutorialStep && !S.docModalOpen) {
         tutTrackingRaf = requestAnimationFrame(loop);
       } else {
         tutTrackingRaf = null;
@@ -3394,7 +3646,7 @@ ${msgWhats}
     const S = window.__mepedeStore;
     let spotlight = document.getElementById('tutorial-spotlight');
 
-    if (!S || !S.tutorialStep || S.orderModalOpen || S.docModalOpen) {
+    if (!S || !S.tutorialStep || S.docModalOpen) {
       if (spotlight) {
         spotlight.style.opacity = '0';
         spotlight.style.display = 'none';
@@ -3451,6 +3703,9 @@ ${msgWhats}
     }
     if (!target && step === 9) {
       target = document.querySelector('#tut-phone-checkout');
+    }
+    if (!target && step === 10) {
+      target = document.querySelector('#tut-btn-finish-tour');
     }
 
     if (!target) {

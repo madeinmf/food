@@ -141,16 +141,99 @@ async function run() {
   await evalJs(`document.querySelector('#tut-phone-add-to-cart').click()`);
   await sleep(400);
 
-  console.log('Step 9 -> Click #tut-phone-checkout');
+  // Verificar o carrinho enriquecido no iPhone mockup (Step 9)
+  const cartInfo = await evalJs(`(() => {
+    const S = window.store || window.__mepedeStore;
+    const checkoutBtn = document.querySelector('#tut-phone-checkout');
+    const pecaTambem = document.querySelectorAll('[onclick*="addPecaTambem"]');
+    const couponInput = document.querySelector('#ph-coupon-input');
+    const pixBadge = document.querySelector('.ph-pix-badge') || document.querySelector('[style*="border:1.5px solid #00B368"]') || document.querySelector('[style*="border: 1.5px solid #00B368"]');
+    const stepperBtns = document.querySelectorAll('[onclick*="changeCartItemQty"]');
+    return {
+      step: S ? S.tutorialStep : null,
+      view: S ? S.ph.view : null,
+      cartCount: S && S.ph ? S.ph.cart.length : 0,
+      checkoutBtnText: checkoutBtn ? checkoutBtn.innerText.trim() : null,
+      pecaTambemCount: pecaTambem.length,
+      hasCouponInput: !!couponInput,
+      hasPixBadge: !!pixBadge,
+      stepperBtnsCount: stepperBtns.length
+    };
+  })()`);
+
+  console.log('Step 9 Rich Cart info:', cartInfo);
+  await snap('02b_step9_rich_cart');
+
+  if (cartInfo.step !== 9) {
+    throw new Error(`Expected tutorialStep === 9 in cart, got: ${cartInfo.step}`);
+  }
+  if (cartInfo.pecaTambemCount < 4) {
+    throw new Error(`Expected at least 4 "Peça também" suggestions, got: ${cartInfo.pecaTambemCount}`);
+  }
+  if (!cartInfo.hasCouponInput) {
+    throw new Error('Expected coupon input in cart');
+  }
+  if (!cartInfo.hasPixBadge) {
+    throw new Error('Expected Pix payment method in cart');
+  }
+  console.log('✓ PASS: Carrinho no smartphone fiel ao padrão iPhone-22 (Peça também, Cupom, Pix, Stepper e Sticky footer)!');
+
+  console.log('Step 9 -> Click #tut-phone-checkout (Continuar)');
   await evalJs(`document.querySelector('#tut-phone-checkout').click()`);
   await sleep(500);
 
-  await snap('03_whatsapp_modal');
-  console.log('✓ PASS: Tour guiado concluído de ponta a ponta com sucesso!');
+  // Verificar se o modal de WhatsApp abriu e o spotlight aponta para #tut-btn-finish-tour (Step 10)
+  const step10Info = await evalJs(`(() => {
+    const S = window.store || window.__mepedeStore;
+    const finishBtn = document.querySelector('#tut-btn-finish-tour');
+    const spotlight = document.querySelector('#tutorial-spotlight');
+    const beaconPin = document.querySelector('#tut-beacon-pin');
+    const spStyle = spotlight ? window.getComputedStyle(spotlight) : null;
+    return {
+      step: S ? S.tutorialStep : null,
+      orderModalOpen: S ? S.orderModalOpen : false,
+      finishBtnExists: !!finishBtn,
+      finishBtnText: finishBtn ? finishBtn.innerText.trim() : null,
+      spotlightVisible: spStyle ? spStyle.display !== 'none' && spStyle.opacity !== '0' : false,
+      beaconText: beaconPin ? beaconPin.innerText.trim() : null
+    };
+  })()`);
 
-  // Fechar modal de WhatsApp
-  await evalJs(`window.__mepedeStore.orderModalOpen = false; window.__mepedeStore.notify()`);
-  await sleep(300);
+  console.log('Step 10 WhatsApp Modal info:', step10Info);
+  await snap('03_whatsapp_modal_with_finish_beacon');
+
+  if (!step10Info.orderModalOpen) {
+    throw new Error('Expected orderModalOpen === true');
+  }
+  if (!step10Info.finishBtnExists) {
+    throw new Error('Expected #tut-btn-finish-tour button in modal');
+  }
+  if (!step10Info.spotlightVisible) {
+    throw new Error('Expected tutorial spotlight to be visible on #tut-btn-finish-tour');
+  }
+  if (!step10Info.beaconText || !step10Info.beaconText.includes('Clique aqui')) {
+    throw new Error(`Expected beacon "Clique aqui", got: ${step10Info.beaconText}`);
+  }
+  console.log('✓ PASS: Modal de WhatsApp com o pin "👉 Clique aqui" direcionado ao botão de fechar/concluir!');
+
+  console.log('Step 10 -> Click #tut-btn-finish-tour');
+  await evalJs(`document.querySelector('#tut-btn-finish-tour').click()`);
+  await sleep(400);
+
+  const postFinishInfo = await evalJs(`(() => {
+    const S = window.store || window.__mepedeStore;
+    return {
+      step: S ? S.tutorialStep : null,
+      orderModalOpen: S ? S.orderModalOpen : false
+    };
+  })()`);
+
+  console.log('Post-finish state:', postFinishInfo);
+  if (postFinishInfo.step !== null || postFinishInfo.orderModalOpen !== false) {
+    throw new Error('Expected tour to be finished and modal to be closed');
+  }
+  await snap('04_tour_concluded_toast');
+  console.log('✓ PASS: Tour guiado finalizado com sucesso ao clicar em fechar no modal!');
 
   // 4. Testar abertura do modal de Documentação ("O que mudou neste painel")
   console.log('Testing Documentation Modal...');
