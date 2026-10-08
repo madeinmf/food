@@ -1,0 +1,19 @@
+{
+  "name": "foodtruqueres-cardapio",
+  "version": "1.0.0",
+  "description": "Sistema moderno de criação e edição de cardápio para foodtruck (mepede.ai)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "cardapio",
+    "foodtruck",
+    "delivery",
+    "menu",
+    "mepede"
+  ],
+  "author": "mepede.ai",
+  "license": "MIT"
+}

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#F6F7F9;font-family:Poppins,system-ui,sans-serif;color:#14171F;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#FF6100;text-decoration:none}a:hover{color:#E85700}
+</style>
+</helmet>
+<div style="max-width:1080px;margin:0 auto;padding:48px 24px 80px;display:flex;flex-direction:column;gap:20px">
+  <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+    <div style="flex:1;min-width:280px">
+      <div style="font-size:13px;font-weight:500;color:#FF6100">mepede.ai · Painel de cardápio</div>
+      <h1 style="font-size:34px;font-weight:600;letter-spacing:-0.6px;margin:6px 0 0">O que mudou no painel</h1>
+      <p style="font-size:15px;color:#4A5160;margin:8px 0 0;max-width:640px;text-wrap:pretty">O cardápio mobile ficou igual. O painel foi refeito para o dono do foodtruck montar o cardápio sem se perder: menos telas, menos janelas, tudo com prévia ao vivo no celular.</p>
+    </div>
+    <a href="Painel Cardapio.dc.html" style="height:44px;padding:0 20px;border-radius:10px;background:#FF6100;color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center">Abrir o painel →</a>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+    <div style="background:#fff;border:1px solid #ECEEF2;border-radius:16px;padding:18px"><div style="font-size:28px;font-weight:600;color:#FF6100">6 → 1</div><div style="font-size:13px;color:#4A5160">telas para criar um produto (tipo + 4–5 etapas → um formulário só)</div></div>
+    <div style="background:#fff;border:1px solid #ECEEF2;border-radius:16px;padding:18px"><div style="font-size:28px;font-weight:600;color:#FF6100">0</div><div style="font-size:13px;color:#4A5160">janelas por cima de janelas (antes: modal + painel lateral juntos)</div></div>
+    <div style="background:#fff;border:1px solid #ECEEF2;border-radius:16px;padding:18px"><div style="font-size:28px;font-weight:600;color:#FF6100">Sempre</div><div style="font-size:13px;color:#4A5160">prévia do celular visível e clicável, inclusive durante a edição</div></div>
+    <div style="background:#fff;border:1px solid #ECEEF2;border-radius:16px;padding:18px"><div style="font-size:28px;font-weight:600;color:#FF6100">Desfazer</div><div style="font-size:13px;color:#4A5160">em toda exclusão, no lugar de modais de “não pode ser desfeito”</div></div>
+  </div>
+
+  <section style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:24px;display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px">
+    <img src="ref/tela-inicial.png" alt="Tela original: Cardápio Digital" style="width:100%;border-radius:12px;border:1px solid #ECEEF2">
+    <div>
+      <div style="font-size:12px;font-weight:600;color:#8A91A0;letter-spacing:.4px">01 · ESTRUTURA</div>
+      <h2 style="font-size:20px;font-weight:600;margin:4px 0 14px">Uma tela de trabalho, não uma lista de cardápios</h2>
+      <div style="font-size:13px;font-weight:600;color:#E5352B">Antes</div>
+      <ul style="margin:4px 0 12px;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>Entrar em “Cardápio Digital”, depois abrir o cardápio, depois escolher entre 4–5 abas.</li><li>Link, QR e WhatsApp só na primeira tela.</li><li>“Novo Cardápio” desabilitado, sem explicação.</li></ul>
+      <div style="font-size:13px;font-weight:600;color:#12A150">Agora</div>
+      <ul style="margin:4px 0 0;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>Abre direto no cardápio. As abas viraram itens do menu lateral: <b>Cardápio</b>, <b>Complementos</b>, <b>Loja e link</b>.</li><li>Link (copiar), QR Code e WhatsApp ficam no topo, em qualquer tela.</li><li>“Loja aberta/fechada” virou um interruptor no menu lateral — reflete no celular na hora.</li><li>“3 de 5 etapas” virou um checklist clicável: cada etapa leva direto à ação.</li></ul>
+    </div>
+  </section>
+
+  <section style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:24px;display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px">
+    <div style="display:flex;flex-direction:column;gap:10px"><img src="ref/categorias.png" alt="Tela original: Categorias" style="width:100%;border-radius:12px;border:1px solid #ECEEF2"><img src="ref/todos-produtos.png" alt="Tela original: Todos os produtos" style="width:100%;border-radius:12px;border:1px solid #ECEEF2"></div>
+    <div>
+      <div style="font-size:12px;font-weight:600;color:#8A91A0;letter-spacing:.4px">02 · CATEGORIAS E PRODUTOS</div>
+      <h2 style="font-size:20px;font-weight:600;margin:4px 0 14px">Categorias e produtos na mesma tela</h2>
+      <div style="font-size:13px;font-weight:600;color:#E5352B">Antes</div>
+      <ul style="margin:4px 0 12px;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>Duas abas separadas (“Categorias” e “Todos os produtos”) para os mesmos dados.</li><li>Lista em tabela, sem fotos grandes — difícil achar o que falta.</li><li>Prévia do celular estática e só na aba Categorias.</li></ul>
+      <div style="font-size:13px;font-weight:600;color:#12A150">Agora</div>
+      <ul style="margin:4px 0 0;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>Barra de categorias em chips (“Todos” + cada categoria, com contagem e bolinha de status). Clicar filtra os produtos e muda a prévia do celular junto.</li><li>Produtos em cards com foto, preço, desconto, complementos e interruptor “Visível”.</li><li>Produto sem foto mostra “Adicionar foto”; produto sem categoria mostra aviso de que não aparece para o cliente.</li><li>Reordenar categoria com ← →; produto pode estar em várias categorias; “Duplicar”, “Tirar desta categoria” e busca.</li></ul>
+    </div>
+  </section>
+
+  <section style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:24px;display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px">
+    <div style="display:flex;flex-direction:column;gap:10px"><img src="ref/criar-categoria.png" alt="Tela original: Nova categoria" style="width:100%;border-radius:12px;border:1px solid #ECEEF2"><img src="ref/excluir-categoria.png" alt="Tela original: Excluir categoria" style="width:100%;border-radius:12px;border:1px solid #ECEEF2"></div>
+    <div>
+      <div style="font-size:12px;font-weight:600;color:#8A91A0;letter-spacing:.4px">03 · CRIAR CATEGORIA</div>
+      <h2 style="font-size:20px;font-weight:600;margin:4px 0 14px">Criar categoria em um passo</h2>
+      <div style="font-size:13px;font-weight:600;color:#E5352B">Antes</div>
+      <ul style="margin:4px 0 12px;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>Modal com nome + 3 opções de disponibilidade logo na criação.</li><li>“Não disponível no momento” repetia o interruptor “Ativar”.</li><li>Excluir abria outro modal com “Essa ação não pode ser desfeita”.</li></ul>
+      <div style="font-size:13px;font-weight:600;color:#12A150">Agora</div>
+      <ul style="margin:4px 0 0;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>“+ Nova categoria”: digite o nome e aperte Enter. No cardápio vazio, sugestões de um clique (Lanches, Bebidas, Combos…).</li><li>Horários ficam em “Nome e horários”, quando precisar: <b>Sempre</b> ou <b>Dias e horários</b>, com o status em tempo real (“Abre sexta às 15:00”).</li><li>A opção repetida saiu: para pausar, use o interruptor “Visível”.</li><li>Excluir pede confirmação no próprio painel, explica que os produtos continuam salvos e permite <b>Desfazer</b>.</li></ul>
+    </div>
+  </section>
+
+  <section style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:24px;display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px">
+    <div style="display:flex;flex-direction:column;gap:10px"><img src="ref/tipo-produto.png" alt="Tela original: tipo de produto" style="width:100%;border-radius:12px;border:1px solid #ECEEF2"><img src="ref/wizard-dados.png" alt="Tela original: etapas do produto" style="width:100%;border-radius:12px;border:1px solid #ECEEF2"></div>
+    <div>
+      <div style="font-size:12px;font-weight:600;color:#8A91A0;letter-spacing:.4px">04 · CRIAR PRODUTO</div>
+      <h2 style="font-size:20px;font-weight:600;margin:4px 0 14px">De assistente em etapas para um formulário com prévia</h2>
+      <div style="font-size:13px;font-weight:600;color:#E5352B">Antes</div>
+      <ul style="margin:4px 0 12px;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>Escolher “Simples” ou “Com variação” antes de tudo — e o número de etapas mudava (3 ou 4).</li><li>Vai e volta com Voltar/Próximo; a revisão só no final.</li><li>Modal tampava a prévia do celular.</li></ul>
+      <div style="font-size:13px;font-weight:600;color:#12A150">Agora</div>
+      <ul style="margin:4px 0 0;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>Um painel lateral com 4 seções numa rolagem só: <b>Básico</b>, <b>Preço</b>, <b>Complementos</b>, <b>Visibilidade</b>. As abas do topo só pulam para a seção e ficam verdes quando completas.</li><li>Tipo do produto virou a escolha dentro de “Preço”: <b>Preço único</b> ou <b>Varia por tamanho/tipo</b> — dá para trocar a qualquer momento.</li><li>A revisão é o próprio celular ao lado, que mostra o produto enquanto você digita (foto, selo, desconto, tamanhos, complementos).</li><li>Rodapé mostra o que falta (“Falta: nome, preço”); ao salvar com erro, rola até o campo. “Salvar e criar outro” para cadastrar em sequência.</li><li>Desconto calculado automaticamente a partir do “Preço antes”, com aviso se estiver menor que o preço de venda.</li></ul>
+    </div>
+  </section>
+
+  <section style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:24px;display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px">
+    <div style="display:flex;flex-direction:column;gap:10px"><img src="ref/wizard-complemento.png" alt="Tela original: criar complemento" style="width:100%;border-radius:12px;border:1px solid #ECEEF2"><img src="ref/grupos.png" alt="Tela original: Grupo de complementos" style="width:100%;border-radius:12px;border:1px solid #ECEEF2"></div>
+    <div>
+      <div style="font-size:12px;font-weight:600;color:#8A91A0;letter-spacing:.4px">05 · COMPLEMENTOS</div>
+      <h2 style="font-size:20px;font-weight:600;margin:4px 0 14px">Complementos sem janela dentro de janela</h2>
+      <div style="font-size:13px;font-weight:600;color:#E5352B">Antes</div>
+      <ul style="margin:4px 0 12px;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>Criar uma opção abria um painel lateral por cima do modal do produto.</li><li>“Qtde mínima/máxima” sem explicar o que o cliente vai ver.</li><li>Tela de grupos longa, uma lista embaixo da outra.</li></ul>
+      <div style="font-size:13px;font-weight:600;color:#12A150">Agora</div>
+      <ul style="margin:4px 0 0;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>No produto: “Usar da biblioteca” (um clique vincula) ou “Criar novo grupo” direto no formulário, com opções em linhas nome + preço. Salvar já vincula e guarda na biblioteca.</li><li>Regra em linguagem simples: <b>Opcional / Obrigatório</b> + “Escolhe até N”, com a frase que o cliente vai ler.</li><li>Ordem dos grupos no produto com ↑ ↓.</li><li>Biblioteca em cards, mostrando onde cada grupo é usado; editar vale para todos os produtos.</li><li>No celular o cliente não consegue adicionar ao carrinho sem as escolhas obrigatórias, e o limite máximo é respeitado.</li></ul>
+    </div>
+  </section>
+
+  <section style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:24px;display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px">
+    <img src="ref/tela-inicial.png" alt="Tela original: lista de cardápios" style="width:100%;border-radius:12px;border:1px solid #ECEEF2">
+    <div>
+      <div style="font-size:12px;font-weight:600;color:#8A91A0;letter-spacing:.4px">06 · VÁRIOS CARDÁPIOS</div>
+      <h2 style="font-size:20px;font-weight:600;margin:4px 0 14px">Mais de um cardápio sem mudar de tela</h2>
+      <div style="font-size:13px;font-weight:600;color:#E5352B">Antes</div>
+      <ul style="margin:4px 0 12px;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>Uma tela só para a lista de cardápios, com o botão “Novo Cardápio” desabilitado.</li><li>Não ficava claro qual cardápio o cliente via em cada horário.</li></ul>
+      <div style="font-size:13px;font-weight:600;color:#12A150">Agora</div>
+      <ul style="margin:4px 0 0;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li>No topo da tela do Cardápio aparecem os cards “Seus cardápios”, cada um com o horário, o status e quantas categorias e produtos tem. Clicar troca o cardápio em edição e a prévia do celular junto.</li><li>“Novo cardápio” pode começar <b>em branco</b> ou <b>copiar</b> as categorias de outro cardápio.</li><li>Cada cardápio tem as próprias categorias e horários. Produtos e complementos são compartilhados: mudar o preço do X-Burguer muda em todos os cardápios. O card do produto avisa “Também em: …”.</li><li>Um selo mostra qual cardápio o cliente vê agora. O link continua o mesmo; vale o primeiro cardápio da lista que estiver no horário.</li></ul>
+    </div>
+  </section>
+
+  <section style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:24px;display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px">
+    <img src="ref/existente.png" alt="Tela original: adicionar produto existente" style="width:100%;border-radius:12px;border:1px solid #ECEEF2">
+    <div>
+      <div style="font-size:12px;font-weight:600;color:#8A91A0;letter-spacing:.4px">07 · PRÉVIA E DETALHES</div>
+      <h2 style="font-size:20px;font-weight:600;margin:4px 0 14px">Prévia interativa e o resto</h2>
+      <ul style="margin:4px 0 0;padding-left:18px;font-size:14px;color:#4A5160;line-height:1.6"><li><b>Celular interativo:</b> trocar categoria, abrir produto, escolher tamanho e complementos, quantidade, carrinho, taxa de entrega, pedido mínimo e loja fechada.</li><li>Categorias fora do horário, desligadas ou vazias somem do celular, com um aviso de quantas estão ocultas.</li><li><b>Adicionar existente</b> virou painel lateral com seleção múltipla e busca.</li><li><b>Loja e link:</b> nome, tempo, taxa, pedido mínimo e endereço do link — tudo aparece no topo do cardápio do cliente.</li><li>Tudo fica salvo no navegador. Em “Loja e link” dá para <b>Começar do zero</b> (testar o fluxo inteiro) ou <b>Restaurar exemplo</b>.</li></ul>
+      <div style="margin-top:16px;font-size:13px;color:#4A5160;background:#F6F7F9;border-radius:12px;padding:12px 14px">Fora do escopo deste protótipo: login, arrastar para reordenar e integração com PDV. O SKU saiu do formulário principal — dá para voltar como campo avançado se ele usar PDV.</div>
+    </div>
+  </section>
+</div>
+</x-dc>
+</body>
+</html>

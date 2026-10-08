@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;background:#F6F7F9;font-family:Poppins,system-ui,sans-serif;color:#14171F;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#FF6100;text-decoration:none}a:hover{color:#E85700}
+input,textarea,select,button{font-family:inherit}
+::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-thumb{background:#D9DDE3;border-radius:8px}
+</style>
+</helmet>
+<div style="display:flex;height:100vh;min-width:1180px;background:#F6F7F9;overflow:hidden;font-family:Poppins,system-ui,sans-serif">
+
+  <aside style="width:232px;flex:none;background:#fff;border-right:1px solid #ECEEF2;display:flex;flex-direction:column;padding:24px 16px 16px">
+    <div style="display:flex;align-items:center;gap:8px;padding:0 8px">
+      <div style="width:28px;height:28px;border-radius:8px 8px 8px 2px;background:#FF6100;display:flex;align-items:center;justify-content:center;color:#fff">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M8 4v6a4 4 0 0 0 8 0V4M12 4v16"></path></svg>
+      </div>
+      <span style="font-size:22px;font-weight:700;color:#FF6100;letter-spacing:-0.5px">mepede.ai</span>
+    </div>
+
+    <div style="margin-top:24px;padding:12px 14px;border-radius:14px;background:{{ storeCard.bg }};border:1px solid {{ storeCard.bd }};display:flex;align-items:center;gap:10px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:{{ storeCard.fg }}">{{ storeCard.label }}</div>
+        <div style="font-size:12px;color:#6B7280">{{ storeCard.sub }}</div>
+      </div>
+      <div onClick="{{ onToggleStore }}" style="cursor:pointer;width:40px;height:24px;border-radius:12px;background:{{ tStore.bg }};position:relative;flex:none;transition:background .2s">
+        <div style="position:absolute;top:2px;left:{{ tStore.x }};width:20px;height:20px;border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s"></div>
+      </div>
+    </div>
+
+    <div style="margin:28px 8px 8px;font-size:12px;color:#8A91A0;letter-spacing:.4px">MENU</div>
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <div onClick="{{ navMenu.onClick }}" style="display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:12px;cursor:pointer;background:{{ navMenu.bg }};color:{{ navMenu.fg }};font-size:14px;font-weight:{{ navMenu.fw }}" style-hover="background:#FFF1E8">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4Z"></path><path d="M8 9h8M8 13h6"></path></svg>
+        <span style="flex:1">Cardápio</span><span style="font-size:12px;color:#8A91A0">{{ navMenu.count }}</span>
+      </div>
+      <div onClick="{{ navGroups.onClick }}" style="display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:12px;cursor:pointer;background:{{ navGroups.bg }};color:{{ navGroups.fg }};font-size:14px;font-weight:{{ navGroups.fw }}" style-hover="background:#FFF1E8">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5Z"></path><path d="m3 13 9 5 9-5"></path></svg>
+        <span style="flex:1">Complementos</span><span style="font-size:12px;color:#8A91A0">{{ navGroups.count }}</span>
+      </div>
+      <div onClick="{{ navSettings.onClick }}" style="display:flex;align-items:center;gap:12px;height:44px;padding:0 12px;border-radius:12px;cursor:pointer;background:{{ navSettings.bg }};color:{{ navSettings.fg }};font-size:14px;font-weight:{{ navSettings.fw }}" style-hover="background:#FFF1E8">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>
+        <span style="flex:1">Loja e link</span>
+      </div>
+    </div>
+
+    <div style="flex:1"></div>
+    <a href="O que mudou.dc.html" style="display:block;padding:14px;border-radius:14px;background:#F6F7F9;border:1px solid #ECEEF2;margin-bottom:16px">
+      <div style="font-size:13px;font-weight:600;color:#14171F">O que mudou neste painel</div>
+      <div style="font-size:12px;color:#FF6100;margin-top:2px">Ver documentação →</div>
+    </a>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 8px 0;border-top:1px solid #ECEEF2">
+      <div style="width:36px;height:36px;border-radius:18px;background:#FFE2CF;color:#C24A00;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600">EH</div>
+      <div style="min-width:0">
+        <div style="font-size:13px;font-weight:500">Enzo Hirrata</div>
+        <div style="font-size:11px;color:#8A91A0;overflow:hidden;text-overflow:ellipsis">enzohirrata@gmail.com</div>
+      </div>
+    </div>
+  </aside>
+
+  <main style="flex:1;min-width:0;position:relative;display:flex;flex-direction:column;overflow:hidden">
+    <header style="flex:none;display:flex;align-items:center;flex-wrap:wrap;gap:12px 16px;padding:20px 32px;background:#fff;border-bottom:1px solid #ECEEF2;white-space:nowrap">
+      <div style="flex:1;min-width:200px">
+        <div style="font-size:12px;color:#8A91A0">{{ pageKicker }}</div>
+        <div style="font-size:22px;font-weight:600;letter-spacing:-0.3px">{{ pageTitle }}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;position:relative">
+        <div onClick="{{ onCopyLink }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;cursor:pointer;font-size:13px;color:#2F6FEB;background:#fff" style-hover="border-color:#2F6FEB">
+          <span>{{ linkText }}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>
+        </div>
+        <button onClick="{{ onToggleQr }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:10px;border:none;background:#14171F;color:#fff;font-size:13px;font-weight:500;cursor:pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><path d="M14 14h3v3h-3zM17 20h4v-3"></path></svg>
+          QR Code
+        </button>
+        <button onClick="{{ onWhats }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:10px;border:none;background:#12A150;color:#fff;font-size:13px;font-weight:500;cursor:pointer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.4A8.5 8.5 0 1 1 21 12Z"></path></svg>
+          WhatsApp
+        </button>
+        <sc-if value="{{ qrOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:48px;right:0;z-index:40;background:#fff;border:1px solid #ECEEF2;border-radius:16px;box-shadow:0 16px 40px rgba(20,23,31,.14);padding:20px;width:240px;text-align:center">
+            <img src="{{ qrSrc }}" loading="lazy" width="180" height="180" style="display:block;margin:0 auto;border-radius:8px" alt="QR Code do cardápio">
+            <div style="font-size:13px;font-weight:500;margin-top:12px">Imprima e cole no foodtruck</div>
+            <div style="font-size:12px;color:#8A91A0;margin-top:2px">Abre direto o seu cardápio</div>
+            <a href="{{ qrSrc }}" target="_blank" style="display:block;margin-top:12px;font-size:13px;font-weight:500">Abrir imagem para baixar</a>
+          </div>
+        </sc-if>
+      </div>
+    </header>
+
+    <div style="flex:1;overflow:auto;padding:24px 32px 64px">
+
+      <sc-if value="{{ isMenu }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:20px;max-width:1040px">
+
+          <div style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 4px">
+              <span style="font-size:15px;font-weight:600">Cardápios</span>
+              <sc-if value="{{ hasLiveBar }}" hint-placeholder-val="{{ false }}">
+                <span style="display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border-radius:12px;background:{{ liveBar.bg }};color:{{ liveBar.fg }};font-size:12px;font-weight:500"><span style="width:6px;height:6px;border-radius:3px;background:{{ liveBar.fg }}"></span>{{ liveBar.text }}</span>
+              </sc-if>
+              <div style="flex:1"></div>
+              <button onClick="{{ onNewMenu }}" style="display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;color:#14171F;font-size:13px;font-weight:500;cursor:pointer" style-hover="border-color:#FF6100;color:#E85700">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+                Novo cardápio
+              </button>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px">
+              <sc-for list="{{ menuCards }}" as="mc" hint-placeholder-count="2">
+                <div onClick="{{ mc.onClick }}" style="flex:0 1 380px;min-width:280px;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:10px 12px 10px 10px;border-radius:14px;border:1.5px solid {{ mc.bd }};background:{{ mc.bg }};cursor:pointer;transition:border-color .15s" style-hover="border-color:#9AA1AE">
+                  <div style="width:56px;height:56px;flex:none;border-radius:12px;overflow:hidden;background:#FFF1E8;color:#E85700;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:600;opacity:{{ mc.op }}">
+                    <sc-if value="{{ mc.hasThumb }}" hint-placeholder-val="{{ false }}"><img src="{{ mc.thumb }}" alt="" style="width:100%;height:100%;object-fit:cover"></sc-if>
+                    <sc-if value="{{ mc.noThumb }}" hint-placeholder-val="{{ true }}"><span>{{ mc.initial }}</span></sc-if>
+                  </div>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                    <div style="display:flex;align-items:center;gap:6px;min-width:0">
+                      <span style="font-size:14px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ mc.name }}</span>
+                      <sc-if value="{{ mc.editing }}" hint-placeholder-val="{{ false }}"><span style="flex:none;font-size:10px;font-weight:600;color:#fff;background:#14171F;border-radius:6px;padding:1px 6px">EDITANDO</span></sc-if>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:{{ mc.sfg }};min-width:0"><span style="width:6px;height:6px;border-radius:3px;background:{{ mc.sfg }};flex:none"></span><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ mc.status }}</span></div>
+                    <div style="font-size:11px;color:#8A91A0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ mc.sched }} · {{ mc.count }}</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:4px;flex:none">
+                    <div onClick="{{ mc.onEdit }}" title="Nome e horários" style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#6B7280" style-hover="background:#F1F2F5;color:#14171F"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></div>
+                    <div onClick="{{ mc.onToggle }}" title="Ligar / desligar" style="width:40px;height:24px;border-radius:12px;background:{{ mc.t.bg }};position:relative;cursor:pointer;transition:background .2s">
+                      <div style="position:absolute;top:2px;left:{{ mc.t.x }};width:20px;height:20px;border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s"></div>
+                    </div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <sc-if value="{{ showChecklist }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #ECEEF2;border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+              <div style="min-width:180px">
+                <div style="font-size:15px;font-weight:600">{{ checkTitle }}</div>
+                <div style="font-size:12px;color:#8A91A0;margin-top:2px">{{ checkSub }}</div>
+              </div>
+              <div style="flex:1;display:flex;gap:8px;flex-wrap:wrap">
+                <sc-for list="{{ checkSteps }}" as="st" hint-placeholder-count="4">
+                  <div onClick="{{ st.onClick }}" style="display:flex;align-items:center;gap:8px;height:36px;padding:0 12px 0 6px;border-radius:18px;background:{{ st.bg }};color:{{ st.fg }};font-size:13px;font-weight:500;cursor:pointer" style-hover="filter:brightness(.97)">
+                    <span style="width:24px;height:24px;border-radius:12px;background:{{ st.markBg }};color:{{ st.markFg }};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">{{ st.mark }}</span>
+                    {{ st.label }} {{ st.arrow }}
+                  </div>
+                </sc-for>
+              </div>
+              <div onClick="{{ onHideChecklist }}" style="cursor:pointer;color:#8A91A0;padding:6px" title="Ocultar">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ noCats }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:48px 40px;text-align:center">
+              <div style="width:56px;height:56px;border-radius:16px;background:#FFF1E8;color:#FF6100;display:flex;align-items:center;justify-content:center;margin:0 auto">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4Z"></path><path d="M8 9h8M8 13h6"></path></svg>
+              </div>
+              <div style="font-size:22px;font-weight:600;margin-top:16px">Vamos montar seu cardápio</div>
+              <div style="font-size:14px;color:#6B7280;margin-top:6px;text-wrap:pretty">Comece pelas categorias — são as abas que o cliente vê no celular.</div>
+              <div style="display:flex;gap:8px;max-width:460px;margin:24px auto 0">
+                <input value="{{ newCatName }}" onChange="{{ onNewCatName }}" onKeyDown="{{ onNewCatKey }}" placeholder="Nome da categoria, ex: Lanches" style="flex:1;height:44px;padding:0 14px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none" style-focus="border-color:#FF6100;box-shadow:0 0 0 3px #FFE2CF">
+                <button onClick="{{ onCreateCatInput }}" style="height:44px;padding:0 18px;border:none;border-radius:10px;background:#FF6100;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Criar</button>
+              </div>
+              <div style="font-size:12px;color:#8A91A0;margin-top:20px">Ou crie com um clique:</div>
+              <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px">
+                <sc-for list="{{ suggestions }}" as="sg" hint-placeholder-count="5">
+                  <div onClick="{{ sg.onClick }}" style="display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:18px;border:1px dashed #FFB98C;color:#E85700;font-size:13px;font-weight:500;cursor:pointer;background:#fff" style-hover="background:#FFF1E8">+ {{ sg.label }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ hasCats }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;flex-direction:column;gap:20px">
+              <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <div onClick="{{ allChip.onClick }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:12px;cursor:pointer;background:{{ allChip.bg }};color:{{ allChip.fg }};border:1px solid {{ allChip.bd }};font-size:14px;font-weight:500">
+                  Todos <span style="font-size:12px;opacity:.75">{{ allChip.count }}</span>
+                </div>
+                <sc-for list="{{ chips }}" as="ch" hint-placeholder-count="4">
+                  <div onClick="{{ ch.onClick }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:12px;cursor:pointer;background:{{ ch.bg }};color:{{ ch.fg }};border:1px solid {{ ch.bd }};font-size:14px;font-weight:500">
+                    <span style="width:7px;height:7px;border-radius:4px;background:{{ ch.dot }}"></span>
+                    {{ ch.label }} <span style="font-size:12px;opacity:.75">{{ ch.count }}</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ newCatOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:6px;height:40px;padding:0 6px 0 12px;border-radius:12px;border:1px solid #FF6100;background:#fff;box-shadow:0 0 0 3px #FFE2CF">
+                    <input autoFocus="{{ true }}" value="{{ newCatName }}" onChange="{{ onNewCatName }}" onKeyDown="{{ onNewCatKey }}" placeholder="Nome e Enter" style="width:150px;border:none;outline:none;font-size:14px;background:transparent">
+                    <button onClick="{{ onCreateCatInput }}" style="height:28px;padding:0 10px;border:none;border-radius:8px;background:#FF6100;color:#fff;font-size:12px;font-weight:600;cursor:pointer">Criar</button>
+                    <div onClick="{{ onCloseNewCat }}" style="cursor:pointer;color:#8A91A0;display:flex;padding:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ newCatClosed }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ onOpenNewCat }}" style="display:flex;align-items:center;gap:6px;height:40px;padding:0 14px;border-radius:12px;border:1px dashed #FFB98C;color:#E85700;font-size:14px;font-weight:500;cursor:pointer" style-hover="background:#FFF1E8">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+                    Nova categoria
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:20px 24px 24px">
+                <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;padding-bottom:18px;border-bottom:1px solid #F0F1F4">
+                  <div style="flex:1;min-width:220px">
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                      <div style="font-size:20px;font-weight:600;letter-spacing:-0.2px">{{ head.title }}</div>
+                      <sc-if value="{{ head.isCat }}" hint-placeholder-val="{{ false }}">
+                        <span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;background:{{ head.sbg }};color:{{ head.sfg }};font-size:12px;font-weight:500"><span style="width:6px;height:6px;border-radius:3px;background:{{ head.sfg }}"></span>{{ head.status }}</span>
+                      </sc-if>
+                    </div>
+                    <div style="font-size:13px;color:#8A91A0;margin-top:4px">{{ head.sub }}</div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                    <div style="display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;width:200px">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A91A0" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+                      <input value="{{ search }}" onChange="{{ onSearch }}" placeholder="Buscar produto" style="flex:1;min-width:0;border:none;outline:none;font-size:13px;background:transparent">
+                    </div>
+                    <sc-if value="{{ head.isCat }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:8px">
+                        <div style="display:flex;border:1px solid #E3E6EB;border-radius:10px;overflow:hidden">
+                          <div onClick="{{ head.onLeft }}" title="Mover para a esquerda" style="width:36px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A5160" style-hover="background:#F6F7F9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m15 18-6-6 6-6"></path></svg></div>
+                          <div onClick="{{ head.onRight }}" title="Mover para a direita" style="width:36px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A5160;border-left:1px solid #E3E6EB" style-hover="background:#F6F7F9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m9 18 6-6-6-6"></path></svg></div>
+                        </div>
+                        <button onClick="{{ head.onSettings }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 14px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;color:#14171F;font-size:13px;font-weight:500;cursor:pointer">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+                          Nome e horários
+                        </button>
+                        <button onClick="{{ onPickExisting }}" style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;color:#14171F;font-size:13px;font-weight:500;cursor:pointer">Adicionar existente</button>
+                      </div>
+                    </sc-if>
+                    <button onClick="{{ onNewProduct }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;border:none;background:#FF6100;color:#fff;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#E85700">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+                      Novo produto
+                    </button>
+                  </div>
+                </div>
+
+                <sc-if value="{{ hasCards }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:20px">
+                    <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+                      <div onClick="{{ c.onEdit }}" style="position:relative;display:flex;flex-direction:column;border:1px solid #ECEEF2;border-radius:16px;padding:10px;cursor:pointer;background:#fff;transition:box-shadow .15s,border-color .15s" style-hover="border-color:#FFC9A6;box-shadow:0 8px 24px rgba(255,97,0,.08)">
+                        <div style="position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:#F6F7F9;opacity:{{ c.op }}">
+                          <sc-if value="{{ c.hasImg }}" hint-placeholder-val="{{ true }}">
+                            <img src="{{ c.img }}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+                          </sc-if>
+                          <sc-if value="{{ c.noImg }}" hint-placeholder-val="{{ false }}">
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#C24A00;background:#FFF1E8">
+                              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+                              <span style="font-size:12px;font-weight:500">Adicionar foto</span>
+                            </div>
+                          </sc-if>
+                          <sc-if value="{{ c.hasBadge }}" hint-placeholder-val="{{ false }}">
+                            <span style="position:absolute;top:8px;left:8px;height:24px;padding:0 10px;border-radius:12px;background:#fff;color:#E85700;font-size:11px;font-weight:600;display:flex;align-items:center">{{ c.badge }}</span>
+                          </sc-if>
+                        </div>
+                        <div style="padding:12px 4px 4px;display:flex;flex-direction:column;gap:4px;flex:1">
+                          <div style="font-size:15px;font-weight:600;line-height:1.3">{{ c.name }}</div>
+                          <div style="font-size:12px;color:#6B7280;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px">{{ c.desc }}</div>
+                          <div style="display:flex;align-items:baseline;gap:8px;margin-top:4px;flex-wrap:wrap">
+                            <span style="font-size:16px;font-weight:600;color:#12A150">{{ c.price }}</span>
+                            <sc-if value="{{ c.hasOrig }}" hint-placeholder-val="{{ false }}">
+                              <span style="font-size:12px;color:#8A91A0;text-decoration:line-through">{{ c.orig }}</span>
+                              <span style="font-size:11px;font-weight:600;color:#fff;background:#12A150;border-radius:8px;padding:1px 6px">{{ c.disc }}</span>
+                            </sc-if>
+                          </div>
+                          <div style="font-size:12px;color:#8A91A0">{{ c.meta }}</div>
+                          <sc-if value="{{ c.warn }}" hint-placeholder-val="{{ false }}">
+                            <div style="font-size:12px;color:#B45309;background:#FFF4E0;border-radius:8px;padding:4px 8px;margin-top:2px">{{ c.warnText }}</div>
+                          </sc-if>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;padding:10px 4px 2px;border-top:1px solid #F0F1F4;margin-top:8px">
+                          <div onClick="{{ c.onToggle }}" style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1">
+                            <div style="width:36px;height:22px;border-radius:11px;background:{{ c.t.bg }};position:relative;transition:background .2s">
+                              <div style="position:absolute;top:2px;left:{{ c.t.xs }};width:18px;height:18px;border-radius:9px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s"></div>
+                            </div>
+                            <span style="font-size:12px;color:#4A5160">{{ c.activeLabel }}</span>
+                          </div>
+                          <div onClick="{{ c.onMenu }}" style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#4A5160" style-hover="background:#F6F7F9">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="19" cy="12" r="1.6"></circle></svg>
+                          </div>
+                        </div>
+                        <sc-if value="{{ c.menuOpen }}" hint-placeholder-val="{{ false }}">
+                          <div style="position:absolute;right:10px;bottom:52px;z-index:5;background:#fff;border:1px solid #ECEEF2;border-radius:12px;box-shadow:0 12px 32px rgba(20,23,31,.14);padding:6px;min-width:200px">
+                            <div onClick="{{ c.onEditBtn }}" style="padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer" style-hover="background:#F6F7F9">Editar</div>
+                            <div onClick="{{ c.onPreview }}" style="padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer" style-hover="background:#F6F7F9">Ver no celular</div>
+                            <div onClick="{{ c.onDup }}" style="padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer" style-hover="background:#F6F7F9">Duplicar</div>
+                            <sc-if value="{{ c.canRemoveCat }}" hint-placeholder-val="{{ false }}">
+                              <div onClick="{{ c.onRemoveCat }}" style="padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer" style-hover="background:#F6F7F9">Tirar desta categoria</div>
+                            </sc-if>
+                            <div onClick="{{ c.onDel }}" style="padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer;color:#E5352B" style-hover="background:#FDECEB">Excluir produto</div>
+                          </div>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                    <div onClick="{{ onNewProduct }}" style="border:1.5px dashed #FFC9A6;border-radius:16px;min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;color:#E85700;background:#FFFAF6" style-hover="background:#FFF1E8">
+                      <div style="width:44px;height:44px;border-radius:22px;background:#FF6100;color:#fff;display:flex;align-items:center;justify-content:center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></div>
+                      <div style="font-size:14px;font-weight:600">Novo produto</div>
+                      <div style="font-size:12px;color:#8A91A0">{{ head.newHint }}</div>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ noCards }}" hint-placeholder-val="{{ false }}">
+                  <div style="text-align:center;padding:48px 20px 24px">
+                    <div style="font-size:17px;font-weight:600">{{ empty.title }}</div>
+                    <div style="font-size:13px;color:#6B7280;margin-top:6px">{{ empty.sub }}</div>
+                    <div style="display:flex;gap:10px;justify-content:center;margin-top:20px">
+                      <button onClick="{{ onNewProduct }}" style="height:44px;padding:0 20px;border-radius:10px;border:none;background:#FF6100;color:#fff;font-size:14px;font-weight:600;cursor:pointer">Criar produto</button>
+                      <sc-if value="{{ empty.canPick }}" hint-placeholder-val="{{ false }}">
+                        <button onClick="{{ onPickExisting }}" style="height:44px;padding:0 20px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;color:#14171F;font-size:14px;font-weight:500;cursor:pointer">Usar produto existente</button>
+                      </sc-if>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isGroups }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:16px;max-width:1040px">
+          <div style="display:flex;align-items:center;gap:16px;background:#EEF4FF;color:#2F6FEB;border-radius:14px;padding:14px 18px;font-size:13px;font-weight:500">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex:none"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+            <span style="flex:1;text-wrap:pretty">Grupos são reutilizáveis: crie uma vez (ex.: “Ponto da carne”) e vincule em vários produtos. Alterar aqui atualiza todos.</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="flex:1;font-size:13px;color:#8A91A0">{{ groupsSummary }}</div>
+            <button onClick="{{ onNewGroup }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;border:none;background:#FF6100;color:#fff;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:#E85700">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+              Novo grupo
+            </button>
+          </div>
+          <sc-if value="{{ noGroups }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:48px;text-align:center">
+              <div style="font-size:17px;font-weight:600">Nenhum grupo de complementos ainda</div>
+              <div style="font-size:13px;color:#6B7280;margin-top:6px">Ex.: “Adicionais”, “Ponto da carne”, “Escolha a bebida”.</div>
+            </div>
+          </sc-if>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+            <sc-for list="{{ groupCards }}" as="g" hint-placeholder-count="3">
+              <div onClick="{{ g.onEdit }}" style="background:#fff;border:1px solid #ECEEF2;border-radius:18px;padding:18px 20px;cursor:pointer;display:flex;flex-direction:column;gap:12px" style-hover="border-color:#FFC9A6;box-shadow:0 8px 24px rgba(255,97,0,.08)">
+                <div style="display:flex;align-items:flex-start;gap:10px">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-size:16px;font-weight:600">{{ g.name }}</div>
+                    <div style="font-size:12px;color:#8A91A0;margin-top:2px">{{ g.rule }}</div>
+                  </div>
+                  <span style="height:24px;padding:0 10px;border-radius:12px;background:{{ g.rbg }};color:{{ g.rfg }};font-size:11px;font-weight:600;display:flex;align-items:center;letter-spacing:.3px">{{ g.ruleTag }}</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:0;border-top:1px solid #F0F1F4">
+                  <sc-for list="{{ g.opts }}" as="o" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #F6F7F9">
+                      <sc-if value="{{ o.hasImg }}" hint-placeholder-val="{{ false }}"><img src="{{ o.img }}" alt="" style="width:28px;height:28px;border-radius:8px;object-fit:cover"></sc-if>
+                      <span style="flex:1;font-size:13px">{{ o.name }}</span>
+                      <span style="font-size:12px;color:#4A5160;background:#F6F7F9;border-radius:8px;padding:3px 8px">{{ o.price }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="font-size:12px;color:#6B7280">{{ g.used }}</div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:16px;max-width:760px">
+          <div style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:24px">
+            <div style="font-size:16px;font-weight:600">Dados da loja</div>
+            <div style="font-size:13px;color:#8A91A0;margin-top:2px">Aparecem no topo do cardápio do cliente.</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+              <label style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1"><span style="font-size:13px;font-weight:500">Nome da loja</span>
+                <input value="{{ st.name }}" onChange="{{ onStName }}" style="height:44px;padding:0 14px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none" style-focus="border-color:#FF6100;box-shadow:0 0 0 3px #FFE2CF"></label>
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">Tempo de preparo/entrega</span>
+                <input value="{{ st.eta }}" onChange="{{ onStEta }}" placeholder="35-45 min" style="height:44px;padding:0 14px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none" style-focus="border-color:#FF6100;box-shadow:0 0 0 3px #FFE2CF"></label>
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">Taxa de entrega (0 = grátis)</span>
+                <input value="{{ st.fee }}" onChange="{{ onStFee }}" placeholder="0,00" style="height:44px;padding:0 14px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none" style-focus="border-color:#FF6100;box-shadow:0 0 0 3px #FFE2CF"></label>
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">Pedido mínimo</span>
+                <input value="{{ st.min }}" onChange="{{ onStMin }}" placeholder="0,00" style="height:44px;padding:0 14px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none" style-focus="border-color:#FF6100;box-shadow:0 0 0 3px #FFE2CF"></label>
+              <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">Link do cardápio</span>
+                <div style="display:flex;align-items:center;height:44px;border:1px solid #E3E6EB;border-radius:10px;overflow:hidden"><span style="padding:0 4px 0 14px;font-size:14px;color:#8A91A0">mepede.ai/</span><input value="{{ st.slug }}" onChange="{{ onStSlug }}" style="flex:1;min-width:0;height:100%;border:none;outline:none;font-size:14px"></div></label>
+            </div>
+          </div>
+          <div style="background:#fff;border:1px solid #ECEEF2;border-radius:20px;padding:24px;display:flex;align-items:center;gap:16px">
+            <div style="flex:1">
+              <div style="font-size:16px;font-weight:600">Dados de exemplo</div>
+              <div style="font-size:13px;color:#8A91A0;margin-top:2px">Teste o fluxo do zero ou volte ao cardápio de exemplo.</div>
+            </div>
+            <button onClick="{{ onResetEmpty }}" style="height:40px;padding:0 14px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;font-size:13px;font-weight:500;cursor:pointer">Começar do zero</button>
+            <button onClick="{{ onResetSeed }}" style="height:40px;padding:0 14px;border-radius:10px;border:none;background:#14171F;color:#fff;font-size:13px;font-weight:500;cursor:pointer">Restaurar exemplo</button>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ onCloseDrawer }}" style="position:absolute;inset:0;background:rgba(20,23,31,.32);z-index:20"></div>
+      <div style="position:absolute;top:0;right:0;bottom:0;width:620px;max-width:100%;background:#fff;z-index:21;display:flex;flex-direction:column;box-shadow:-16px 0 48px rgba(20,23,31,.14)">
+
+        <sc-if value="{{ dProduct }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none;padding:22px 28px 0;border-bottom:1px solid #ECEEF2">
+            <div style="display:flex;align-items:flex-start;gap:12px">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:12px;font-weight:500;color:#FF6100">{{ pe.kicker }}</div>
+                <div style="font-size:22px;font-weight:600;letter-spacing:-0.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ pe.title }}</div>
+              </div>
+              <div onClick="{{ onCloseDrawer }}" style="width:36px;height:36px;border-radius:18px;border:1px solid #ECEEF2;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A5160" style-hover="background:#F6F7F9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></div>
+            </div>
+            <div style="display:flex;gap:4px;margin-top:16px">
+              <sc-for list="{{ pe.secs }}" as="s" hint-placeholder-count="4">
+                <div onClick="{{ s.onClick }}" style="display:flex;align-items:center;gap:6px;padding:10px 12px;font-size:13px;font-weight:500;color:{{ s.fg }};border-bottom:2px solid {{ s.bd }};cursor:pointer">
+                  <span style="width:16px;height:16px;border-radius:8px;background:{{ s.dot }};border:1.5px solid {{ s.ring }};display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px">{{ s.mark }}</span>{{ s.label }}
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <div ref="{{ scrollRef }}" style="flex:1;overflow:auto;padding:24px 28px 32px;display:flex;flex-direction:column;gap:32px">
+            <div ref="{{ secBasic }}" style="display:flex;flex-direction:column;gap:18px">
+              <div style="display:grid;grid-template-columns:150px 1fr;gap:20px">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <span style="font-size:13px;font-weight:500">Foto</span>
+                  <sc-if value="{{ pe.hasImg }}" hint-placeholder-val="{{ false }}">
+                    <img src="{{ d.img }}" alt="" style="width:150px;height:150px;border-radius:14px;object-fit:cover;display:block">
+                    <div style="display:flex;gap:6px">
+                      <label style="flex:1;height:32px;border:1px solid #E3E6EB;border-radius:8px;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;cursor:pointer">Trocar<input type="file" accept="image/*" onChange="{{ onDImg }}" style="display:none"></label>
+                      <div onClick="{{ onDImgRemove }}" style="width:32px;height:32px;border:1px solid #E3E6EB;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#E5352B"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"></path></svg></div>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ pe.noImg }}" hint-placeholder-val="{{ true }}">
+                    <label style="width:150px;height:150px;border:1.5px dashed #FFB98C;border-radius:14px;background:#FFFAF6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;color:#E85700;text-align:center" style-hover="background:#FFF1E8">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+                      <span style="font-size:13px;font-weight:600">Enviar foto</span>
+                      <span style="font-size:11px;color:#8A91A0">Produtos com foto<br>vendem mais</span>
+                      <input type="file" accept="image/*" onChange="{{ onDImg }}" style="display:none">
+                    </label>
+                  </sc-if>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:14px">
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">Nome do produto <span style="color:#FF6100">*</span></span>
+                    <input value="{{ d.name }}" onChange="{{ onDName }}" placeholder="Ex: X-Burguer Clássico" style="height:44px;padding:0 14px;border:1px solid {{ pe.nameBd }};border-radius:10px;font-size:14px;outline:none" style-focus="border-color:#FF6100;box-shadow:0 0 0 3px #FFE2CF"></label>
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500;display:flex"><span style="flex:1">Descrição</span><span style="font-weight:400;color:#8A91A0;font-size:12px">{{ pe.descCount }}/160</span></span>
+                    <textarea value="{{ d.desc }}" onChange="{{ onDDesc }}" maxLength="160" placeholder="Ingredientes e diferenciais. Ex: Blend 180g, cheddar, alface e molho da casa" style="height:84px;padding:12px 14px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none;resize:none;line-height:1.45" style-focus="border-color:#FF6100;box-shadow:0 0 0 3px #FFE2CF"></textarea></label>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:13px;font-weight:500">Em quais categorias aparece? <span style="color:#FF6100">*</span> <span style="font-weight:400;color:#8A91A0">Pode marcar mais de uma</span></span>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <sc-for list="{{ pe.cats }}" as="pc" hint-placeholder-count="3">
+                    <div onClick="{{ pc.onClick }}" style="display:flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:18px;border:1px solid {{ pc.bd }};background:{{ pc.bg }};color:{{ pc.fg }};font-size:13px;font-weight:500;cursor:pointer">{{ pc.mark }}{{ pc.label }}</div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 180px;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <span style="font-size:13px;font-weight:500">Selo de destaque <span style="font-weight:400;color:#8A91A0">opcional</span></span>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <sc-for list="{{ pe.badges }}" as="pb" hint-placeholder-count="5">
+                      <div onClick="{{ pb.onClick }}" style="height:32px;padding:0 12px;border-radius:16px;border:1px solid {{ pb.bd }};background:{{ pb.bg }};color:{{ pb.fg }};font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center">{{ pb.label }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+                <label style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;font-weight:500">Serve até</span>
+                  <select value="{{ d.serves }}" onChange="{{ onDServes }}" style="height:40px;padding:0 10px;border:1px solid #E3E6EB;border-radius:10px;font-size:13px;background:#fff;outline:none">
+                    <option value="">Não se aplica</option><option value="1 pessoa">1 pessoa</option><option value="2 pessoas">2 pessoas</option><option value="3 pessoas">3 pessoas</option><option value="4 pessoas">4 pessoas</option>
+                  </select></label>
+              </div>
+            </div>
+
+            <div ref="{{ secPrice }}" style="display:flex;flex-direction:column;gap:14px;padding-top:24px;border-top:1px solid #F0F1F4">
+              <div style="font-size:16px;font-weight:600">Preço</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div onClick="{{ onTypeSimple }}" style="padding:14px 16px;border-radius:14px;border:1.5px solid {{ pe.tS.bd }};background:{{ pe.tS.bg }};cursor:pointer">
+                  <div style="font-size:14px;font-weight:600">Preço único</div>
+                  <div style="font-size:12px;color:#6B7280;margin-top:2px">Ex: X-Burguer, lata de refri</div>
+                </div>
+                <div onClick="{{ onTypeVar }}" style="padding:14px 16px;border-radius:14px;border:1.5px solid {{ pe.tV.bd }};background:{{ pe.tV.bg }};cursor:pointer">
+                  <div style="font-size:14px;font-weight:600">Varia por tamanho/tipo</div>
+                  <div style="font-size:12px;color:#6B7280;margin-top:2px">Ex: Açaí 300/500ml, Pizza P/M/G</div>
+                </div>
+              </div>
+              <sc-if value="{{ pe.isSimple }}" hint-placeholder-val="{{ true }}">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">Preço de venda <span style="color:#FF6100">*</span></span>
+                    <div style="display:flex;align-items:center;height:44px;border:1px solid {{ pe.priceBd }};border-radius:10px;padding:0 14px;gap:6px;background:#fff"><span style="font-size:14px;font-weight:600;color:#4A5160">R$</span><input value="{{ d.priceStr }}" onChange="{{ onDPrice }}" inputMode="decimal" placeholder="0,00" style="flex:1;min-width:0;border:none;outline:none;font-size:14px"></div></label>
+                  <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">Preço antes <span style="font-weight:400;color:#8A91A0">opcional, aparece riscado</span></span>
+                    <div style="display:flex;align-items:center;height:44px;border:1px solid #E3E6EB;border-radius:10px;padding:0 14px;gap:6px;background:#fff"><span style="font-size:14px;font-weight:600;color:#8A91A0">R$</span><input value="{{ d.origStr }}" onChange="{{ onDOrig }}" inputMode="decimal" placeholder="0,00" style="flex:1;min-width:0;border:none;outline:none;font-size:14px"></div></label>
+                </div>
+                <sc-if value="{{ pe.hasPriceHint }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12px;color:{{ pe.priceHintFg }};background:{{ pe.priceHintBg }};border-radius:10px;padding:8px 12px">{{ pe.priceHint }}</div>
+                </sc-if>
+              </sc-if>
+              <sc-if value="{{ pe.isVar }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#F6F7F9;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px">
+                  <label style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;font-weight:500;white-space:nowrap">O cliente escolhe o(a)</span>
+                    <input value="{{ d.varName }}" onChange="{{ onDVarName }}" placeholder="Tamanho" style="flex:1;height:38px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none;background:#fff" style-focus="border-color:#FF6100"></label>
+                  <div style="display:grid;grid-template-columns:1fr 150px 32px;gap:8px;font-size:12px;color:#8A91A0;padding:4px 2px 0"><span>Opção</span><span>Preço</span><span></span></div>
+                  <sc-for list="{{ pe.varRows }}" as="vr" hint-placeholder-count="2">
+                    <div style="display:grid;grid-template-columns:1fr 150px 32px;gap:8px;align-items:center">
+                      <input value="{{ vr.name }}" onChange="{{ vr.onName }}" placeholder="{{ vr.ph }}" style="height:42px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none;background:#fff" style-focus="border-color:#FF6100">
+                      <div style="display:flex;align-items:center;height:42px;border:1px solid #E3E6EB;border-radius:10px;padding:0 12px;gap:6px;background:#fff"><span style="font-size:13px;font-weight:600;color:#4A5160">R$</span><input value="{{ vr.price }}" onChange="{{ vr.onPrice }}" inputMode="decimal" placeholder="0,00" style="flex:1;min-width:0;border:none;outline:none;font-size:14px"></div>
+                      <div onClick="{{ vr.onRemove }}" style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A91A0" style-hover="background:#fff;color:#E5352B"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></div>
+                    </div>
+                  </sc-for>
+                  <div onClick="{{ onAddVar }}" style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:#E85700;cursor:pointer;padding:6px 2px;width:fit-content">
+                    <span style="width:20px;height:20px;border-radius:10px;background:#FF6100;color:#fff;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+                    Adicionar opção
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+
+            <div ref="{{ secComp }}" style="display:flex;flex-direction:column;gap:12px;padding-top:24px;border-top:1px solid #F0F1F4">
+              <div>
+                <div style="font-size:16px;font-weight:600">Complementos <span style="font-size:13px;font-weight:400;color:#8A91A0">opcional</span></div>
+                <div style="font-size:13px;color:#6B7280;margin-top:2px">Extras que o cliente escolhe, como adicionais ou ponto da carne.</div>
+              </div>
+              <sc-for list="{{ pe.linked }}" as="lg" hint-placeholder-count="0">
+                <div style="display:flex;align-items:center;gap:12px;border:1px solid #ECEEF2;border-radius:12px;padding:12px 12px 12px 16px">
+                  <div style="flex:1;min-width:0">
+                    <div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px;font-weight:600">{{ lg.name }}</span><span style="height:20px;padding:0 8px;border-radius:10px;background:{{ lg.rbg }};color:{{ lg.rfg }};font-size:10px;font-weight:600;display:flex;align-items:center;letter-spacing:.3px">{{ lg.ruleTag }}</span></div>
+                    <div style="font-size:12px;color:#8A91A0;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ lg.optsText }}</div>
+                  </div>
+                  <div onClick="{{ lg.onUp }}" title="Subir" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A5160" style-hover="background:#F6F7F9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m18 15-6-6-6 6"></path></svg></div>
+                  <div onClick="{{ lg.onDown }}" title="Descer" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A5160" style-hover="background:#F6F7F9"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m6 9 6 6 6-6"></path></svg></div>
+                  <div onClick="{{ lg.onRemove }}" title="Desvincular" style="width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A91A0" style-hover="background:#FDECEB;color:#E5352B"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></div>
+                </div>
+              </sc-for>
+
+              <sc-if value="{{ pe.libOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1px solid #ECEEF2;border-radius:14px;padding:8px;background:#FAFBFC">
+                  <div style="font-size:12px;color:#8A91A0;padding:6px 8px">Da sua biblioteca — toque para vincular</div>
+                  <sc-for list="{{ pe.lib }}" as="lb" hint-placeholder-count="2">
+                    <div onClick="{{ lb.onAdd }}" style="display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:10px;cursor:pointer" style-hover="background:#fff">
+                      <span style="width:22px;height:22px;border-radius:11px;background:#FFF1E8;color:#FF6100;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+                      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500">{{ lb.name }}</div><div style="font-size:12px;color:#8A91A0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ lb.optsText }}</div></div>
+                      <span style="font-size:11px;color:#8A91A0">{{ lb.ruleTag }}</span>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ pe.libEmpty }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#6B7280;padding:8px">Todos os grupos já estão vinculados.</div></sc-if>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ pe.ngOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="border:1.5px solid #FFC9A6;border-radius:14px;background:#FFFAF6;padding:16px;display:flex;flex-direction:column;gap:12px">
+                  <div style="font-size:14px;font-weight:600;color:#C24A00">Novo grupo de complementos</div>
+                  <input value="{{ ng.name }}" onChange="{{ onNgName }}" placeholder="Nome do grupo. Ex: Adicionais, Ponto da carne" style="height:42px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none;background:#fff" style-focus="border-color:#FF6100">
+                  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <div style="display:flex;background:#fff;border:1px solid #E3E6EB;border-radius:10px;padding:3px">
+                      <div onClick="{{ onNgOpt }}" style="padding:6px 12px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;background:{{ ngSeg.oBg }};color:{{ ngSeg.oFg }}">Opcional</div>
+                      <div onClick="{{ onNgReq }}" style="padding:6px 12px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;background:{{ ngSeg.rBg }};color:{{ ngSeg.rFg }}">Obrigatório</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;font-size:13px">Escolhe até
+                      <div style="display:flex;align-items:center;border:1px solid #E3E6EB;border-radius:10px;background:#fff;height:34px">
+                        <div onClick="{{ onNgMaxDec }}" style="width:30px;text-align:center;cursor:pointer;font-size:16px;color:#4A5160">−</div><span style="min-width:20px;text-align:center;font-weight:600">{{ ng.max }}</span><div onClick="{{ onNgMaxInc }}" style="width:30px;text-align:center;cursor:pointer;font-size:16px;color:#4A5160">+</div>
+                      </div>
+                    </div>
+                  </div>
+                  <sc-for list="{{ ngRows }}" as="nr" hint-placeholder-count="1">
+                    <div style="display:grid;grid-template-columns:1fr 130px 32px;gap:8px;align-items:center">
+                      <input value="{{ nr.name }}" onChange="{{ nr.onName }}" placeholder="Opção. Ex: Bacon" style="height:40px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none;background:#fff" style-focus="border-color:#FF6100">
+                      <div style="display:flex;align-items:center;height:40px;border:1px solid #E3E6EB;border-radius:10px;padding:0 10px;gap:6px;background:#fff"><span style="font-size:13px;font-weight:600;color:#4A5160">+R$</span><input value="{{ nr.price }}" onChange="{{ nr.onPrice }}" inputMode="decimal" placeholder="0,00" style="flex:1;min-width:0;border:none;outline:none;font-size:14px"></div>
+                      <div onClick="{{ nr.onRemove }}" style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A91A0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></div>
+                    </div>
+                  </sc-for>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div onClick="{{ onNgAddRow }}" style="flex:1;font-size:13px;font-weight:500;color:#E85700;cursor:pointer">+ Adicionar opção <span style="color:#8A91A0;font-weight:400">(R$ 0,00 = grátis)</span></div>
+                    <button onClick="{{ onNgCancel }}" style="height:36px;padding:0 12px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;font-size:13px;cursor:pointer">Cancelar</button>
+                    <button onClick="{{ onNgSave }}" style="height:36px;padding:0 14px;border-radius:10px;border:none;background:{{ ngSeg.saveBg }};color:#fff;font-size:13px;font-weight:600;cursor:pointer">Salvar e vincular</button>
+                  </div>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ pe.showCompBtns }}" hint-placeholder-val="{{ true }}">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                  <div onClick="{{ onToggleLib }}" style="height:44px;border:1.5px dashed #FFB98C;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:500;color:#E85700;cursor:pointer" style-hover="background:#FFF1E8">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5Z"></path><path d="m3 13 9 5 9-5"></path></svg>{{ pe.libBtn }}
+                  </div>
+                  <div onClick="{{ onNgOpen }}" style="height:44px;border:1.5px dashed #FFB98C;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;font-weight:500;color:#E85700;cursor:pointer" style-hover="background:#FFF1E8">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>Criar novo grupo
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+
+            <div ref="{{ secVis }}" style="display:flex;flex-direction:column;gap:12px;padding-top:24px;border-top:1px solid #F0F1F4">
+              <div onClick="{{ onDActive }}" style="display:flex;align-items:center;gap:14px;cursor:pointer">
+                <div style="flex:1"><div style="font-size:16px;font-weight:600">Visível no cardápio</div><div style="font-size:13px;color:#6B7280;margin-top:2px">Desligue quando acabar o estoque — o produto continua salvo.</div></div>
+                <div style="width:44px;height:26px;border-radius:13px;background:{{ pe.tAct.bg }};position:relative;transition:background .2s"><div style="position:absolute;top:3px;left:{{ pe.tAct.xl }};width:20px;height:20px;border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s"></div></div>
+              </div>
+              <sc-if value="{{ pe.isEdit }}" hint-placeholder-val="{{ false }}">
+                <div onClick="{{ onDDelete }}" style="font-size:13px;font-weight:500;color:#E5352B;cursor:pointer;width:fit-content;padding:4px 0">Excluir este produto</div>
+              </sc-if>
+            </div>
+          </div>
+
+          <div style="flex:none;display:flex;align-items:center;gap:10px;padding:14px 28px;border-top:1px solid #ECEEF2;background:#fff">
+            <div style="flex:1;font-size:12px;color:{{ pe.missFg }};line-height:1.4">{{ pe.missText }}</div>
+            <button onClick="{{ onCloseDrawer }}" style="height:44px;padding:0 16px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;font-size:14px;font-weight:500;cursor:pointer">Cancelar</button>
+            <sc-if value="{{ pe.isNew }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ onSaveAgain }}" style="height:44px;padding:0 16px;border-radius:10px;border:1px solid #FF6100;background:#fff;color:#E85700;font-size:14px;font-weight:500;cursor:pointer">Salvar e criar outro</button>
+            </sc-if>
+            <button onClick="{{ onSaveProduct }}" style="height:44px;padding:0 22px;border-radius:10px;border:none;background:{{ pe.saveBg }};color:#fff;font-size:14px;font-weight:600;cursor:pointer">{{ pe.saveLabel }}</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ dCategory }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none;display:flex;align-items:flex-start;gap:12px;padding:22px 28px 18px;border-bottom:1px solid #ECEEF2">
+            <div style="flex:1"><div style="font-size:12px;font-weight:500;color:#FF6100">Categoria</div><div style="font-size:22px;font-weight:600">{{ ce.title }}</div></div>
+            <div onClick="{{ onCloseDrawer }}" style="width:36px;height:36px;border-radius:18px;border:1px solid #ECEEF2;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A5160"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></div>
+          </div>
+          <div style="flex:1;overflow:auto;padding:24px 28px;display:flex;flex-direction:column;gap:24px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">Nome da categoria</span>
+              <input value="{{ cd.name }}" onChange="{{ onCdName }}" placeholder="Ex: Os mais vendidos" style="height:44px;padding:0 14px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none" style-focus="border-color:#FF6100;box-shadow:0 0 0 3px #FFE2CF"></label>
+            <div onClick="{{ onCdActive }}" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:14px 16px;border:1px solid #ECEEF2;border-radius:14px">
+              <div style="flex:1"><div style="font-size:14px;font-weight:600">Visível no cardápio</div><div style="font-size:12px;color:#6B7280">Desligue para esconder a categoria inteira.</div></div>
+              <div style="width:44px;height:26px;border-radius:13px;background:{{ ce.tAct.bg }};position:relative"><div style="position:absolute;top:3px;left:{{ ce.tAct.xl }};width:20px;height:20px;border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s"></div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:13px;font-weight:500">Quando aparece?</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div onClick="{{ onCdAlways }}" style="padding:14px 16px;border-radius:14px;border:1.5px solid {{ ce.sA.bd }};background:{{ ce.sA.bg }};cursor:pointer"><div style="font-size:14px;font-weight:600">Sempre</div><div style="font-size:12px;color:#6B7280">Enquanto a loja estiver aberta</div></div>
+                <div onClick="{{ onCdSched }}" style="padding:14px 16px;border-radius:14px;border:1.5px solid {{ ce.sS.bd }};background:{{ ce.sS.bg }};cursor:pointer"><div style="font-size:14px;font-weight:600">Dias e horários</div><div style="font-size:12px;color:#6B7280">Ex: Açaí só no fim de semana</div></div>
+              </div>
+              <sc-if value="{{ ce.isSched }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#F6F7F9;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px">
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <sc-for list="{{ ce.days }}" as="dy" hint-placeholder-count="7">
+                      <div onClick="{{ dy.onClick }}" style="width:46px;height:46px;border-radius:23px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;cursor:pointer;background:{{ dy.bg }};color:{{ dy.fg }};border:1px solid {{ dy.bd }}">{{ dy.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;gap:12px;align-items:flex-end">
+                    <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;color:#4A5160">Das</span><input type="time" value="{{ cd.start }}" onChange="{{ onCdStart }}" style="height:42px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;background:#fff"></label>
+                    <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;color:#4A5160">Até</span><input type="time" value="{{ cd.end }}" onChange="{{ onCdEnd }}" style="height:42px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;background:#fff"></label>
+                  </div>
+                </div>
+              </sc-if>
+              <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4A5160">Status agora:
+                <span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;background:{{ ce.sbg }};color:{{ ce.sfg }};font-size:12px;font-weight:500">{{ ce.status }}</span>
+              </div>
+            </div>
+            <sc-if value="{{ ce.isEdit }}" hint-placeholder-val="{{ false }}">
+              <div style="padding-top:20px;border-top:1px solid #F0F1F4">
+                <sc-if value="{{ ce.noConfirm }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ onCdAskDelete }}" style="font-size:13px;font-weight:500;color:#E5352B;cursor:pointer;width:fit-content">Excluir categoria</div>
+                </sc-if>
+                <sc-if value="{{ cd.confirm }}" hint-placeholder-val="{{ false }}">
+                  <div style="background:#FDECEB;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                    <div style="font-size:14px;font-weight:600;color:#B42318">Excluir “{{ cd.name }}”?</div>
+                    <div style="font-size:13px;color:#4A5160">{{ ce.delText }}</div>
+                    <div style="display:flex;gap:8px">
+                      <button onClick="{{ onCdCancelDelete }}" style="height:38px;padding:0 14px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;font-size:13px;cursor:pointer">Manter</button>
+                      <button onClick="{{ onCdDelete }}" style="height:38px;padding:0 14px;border-radius:10px;border:none;background:#E5352B;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Excluir categoria</button>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+          <div style="flex:none;display:flex;justify-content:flex-end;gap:10px;padding:14px 28px;border-top:1px solid #ECEEF2">
+            <button onClick="{{ onCloseDrawer }}" style="height:44px;padding:0 16px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;font-size:14px;font-weight:500;cursor:pointer">Cancelar</button>
+            <button onClick="{{ onCdSave }}" style="height:44px;padding:0 22px;border-radius:10px;border:none;background:{{ ce.saveBg }};color:#fff;font-size:14px;font-weight:600;cursor:pointer">Salvar categoria</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ dMenu }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none;display:flex;align-items:flex-start;gap:12px;padding:22px 28px 18px;border-bottom:1px solid #ECEEF2">
+            <div style="flex:1"><div style="font-size:12px;font-weight:500;color:#FF6100">{{ me.kicker }}</div><div style="font-size:22px;font-weight:600">{{ me.title }}</div></div>
+            <div onClick="{{ onCloseDrawer }}" style="width:36px;height:36px;border-radius:18px;border:1px solid #ECEEF2;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A5160"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></div>
+          </div>
+          <div style="flex:1;overflow:auto;padding:24px 28px;display:flex;flex-direction:column;gap:24px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">Nome do cardápio</span>
+              <input value="{{ md.name }}" onChange="{{ onMdName }}" placeholder="Ex: Almoço executivo, Noite, Fim de semana" style="height:44px;padding:0 14px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none" style-focus="border-color:#FF6100;box-shadow:0 0 0 3px #FFE2CF"></label>
+            <sc-if value="{{ me.isNew }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <span style="font-size:13px;font-weight:500">Como começar?</span>
+                <sc-for list="{{ me.copies }}" as="cp" hint-placeholder-count="2">
+                  <div onClick="{{ cp.onClick }}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1.5px solid {{ cp.bd }};background:{{ cp.bg }};cursor:pointer">
+                    <span style="width:18px;height:18px;border-radius:9px;border:1.5px solid {{ cp.ring }};display:flex;align-items:center;justify-content:center;flex:none"><span style="width:10px;height:10px;border-radius:5px;background:{{ cp.dot }}"></span></span>
+                    <div><div style="font-size:14px;font-weight:500">{{ cp.label }}</div><div style="font-size:12px;color:#6B7280">{{ cp.sub }}</div></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:13px;font-weight:500">Quando fica no ar?</span>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div onClick="{{ onMdAlways }}" style="padding:14px 16px;border-radius:14px;border:1.5px solid {{ me.sA.bd }};background:{{ me.sA.bg }};cursor:pointer"><div style="font-size:14px;font-weight:600">Sempre</div><div style="font-size:12px;color:#6B7280">Enquanto a loja estiver aberta</div></div>
+                <div onClick="{{ onMdSched }}" style="padding:14px 16px;border-radius:14px;border:1.5px solid {{ me.sS.bd }};background:{{ me.sS.bg }};cursor:pointer"><div style="font-size:14px;font-weight:600">Dias e horários</div><div style="font-size:12px;color:#6B7280">Ex: almoço seg–sex, 11h às 15h</div></div>
+              </div>
+              <sc-if value="{{ me.isSched }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#F6F7F9;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px">
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <sc-for list="{{ me.days }}" as="dy" hint-placeholder-count="7">
+                      <div onClick="{{ dy.onClick }}" style="width:46px;height:46px;border-radius:23px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;cursor:pointer;background:{{ dy.bg }};color:{{ dy.fg }};border:1px solid {{ dy.bd }}">{{ dy.label }}</div>
+                    </sc-for>
+                  </div>
+                  <div style="display:flex;gap:12px">
+                    <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;color:#4A5160">Das</span><input type="time" value="{{ md.start }}" onChange="{{ onMdStart }}" style="height:42px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;background:#fff"></label>
+                    <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:12px;color:#4A5160">Até</span><input type="time" value="{{ md.end }}" onChange="{{ onMdEnd }}" style="height:42px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;background:#fff"></label>
+                  </div>
+                </div>
+              </sc-if>
+              <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#4A5160">Status agora:
+                <span style="display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:13px;background:{{ me.sbg }};color:{{ me.sfg }};font-size:12px;font-weight:500">{{ me.status }}</span>
+              </div>
+              <div style="font-size:12px;color:#2F6FEB;background:#EEF4FF;border-radius:10px;padding:8px 12px;text-wrap:pretty">O cliente usa sempre o mesmo link. Ele vê o cardápio que estiver no horário; se mais de um estiver, vale o primeiro da lista.</div>
+            </div>
+            <div onClick="{{ onMdActive }}" style="display:flex;align-items:center;gap:14px;cursor:pointer;padding:14px 16px;border:1px solid #ECEEF2;border-radius:14px">
+              <div style="flex:1"><div style="font-size:14px;font-weight:600">Cardápio ligado</div><div style="font-size:12px;color:#6B7280">Desligue para tirar do ar sem apagar.</div></div>
+              <div style="width:44px;height:26px;border-radius:13px;background:{{ me.tAct.bg }};position:relative"><div style="position:absolute;top:3px;left:{{ me.tAct.xl }};width:20px;height:20px;border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s"></div></div>
+            </div>
+            <sc-if value="{{ me.canDelete }}" hint-placeholder-val="{{ false }}">
+              <div style="padding-top:20px;border-top:1px solid #F0F1F4">
+                <sc-if value="{{ me.noConfirm }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ onMdAskDelete }}" style="font-size:13px;font-weight:500;color:#E5352B;cursor:pointer;width:fit-content">Excluir cardápio</div>
+                </sc-if>
+                <sc-if value="{{ md.confirm }}" hint-placeholder-val="{{ false }}">
+                  <div style="background:#FDECEB;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px">
+                    <div style="font-size:14px;font-weight:600;color:#B42318">Excluir “{{ md.name }}”?</div>
+                    <div style="font-size:13px;color:#4A5160">{{ me.delText }}</div>
+                    <div style="display:flex;gap:8px">
+                      <button onClick="{{ onMdCancelDelete }}" style="height:38px;padding:0 14px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;font-size:13px;cursor:pointer">Manter</button>
+                      <button onClick="{{ onMdDelete }}" style="height:38px;padding:0 14px;border-radius:10px;border:none;background:#E5352B;color:#fff;font-size:13px;font-weight:600;cursor:pointer">Excluir cardápio</button>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-if>
+          </div>
+          <div style="flex:none;display:flex;justify-content:flex-end;gap:10px;padding:14px 28px;border-top:1px solid #ECEEF2">
+            <button onClick="{{ onCloseDrawer }}" style="height:44px;padding:0 16px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;font-size:14px;font-weight:500;cursor:pointer">Cancelar</button>
+            <button onClick="{{ onMdSave }}" style="height:44px;padding:0 22px;border-radius:10px;border:none;background:{{ me.saveBg }};color:#fff;font-size:14px;font-weight:600;cursor:pointer">Salvar cardápio</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ dGroup }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none;display:flex;align-items:flex-start;gap:12px;padding:22px 28px 18px;border-bottom:1px solid #ECEEF2">
+            <div style="flex:1"><div style="font-size:12px;font-weight:500;color:#FF6100">Grupo de complementos</div><div style="font-size:22px;font-weight:600">{{ ge.title }}</div></div>
+            <div onClick="{{ onCloseDrawer }}" style="width:36px;height:36px;border-radius:18px;border:1px solid #ECEEF2;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A5160"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></div>
+          </div>
+          <div style="flex:1;overflow:auto;padding:24px 28px;display:flex;flex-direction:column;gap:20px">
+            <label style="display:flex;flex-direction:column;gap:6px"><span style="font-size:13px;font-weight:500">Nome do grupo</span>
+              <input value="{{ gd.name }}" onChange="{{ onGdName }}" placeholder="Ex: Adicionais no burger" style="height:44px;padding:0 14px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none" style-focus="border-color:#FF6100;box-shadow:0 0 0 3px #FFE2CF"></label>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <span style="font-size:13px;font-weight:500">Regra de escolha</span>
+              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                <div style="display:flex;background:#F6F7F9;border-radius:10px;padding:3px">
+                  <div onClick="{{ onGdOpt }}" style="padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;background:{{ ge.oBg }};color:{{ ge.oFg }}">Opcional</div>
+                  <div onClick="{{ onGdReq }}" style="padding:8px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;background:{{ ge.rBg }};color:{{ ge.rFg }}">Obrigatório</div>
+                </div>
+                <sc-if value="{{ ge.isReq }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:8px;font-size:13px">Mínimo
+                    <div style="display:flex;align-items:center;border:1px solid #E3E6EB;border-radius:10px;height:36px"><div onClick="{{ onGdMinDec }}" style="width:32px;text-align:center;cursor:pointer;font-size:16px">−</div><span style="min-width:20px;text-align:center;font-weight:600">{{ gd.min }}</span><div onClick="{{ onGdMinInc }}" style="width:32px;text-align:center;cursor:pointer;font-size:16px">+</div></div>
+                  </div>
+                </sc-if>
+                <div style="display:flex;align-items:center;gap:8px;font-size:13px">Máximo
+                  <div style="display:flex;align-items:center;border:1px solid #E3E6EB;border-radius:10px;height:36px"><div onClick="{{ onGdMaxDec }}" style="width:32px;text-align:center;cursor:pointer;font-size:16px">−</div><span style="min-width:20px;text-align:center;font-weight:600">{{ gd.max }}</span><div onClick="{{ onGdMaxInc }}" style="width:32px;text-align:center;cursor:pointer;font-size:16px">+</div></div>
+                </div>
+              </div>
+              <div style="font-size:12px;color:#2F6FEB;background:#EEF4FF;border-radius:10px;padding:8px 12px">{{ ge.ruleText }}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:grid;grid-template-columns:1fr 130px 32px;gap:8px;font-size:12px;color:#8A91A0"><span>Opção</span><span>Preço extra</span><span></span></div>
+              <sc-for list="{{ gdRows }}" as="gr" hint-placeholder-count="3">
+                <div style="display:grid;grid-template-columns:1fr 130px 32px;gap:8px;align-items:start">
+                  <div style="display:flex;flex-direction:column;gap:4px">
+                    <input value="{{ gr.name }}" onChange="{{ gr.onName }}" placeholder="Ex: Bacon" style="height:40px;padding:0 12px;border:1px solid #E3E6EB;border-radius:10px;font-size:14px;outline:none" style-focus="border-color:#FF6100">
+                    <input value="{{ gr.desc }}" onChange="{{ gr.onDesc }}" placeholder="Descrição (opcional)" style="height:32px;padding:0 12px;border:1px solid #F0F1F4;border-radius:8px;font-size:12px;outline:none;color:#4A5160" style-focus="border-color:#FF6100">
+                  </div>
+                  <div style="display:flex;align-items:center;height:40px;border:1px solid #E3E6EB;border-radius:10px;padding:0 10px;gap:6px"><span style="font-size:13px;font-weight:600;color:#4A5160">+R$</span><input value="{{ gr.price }}" onChange="{{ gr.onPrice }}" inputMode="decimal" placeholder="0,00" style="flex:1;min-width:0;border:none;outline:none;font-size:14px"></div>
+                  <div onClick="{{ gr.onRemove }}" style="width:32px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#8A91A0" style-hover="color:#E5352B"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"></path></svg></div>
+                </div>
+              </sc-for>
+              <div onClick="{{ onGdAddRow }}" style="font-size:13px;font-weight:500;color:#E85700;cursor:pointer;padding:6px 0;width:fit-content">+ Adicionar opção <span style="color:#8A91A0;font-weight:400">(R$ 0,00 = grátis)</span></div>
+            </div>
+            <div style="font-size:13px;color:#4A5160;background:#F6F7F9;border-radius:12px;padding:12px 14px">{{ ge.used }}</div>
+            <sc-if value="{{ ge.isEdit }}" hint-placeholder-val="{{ false }}">
+              <div onClick="{{ onGdDelete }}" style="font-size:13px;font-weight:500;color:#E5352B;cursor:pointer;width:fit-content">Excluir grupo (pode desfazer)</div>
+            </sc-if>
+          </div>
+          <div style="flex:none;display:flex;justify-content:flex-end;gap:10px;padding:14px 28px;border-top:1px solid #ECEEF2">
+            <button onClick="{{ onCloseDrawer }}" style="height:44px;padding:0 16px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;font-size:14px;font-weight:500;cursor:pointer">Cancelar</button>
+            <button onClick="{{ onGdSave }}" style="height:44px;padding:0 22px;border-radius:10px;border:none;background:{{ ge.saveBg }};color:#fff;font-size:14px;font-weight:600;cursor:pointer">Salvar grupo</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ dPick }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:none;display:flex;align-items:flex-start;gap:12px;padding:22px 28px 18px;border-bottom:1px solid #ECEEF2">
+            <div style="flex:1"><div style="font-size:12px;font-weight:500;color:#FF6100">{{ pk.cat }}</div><div style="font-size:22px;font-weight:600">Adicionar produto existente</div><div style="font-size:13px;color:#8A91A0">O produto continua nas outras categorias.</div></div>
+            <div onClick="{{ onCloseDrawer }}" style="width:36px;height:36px;border-radius:18px;border:1px solid #ECEEF2;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4A5160"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></div>
+          </div>
+          <div style="flex:1;overflow:auto;padding:20px 28px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border:1px solid #E3E6EB;border-radius:10px;margin-bottom:8px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A91A0" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+              <input value="{{ pk.q }}" onChange="{{ onPickQ }}" placeholder="Buscar pelo nome" style="flex:1;border:none;outline:none;font-size:14px">
+            </div>
+            <sc-for list="{{ pk.rows }}" as="pr" hint-placeholder-count="4">
+              <div onClick="{{ pr.onClick }}" style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;border:1px solid {{ pr.bd }};background:{{ pr.bg }};cursor:pointer">
+                <span style="width:20px;height:20px;border-radius:6px;border:1.5px solid {{ pr.box }};background:{{ pr.fill }};color:#fff;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></span>
+                <sc-if value="{{ pr.hasImg }}" hint-placeholder-val="{{ false }}"><img src="{{ pr.img }}" alt="" style="width:40px;height:40px;border-radius:10px;object-fit:cover"></sc-if>
+                <sc-if value="{{ pr.noImg }}" hint-placeholder-val="{{ true }}"><span style="width:40px;height:40px;border-radius:10px;background:#FFF1E8;color:#E85700;display:flex;align-items:center;justify-content:center;font-weight:600">{{ pr.initial }}</span></sc-if>
+                <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:500">{{ pr.name }}</div><div style="font-size:12px;color:#8A91A0">{{ pr.cats }}</div></div>
+                <span style="font-size:14px;font-weight:600">{{ pr.price }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ pk.empty }}" hint-placeholder-val="{{ false }}"><div style="font-size:13px;color:#6B7280;padding:20px 0;text-align:center">Nenhum outro produto para adicionar.</div></sc-if>
+          </div>
+          <div style="flex:none;display:flex;justify-content:flex-end;gap:10px;padding:14px 28px;border-top:1px solid #ECEEF2">
+            <button onClick="{{ onCloseDrawer }}" style="height:44px;padding:0 16px;border-radius:10px;border:1px solid #E3E6EB;background:#fff;font-size:14px;font-weight:500;cursor:pointer">Cancelar</button>
+            <button onClick="{{ onPickSave }}" style="height:44px;padding:0 22px;border-radius:10px;border:none;background:{{ pk.saveBg }};color:#fff;font-size:14px;font-weight:600;cursor:pointer">{{ pk.saveLabel }}</button>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:16px;background:#14171F;color:#fff;border-radius:12px;padding:12px 16px 12px 18px;font-size:14px;box-shadow:0 12px 32px rgba(20,23,31,.3);white-space:nowrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.6" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg>
+        <span>{{ toast.msg }}</span>
+        <sc-if value="{{ toast.canUndo }}" hint-placeholder-val="{{ false }}">
+          <span onClick="{{ onUndo }}" style="color:#FF9A5C;font-weight:600;cursor:pointer">Desfazer</span>
+        </sc-if>
+      </div>
+    </sc-if>
+  </main>
+
+  <section style="width:390px;flex:none;background:#fff;border-left:1px solid #ECEEF2;display:flex;flex-direction:column;align-items:center;padding:20px 0 16px;overflow:auto">
+    <div style="width:320px;display:flex;align-items:center;gap:8px">
+      <div style="flex:1">
+        <div style="font-size:15px;font-weight:600">Prévia do cliente</div>
+        <div style="font-size:12px;color:#8A91A0">{{ phLabel }}</div>
+      </div>
+      <span style="display:flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:13px;background:#E5352B;color:#fff;font-size:12px;font-weight:500"><span style="width:6px;height:6px;border-radius:3px;background:#fff"></span>Ao vivo</span>
+    </div>
+
+    <div style="margin-top:16px;width:320px;height:660px;flex:none;border-radius:48px;background:#1F2128;padding:10px;box-shadow:0 20px 50px rgba(20,23,31,.18)">
+      <div style="position:relative;width:100%;height:100%;border-radius:38px;overflow:hidden;background:#fff">
+        <div style="position:absolute;top:8px;left:50%;transform:translateX(-50%);width:96px;height:26px;border-radius:14px;background:#1F2128;z-index:30"></div>
+
+        <div style="position:absolute;inset:0;overflow:auto;padding-bottom:84px">
+          <div style="position:relative;height:120px;background:#FF6100">
+            <img src="assets/capa.png" alt="" style="width:100%;height:100%;object-fit:cover;display:block">
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;margin-top:-26px;position:relative">
+            <div style="width:52px;height:52px;border-radius:26px;background:#FF6100;border:3px solid #fff;display:flex;align-items:center;justify-content:center;color:#fff"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M8 4v6a4 4 0 0 0 8 0V4M12 4v16"></path></svg></div>
+            <div style="font-size:16px;font-weight:600;margin-top:6px;text-align:center;padding:0 16px">{{ ph.storeName }}</div>
+            <div style="font-size:11px;color:#8A91A0;margin-top:2px"><span style="color:#FF6100">★</span> 4.6 (170) · <span style="color:{{ ph.openFg }};font-weight:600">{{ ph.openLabel }}</span> · 2,7 km</div>
+          </div>
+          <div style="margin:12px 14px 0;border-radius:24px;background:#F6F7F9;padding:10px 14px;font-size:11px;line-height:1.5">
+            <div style="font-weight:600">Tempo padrão: {{ ph.eta }}</div>
+            <div style="color:#8A91A0">Entrega: <span style="color:#12A150;font-weight:600">{{ ph.fee }}</span> · Pedido mín: {{ ph.min }}</div>
+          </div>
+          <div style="display:flex;gap:6px;overflow-x:auto;padding:14px 14px 4px;scrollbar-width:none">
+            <sc-for list="{{ ph.chips }}" as="pc" hint-placeholder-count="3">
+              <div onClick="{{ pc.onClick }}" style="flex:none;height:30px;padding:0 12px;border-radius:15px;background:{{ pc.bg }};color:{{ pc.fg }};font-size:12px;font-weight:500;display:flex;align-items:center;cursor:pointer">{{ pc.label }}</div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;padding:10px 14px">
+            <sc-for list="{{ ph.products }}" as="pp" hint-placeholder-count="3">
+              <div onClick="{{ pp.onClick }}" style="position:relative;display:flex;gap:10px;padding:8px;border:1px solid {{ pp.bd }};border-radius:16px;cursor:pointer;background:#fff">
+                <div style="width:78px;height:78px;flex:none;border-radius:12px;overflow:hidden;background:#FFF1E8;display:flex;align-items:center;justify-content:center;color:#E85700;font-size:22px;font-weight:600">
+                  <sc-if value="{{ pp.hasImg }}" hint-placeholder-val="{{ true }}"><img src="{{ pp.img }}" alt="" style="width:100%;height:100%;object-fit:cover"></sc-if>
+                  <sc-if value="{{ pp.noImg }}" hint-placeholder-val="{{ false }}"><span>{{ pp.initial }}</span></sc-if>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+                  <sc-if value="{{ pp.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="align-self:flex-start;font-size:9px;font-weight:600;color:#E85700;border:1px solid #FFC9A6;border-radius:8px;padding:0 6px;margin-bottom:2px">{{ pp.badge }}</span></sc-if>
+                  <div style="font-size:12px;font-weight:600;line-height:1.25">{{ pp.name }}</div>
+                  <div style="font-size:10px;color:#8A91A0;line-height:1.35;margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ pp.desc }}</div>
+                  <div style="flex:1"></div>
+                  <div style="display:flex;align-items:flex-end;gap:6px;margin-top:4px">
+                    <div style="flex:1;min-width:0">
+                      <sc-if value="{{ pp.hasOrig }}" hint-placeholder-val="{{ false }}"><div style="font-size:9px;color:#8A91A0"><span style="text-decoration:line-through">{{ pp.orig }}</span> <span style="background:#12A150;color:#fff;border-radius:6px;padding:0 4px;font-weight:600">{{ pp.disc }}</span></div></sc-if>
+                      <div style="font-size:13px;font-weight:600;color:#12A150">{{ pp.price }}</div>
+                    </div>
+                    <span style="height:24px;padding:0 10px;border-radius:12px;background:#FF6100;color:#fff;font-size:10px;font-weight:600;display:flex;align-items:center">Add</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ ph.empty }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:30px 10px;font-size:12px;color:#8A91A0">{{ ph.emptyText }}</div>
+            </sc-if>
+            <sc-if value="{{ ph.hiddenNote }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;font-size:10px;color:#8A91A0">{{ ph.hiddenText }}</div>
+            </sc-if>
+          </div>
+        </div>
+
+        <sc-if value="{{ phCart }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;bottom:72px;background:#fff;z-index:10;display:flex;flex-direction:column;padding:48px 16px 12px">
+            <div style="font-size:17px;font-weight:600">Carrinho</div>
+            <div style="flex:1;overflow:auto;margin-top:12px;display:flex;flex-direction:column;gap:8px">
+              <sc-for list="{{ cart.items }}" as="ci" hint-placeholder-count="0">
+                <div style="display:flex;gap:8px;padding:10px;border:1px solid #ECEEF2;border-radius:12px">
+                  <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600">{{ ci.qty }}× {{ ci.name }}</div><div style="font-size:10px;color:#8A91A0">{{ ci.detail }}</div></div>
+                  <div style="text-align:right"><div style="font-size:12px;font-weight:600">{{ ci.total }}</div><div onClick="{{ ci.onRemove }}" style="font-size:10px;color:#E5352B;cursor:pointer;margin-top:2px">Remover</div></div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ cart.empty }}" hint-placeholder-val="{{ true }}"><div style="text-align:center;font-size:12px;color:#8A91A0;padding:40px 0">Seu carrinho está vazio</div></sc-if>
+            </div>
+            <div style="border-top:1px solid #ECEEF2;padding-top:10px;font-size:12px;display:flex;flex-direction:column;gap:4px">
+              <div style="display:flex"><span style="flex:1;color:#6B7280">Subtotal</span><span>{{ cart.sub }}</span></div>
+              <div style="display:flex"><span style="flex:1;color:#6B7280">Entrega</span><span>{{ cart.fee }}</span></div>
+              <div style="display:flex;font-size:14px;font-weight:600;margin-top:2px"><span style="flex:1">Total</span><span>{{ cart.total }}</span></div>
+              <div onClick="{{ onCheckout }}" style="margin-top:8px;height:42px;border-radius:21px;background:{{ cart.btnBg }};color:#fff;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer">{{ cart.btn }}</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ phSheet }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;inset:0;background:#fff;z-index:20;display:flex;flex-direction:column">
+            <div style="flex:1;overflow:auto">
+              <div style="position:relative;height:190px;background:#FFF1E8;display:flex;align-items:center;justify-content:center;color:#E85700;font-size:44px;font-weight:600">
+                <sc-if value="{{ sh.hasImg }}" hint-placeholder-val="{{ false }}"><img src="{{ sh.img }}" alt="" style="width:100%;height:100%;object-fit:cover"></sc-if>
+                <sc-if value="{{ sh.noImg }}" hint-placeholder-val="{{ true }}"><span>{{ sh.initial }}</span></sc-if>
+                <sc-if value="{{ sh.canClose }}" hint-placeholder-val="{{ true }}">
+                  <div onClick="{{ onSheetClose }}" style="position:absolute;top:44px;left:12px;width:34px;height:34px;border-radius:17px;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.15);color:#14171F"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m15 18-6-6 6-6"></path></svg></div>
+                </sc-if>
+                <sc-if value="{{ sh.editing }}" hint-placeholder-val="{{ false }}">
+                  <span style="position:absolute;top:44px;right:12px;height:24px;padding:0 10px;border-radius:12px;background:#14171F;color:#fff;font-size:10px;font-weight:500;display:flex;align-items:center">Editando</span>
+                </sc-if>
+              </div>
+              <div style="padding:14px 16px 4px">
+                <sc-if value="{{ sh.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="display:inline-block;font-size:10px;font-weight:600;color:#E85700;background:#FFF1E8;border-radius:8px;padding:2px 8px;margin-bottom:6px">{{ sh.badge }}</span></sc-if>
+                <div style="font-size:17px;font-weight:600;line-height:1.25">{{ sh.name }}</div>
+                <div style="font-size:12px;color:#8A91A0;line-height:1.45;margin-top:4px">{{ sh.desc }}</div>
+                <div style="display:flex;align-items:baseline;gap:6px;margin-top:8px">
+                  <span style="font-size:16px;font-weight:600;color:#12A150">{{ sh.price }}</span>
+                  <sc-if value="{{ sh.hasOrig }}" hint-placeholder-val="{{ false }}"><span style="font-size:11px;color:#8A91A0;text-decoration:line-through">{{ sh.orig }}</span><span style="font-size:10px;background:#12A150;color:#fff;border-radius:6px;padding:0 5px;font-weight:600">{{ sh.disc }}</span></sc-if>
+                </div>
+                <sc-if value="{{ sh.hasServes }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#6B7280;margin-top:4px">Serve {{ sh.serves }}</div></sc-if>
+              </div>
+              <sc-if value="{{ sh.isVar }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:12px">
+                  <div style="display:flex;align-items:center;background:#F3F4F6;padding:8px 16px">
+                    <div style="flex:1"><div style="font-size:12px;font-weight:600">Escolha o(a) {{ sh.varName }}</div><div style="font-size:10px;color:#8A91A0">Escolha 1 opção</div></div>
+                    <span style="font-size:9px;font-weight:600;color:#fff;background:#14171F;border-radius:6px;padding:2px 6px">OBRIGATÓRIO</span>
+                  </div>
+                  <sc-for list="{{ sh.vars }}" as="sv" hint-placeholder-count="2">
+                    <div onClick="{{ sv.onClick }}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #F3F4F6;cursor:pointer">
+                      <span style="flex:1;font-size:12px">{{ sv.name }}</span>
+                      <span style="font-size:12px;font-weight:600;color:#12A150">{{ sv.price }}</span>
+                      <span style="width:18px;height:18px;border-radius:9px;border:1.5px solid {{ sv.ring }};display:flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:5px;background:{{ sv.dot }}"></span></span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-for list="{{ sh.groups }}" as="sg" hint-placeholder-count="0">
+                <div style="margin-top:12px">
+                  <div style="display:flex;align-items:center;gap:8px;background:#F3F4F6;padding:8px 16px">
+                    <div style="flex:1"><div style="font-size:12px;font-weight:600">{{ sg.name }}</div><div style="font-size:10px;color:#8A91A0">{{ sg.rule }}</div></div>
+                    <span style="font-size:10px;color:#6B7280">{{ sg.count }}</span>
+                    <span style="font-size:9px;font-weight:600;color:{{ sg.tagFg }};background:{{ sg.tagBg }};border-radius:6px;padding:2px 6px">{{ sg.tag }}</span>
+                  </div>
+                  <sc-for list="{{ sg.opts }}" as="so" hint-placeholder-count="2">
+                    <div onClick="{{ so.onClick }}" style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid #F3F4F6;cursor:pointer">
+                      <div style="flex:1;min-width:0"><div style="font-size:12px">{{ so.name }}</div><sc-if value="{{ so.hasDesc }}" hint-placeholder-val="{{ false }}"><div style="font-size:10px;color:#8A91A0">{{ so.desc }}</div></sc-if><div style="font-size:11px;color:#12A150;font-weight:500">{{ so.price }}</div></div>
+                      <span style="width:18px;height:18px;border-radius:{{ so.radius }};border:1.5px solid {{ so.ring }};background:{{ so.fill }};color:#fff;display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"><path d="M20 6 9 17l-5-5"></path></svg></span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+              <div style="height:16px"></div>
+            </div>
+            <div style="flex:none;display:flex;align-items:center;gap:10px;padding:10px 14px 18px;border-top:1px solid #ECEEF2;background:#fff">
+              <div style="display:flex;align-items:center;border:1px solid #E3E6EB;border-radius:20px;height:40px">
+                <div onClick="{{ onQtyDec }}" style="width:32px;text-align:center;cursor:pointer;font-size:18px;color:#FF6100">−</div>
+                <span style="min-width:16px;text-align:center;font-size:13px;font-weight:600">{{ sh.qty }}</span>
+                <div onClick="{{ onQtyInc }}" style="width:32px;text-align:center;cursor:pointer;font-size:18px;color:#FF6100">+</div>
+              </div>
+              <div onClick="{{ onAddCart }}" style="flex:1;height:40px;border-radius:20px;background:{{ sh.addBg }};color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;text-align:center;padding:0 8px">{{ sh.addLabel }}</div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ phHasMsg }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;left:14px;right:14px;top:46px;z-index:40;background:#14171F;color:#fff;font-size:11px;border-radius:12px;padding:10px 12px;text-align:center">{{ phMsg }}</div>
+        </sc-if>
+
+        <sc-if value="{{ phNav }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;left:10px;right:10px;bottom:10px;height:58px;border-radius:29px;background:#fff;box-shadow:0 -2px 16px rgba(20,23,31,.1);display:flex;align-items:center;z-index:15">
+            <div onClick="{{ onPhHome }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:{{ ph.homeFg }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 11 12 4l9 7v9h-6v-6H9v6H3z"></path></svg><span style="font-size:10px">Início</span></div>
+            <div onClick="{{ onPhCart }}" style="position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;color:{{ ph.cartFg }}">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 8h14l-1 12H6Z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg><span style="font-size:10px">Carrinho</span>
+              <sc-if value="{{ ph.hasCart }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-4px;left:54%;min-width:16px;height:16px;border-radius:8px;background:#E5352B;color:#fff;font-size:9px;font-weight:600;display:flex;align-items:center;justify-content:center;padding:0 4px">{{ ph.cartCount }}</span></sc-if>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;color:#4A5160"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0Z"></path></svg><span style="font-size:10px">Perfil</span></div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+    <div style="width:320px;font-size:11px;color:#8A91A0;text-align:center;margin-top:12px;text-wrap:pretty">Tudo o que você edita aparece aqui na hora — toque para testar como o cliente.</div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const LS='mepede-cardapio-v3';
+const uid=()=>Math.random().toString(36).slice(2,9);
+const money=n=>'R$ '+(Number(n)||0).toFixed(2).replace('.',',');
+const pm=s=>{if(typeof s==='number')return s;s=String(s||'').replace(/[^\d,.]/g,'');if(!s)return 0;if(s.indexOf(',')>-1)s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0;};
+const ms=n=>n?Number(n).toFixed(2).replace('.',','):'';
+const DAYS=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const DAY_ORDER=[1,2,3,4,5,6,0];
+const BADGES=['Mais pedido','Novidade','Promoção','Vegetariano'];
+const ORANGE='#FF6100';
+const tg=on=>({bg:on?ORANGE:'#D5D9E0',x:on?'18px':'2px',xs:on?'16px':'2px',xl:on?'21px':'3px'});
+const O=(name,price,desc,img)=>({id:uid(),name,price,desc:desc||'',img:img||''});
+const ALL=[0,1,2,3,4,5,6];
+function seed(){
+  const groups=[
+    {id:'g1',name:'Ponto da carne',min:1,max:1,options:[O('Mal passado',0),O('Ao ponto',0),O('Bem passado',0)]},
+    {id:'g2',name:'Adicionais no burger',min:0,max:3,options:[O('Bacon',5,'Bacon crocante em tiras','assets/bacon.png'),O('Cheddar extra',5,'Cheddar cremoso','assets/cheddar.png'),O('+1 Hambúrguer',12,'120g de carne','assets/carne.png'),O('Maionese trufada verde',5,'A melhor maionese da casa','assets/maionese.png'),O('Alface americana',2,'','assets/alface.png'),O('Molho especial',8,'','assets/molho.png')]},
+    {id:'g3',name:'Monte seu açaí',min:0,max:3,options:[O('Granola',0),O('Leite ninho',3),O('Morango',4),O('Banana',0),O('Paçoca',2)]}
+  ];
+  const C=(id,name,o)=>Object.assign({id,name,menuId:'m1',active:true,avail:'always',days:ALL.slice(),start:'17:00',end:'23:30'},o||{});
+  const categories=[C('c1','Mais vendidos'),C('c2','Hambúrgueres'),C('c3','Bebidas'),C('c4','Açaí',{avail:'schedule',days:[5,6,0],start:'15:00',end:'23:30'}),C('c5','Pratos executivos',{menuId:'m2'}),C('c6','Bebidas',{menuId:'m2'})];
+  const P=o=>Object.assign({id:uid(),desc:'',img:'',badge:'',serves:'1 pessoa',type:'simple',price:0,orig:0,varName:'Tamanho',varOpts:[],groupIds:[],active:true,catIds:[]},o);
+  const V=(n,p)=>({id:uid(),name:n,price:p});
+  const products=[
+    P({name:'X-Burguer Clássico',desc:'Blend 180g, queijo cheddar, alface, tomate e maionese da casa',img:'assets/burger.png',badge:'Mais pedido',price:32.9,orig:49.9,groupIds:['g1','g2'],catIds:['c1','c2']}),
+    P({name:'Smash Burger Duplo',desc:'Dois smash de 90g, cheddar duplo e cebola caramelizada',img:'assets/carne.png',price:29.9,groupIds:['g1','g2'],catIds:['c2']}),
+    P({name:'Bacon Lovers',desc:'Blend 180g, muito bacon crocante e molho especial',img:'assets/bacon.png',price:36.9,groupIds:['g1','g2'],catIds:['c1','c2']}),
+    P({name:'Coca-Cola lata',desc:'350ml, bem gelada',price:6.5,serves:'',catIds:['c3','c6']}),
+    P({name:'Suco natural',desc:'Laranja, limão ou maracujá — feito na hora',serves:'',type:'var',varOpts:[V('300ml',9),V('500ml',13)],catIds:['c3','c6']}),
+    P({name:'Prato executivo do dia',desc:'Arroz, feijão, salada e a proteína do dia',price:24.9,catIds:['c5']}),
+    P({name:'Parmegiana com fritas',desc:'Filé empanado, molho de tomate, muçarela e fritas',price:29.9,badge:'Mais pedido',catIds:['c5']}),
+    P({name:'Monte seu Açaí',desc:'Açaí 100% natural, cremoso, com frutas frescas',img:'assets/acai.png',badge:'Novidade',type:'var',varOpts:[V('300ml',15),V('500ml',20),V('700ml',22)],groupIds:['g3'],catIds:['c4','c1']})
+  ];
+  const menus=[{id:'m1',name:'Cardápio Principal',active:true,avail:'always',days:ALL.slice(),start:'17:00',end:'23:30'},{id:'m2',name:'Almoço executivo',active:true,avail:'schedule',days:[1,2,3,4,5],start:'11:00',end:'15:00'}];
+  return {store:{name:'Me Pede Burguer Ai',open:true,eta:'35-45 min',fee:0,min:20,slug:'mepedeburguer'},menus,categories,groups,products};
+}
+function emptyData(){const s=seed();return {store:s.store,menus:[s.menus[0]],categories:[],groups:[],products:[]};}
+function loadData(){try{const d=JSON.parse(localStorage.getItem(LS));if(d&&d.categories){if(!d.menus||!d.menus.length){d.menus=[{id:'m1',name:'Cardápio Principal',active:true,avail:'always',days:ALL.slice(),start:'17:00',end:'23:30'}];d.categories.forEach(c=>{c.menuId='m1';});}return d;}}catch(e){}return seed();}
+const priceOf=p=>{if(p.type==='var'){const ps=p.varOpts.map(o=>o.price).filter(x=>x>0);if(!ps.length)return 'R$ 0,00';const mn=Math.min(...ps);return (ps.length>1?'a partir de ':'')+money(mn);}return money(p.price);};
+const discOf=p=>p.type!=='var'&&p.orig>p.price&&p.price>0?'-'+Math.round((1-p.price/p.orig)*100)+'%':'';
+const ruleText=g=>{if(g.min>0&&g.min===g.max)return 'Escolha '+g.max+(g.max>1?' opções':' opção');if(g.min>0)return 'Escolha de '+g.min+' a '+g.max;return 'Escolha até '+g.max+(g.max>1?' opções':' opção');};
+const toM=t=>{const[a,b]=String(t||'0:0').split(':').map(Number);return a*60+(b||0);};
+
+class Component extends DCLogic {
+  state={data:loadData(),tab:'menu',selCat:'all',search:'',drawer:null,draft:null,cd:null,gd:null,pick:null,menuFor:null,toast:null,newCatOpen:false,newCatName:'',hideCheck:false,qrOpen:false,
+    ph:{cat:null,pid:null,sel:{v:null,g:{}},qty:1,cart:[],view:'home',msg:''}};
+  scrollRef=React.createRef();secBasic=React.createRef();secPrice=React.createRef();secComp=React.createRef();secVis=React.createRef();
+
+  componentDidUpdate(pp,ps){if(ps.data!==this.state.data){try{localStorage.setItem(LS,JSON.stringify(this.state.data));}catch(e){}}}
+  componentWillUnmount(){clearTimeout(this.tt);clearTimeout(this.pt);}
+
+  mut(fn,msg,undo){this.setState(s=>{const prev=s.data;const data=JSON.parse(JSON.stringify(prev));fn(data);const st={data};if(msg)st.toast={msg,undo:undo?prev:null};return st;});if(msg)this.armToast();}
+  armToast(){clearTimeout(this.tt);this.tt=setTimeout(()=>this.setState({toast:null}),5000);}
+  say(msg){this.setState({toast:{msg,undo:null}});this.armToast();}
+  setPh(p){this.setState(s=>({ph:{...s.ph,...p}}));}
+  phSay(msg){this.setPh({msg});clearTimeout(this.pt);this.pt=setTimeout(()=>this.setPh({msg:''}),2200);}
+  stop(fn){return e=>{if(e&&e.stopPropagation)e.stopPropagation();fn();};}
+
+  catStatus(c){
+    if(!c.active)return {live:false,label:'Oculta',bg:'#F1F2F5',fg:'#6B7280',dot:'#B8BEC9'};
+    if(c.avail!=='schedule')return {live:true,label:'Ativa agora',bg:'#E8F7EE',fg:'#12A150',dot:'#12A150'};
+    const now=new Date(),d=now.getDay(),m=now.getHours()*60+now.getMinutes(),s=toM(c.start),e=toM(c.end);
+    const inWin=e>s?(m>=s&&m<e):(m>=s||m<e);
+    if(c.days.includes(d)&&inWin)return {live:true,label:'Ativa agora · até '+c.end,bg:'#E8F7EE',fg:'#12A150',dot:'#12A150'};
+    for(let i=0;i<8;i++){const dd=(d+i)%7;if(c.days.includes(dd)&&(i>0||m<s))return {live:false,label:'Abre '+(i===0?'hoje':i===1?'amanhã':DAYS[dd])+' às '+c.start,bg:'#FFF4E0',fg:'#B45309',dot:'#F59E0B'};}
+    return {live:false,label:'Sem dias definidos',bg:'#FFF4E0',fg:'#B45309',dot:'#F59E0B'};
+  }
+  schedText(c){if(c.avail!=='schedule')return 'Sempre disponível';const ds=DAY_ORDER.filter(d=>c.days.includes(d)).map(d=>DAYS[d]);return (ds.length===7?'Todos os dias':ds.join(', '))+' · '+c.start+' às '+c.end;}
+
+  readImg(e,cb){const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,640/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',0.82));};im.src=r.result;};r.readAsDataURL(f);e.target.value='';}
+
+  // ---------- products
+  openProduct(p,catIds){
+    const row=()=>({id:uid(),name:'',priceStr:''});
+    const d=p?{id:p.id,name:p.name,desc:p.desc,img:p.img,badge:p.badge,serves:p.serves||'',catIds:p.catIds.slice(),type:p.type,priceStr:ms(p.price),origStr:ms(p.orig),varName:p.varName||'Tamanho',varOpts:p.varOpts.length?p.varOpts.map(o=>({id:o.id,name:o.name,priceStr:ms(o.price)})):[row(),row()],groupIds:p.groupIds.slice(),active:p.active}
+      :{id:null,name:'',desc:'',img:'',badge:'',serves:'1 pessoa',catIds:catIds||[],type:'simple',priceStr:'',origStr:'',varName:'Tamanho',varOpts:[row(),row()],groupIds:[],active:true};
+    d.libOpen=false;d.ng=null;d.tried=false;
+    this.setState(s=>({drawer:'product',draft:d,menuFor:null,qrOpen:false,ph:{...s.ph,view:'home',sel:{v:null,g:{}},qty:1}}));
+    setTimeout(()=>{if(this.scrollRef.current)this.scrollRef.current.scrollTop=0;},0);
+  }
+  sd(p){this.setState(s=>({draft:{...s.draft,...p}}));}
+  missing(d){
+    const m=[];
+    if(!d.name.trim())m.push('nome');
+    if(!d.catIds.length)m.push('categoria');
+    if(d.type==='simple'){if(pm(d.priceStr)<=0)m.push('preço de venda');}
+    else{const ok=d.varOpts.filter(o=>o.name.trim()&&pm(o.priceStr)>0);const bad=d.varOpts.filter(o=>(o.name.trim()&&pm(o.priceStr)<=0)||(!o.name.trim()&&pm(o.priceStr)>0));if(!ok.length)m.push('ao menos 1 opção com preço');else if(bad.length)m.push('nome e preço em todas as opções');}
+    return m;
+  }
+  goSec(k){const box=this.scrollRef.current,el=this[k]&&this[k].current;if(box&&el)box.scrollTo({top:el.offsetTop-box.offsetTop-8,behavior:'smooth'});}
+  saveProduct(again){
+    const d=this.state.draft;const miss=this.missing(d);
+    if(miss.length){this.sd({tried:true});this.goSec(miss[0]==='nome'||miss[0]==='categoria'?'secBasic':'secPrice');return;}
+    const price=d.type==='simple'?pm(d.priceStr):0;const orig=pm(d.origStr);
+    const p={id:d.id||uid(),name:d.name.trim(),desc:d.desc.trim(),img:d.img,badge:d.badge,serves:d.serves,catIds:d.catIds,type:d.type,price,orig:d.type==='simple'&&orig>price?orig:0,varName:d.varName.trim()||'Tamanho',
+      varOpts:d.type==='var'?d.varOpts.filter(o=>o.name.trim()&&pm(o.priceStr)>0).map(o=>({id:o.id,name:o.name.trim(),price:pm(o.priceStr)})):[],groupIds:d.groupIds,active:d.active};
+    const isNew=!d.id;
+    this.mut(data=>{const i=data.products.findIndex(x=>x.id===p.id);if(i>-1)data.products[i]=p;else data.products.push(p);},isNew?'“'+p.name+'” criado':'Alterações salvas');
+    if(again)this.openProduct(null,d.catIds.slice());else this.closeDrawer();
+  }
+  deleteProduct(id){const p=this.state.data.products.find(x=>x.id===id);this.mut(data=>{data.products=data.products.filter(x=>x.id!==id);},'“'+(p?p.name:'Produto')+'” excluído',true);this.setState({menuFor:null});}
+  dupProduct(id){this.mut(data=>{const i=data.products.findIndex(x=>x.id===id);if(i<0)return;const c=JSON.parse(JSON.stringify(data.products[i]));c.id=uid();c.name=c.name+' (cópia)';data.products.splice(i+1,0,c);},'Produto duplicado',true);this.setState({menuFor:null});}
+  closeDrawer(){this.setState(s=>({drawer:null,draft:null,cd:null,gd:null,pick:null,md:null,ph:{...s.ph,pid:null,sel:{v:null,g:{}},qty:1}}));}
+
+  // ---------- categories
+  createCat(name){
+    name=(name||'').trim();if(!name)return;const id=uid();
+    const menuId=this.curMenuId();
+    this.mut(data=>{data.categories.push({id,name,menuId,active:true,avail:'always',days:ALL.slice(),start:'17:00',end:'23:30'});},'Categoria “'+name+'” criada — agora adicione produtos',true);
+    this.setState(s=>({selCat:id,newCatOpen:false,newCatName:'',search:'',ph:{...s.ph,cat:id,view:'home',pid:null}}));
+  }
+  openCat(c){this.setState(s=>({drawer:'category',cd:{id:c.id,name:c.name,active:c.active,avail:c.avail,days:c.days.slice(),start:c.start,end:c.end,confirm:false},ph:{...s.ph,cat:c.id,view:'home',pid:null}}));}
+  scd(p){this.setState(s=>({cd:{...s.cd,...p}}));}
+  saveCat(){const cd=this.state.cd;if(!cd.name.trim())return;this.mut(data=>{const c=data.categories.find(x=>x.id===cd.id);if(c)Object.assign(c,{name:cd.name.trim(),active:cd.active,avail:cd.avail,days:cd.days,start:cd.start,end:cd.end});},'Categoria salva');this.closeDrawer();}
+  deleteCat(){const cd=this.state.cd;this.mut(data=>{data.categories=data.categories.filter(x=>x.id!==cd.id);data.products.forEach(p=>{p.catIds=p.catIds.filter(c=>c!==cd.id);});},'Categoria “'+cd.name+'” excluída',true);this.setState({selCat:'all'});this.closeDrawer();}
+  moveCat(id,dir){this.mut(data=>{const c=data.categories.find(x=>x.id===id);if(!c)return;const idx=data.categories.map((x,i)=>x.menuId===c.menuId?i:-1).filter(i=>i>-1);const k=idx.indexOf(data.categories.indexOf(c));const j=idx[k+dir];if(j==null)return;const i=idx[k];const t=data.categories[i];data.categories[i]=data.categories[j];data.categories[j]=t;});}
+
+  // ---------- menus
+  curMenuId(){const d=this.state.data;if(!d.menus||!d.menus.length){d.menus=[{id:'m1',name:'Cardápio Principal',active:true,avail:'always',days:ALL.slice(),start:'17:00',end:'23:30'}];}d.categories.forEach(c=>{if(!c.menuId||!d.menus.some(m=>m.id===c.menuId))c.menuId=d.menus[0].id;});const ms=d.menus;return ms.find(m=>m.id===this.state.menuId)?this.state.menuId:ms[0].id;}
+  selectMenu(id){this.setState(s=>({menuId:id,selCat:'all',search:'',menuDrop:false,ph:{...s.ph,cat:null,pid:null,view:'home'}}));}
+  openMenu(m){const base={active:true,avail:'schedule',days:[1,2,3,4,5],start:'11:00',end:'15:00'};
+    this.setState({drawer:'menu',md:m?{id:m.id,name:m.name,active:m.active,avail:m.avail,days:m.days.slice(),start:m.start,end:m.end,confirm:false}:{id:null,name:'',...base,copy:'',confirm:false}});}
+  smd(p){this.setState(s=>({md:{...s.md,...p}}));}
+  saveMenu(){const md=this.state.md;if(!md.name.trim())return;const id=md.id||uid();
+    this.mut(data=>{const f={name:md.name.trim(),active:md.active,avail:md.avail,days:md.days,start:md.start,end:md.end};
+      const m=data.menus.find(x=>x.id===id);if(m){Object.assign(m,f);return;}
+      data.menus.push({id,...f});
+      if(md.copy){data.categories.filter(c=>c.menuId===md.copy).forEach(c=>{const nid=uid();data.categories.push({...c,id:nid,menuId:id,days:c.days.slice()});data.products.forEach(p=>{if(p.catIds.includes(c.id))p.catIds.push(nid);});});}
+    },md.id?'Cardápio salvo':'Cardápio “'+md.name.trim()+'” criado',!md.id);
+    this.closeDrawer();if(!md.id)this.selectMenu(id);}
+  deleteMenu(){const md=this.state.md;if(this.state.data.menus.length<2)return;
+    this.mut(data=>{const ids=data.categories.filter(c=>c.menuId===md.id).map(c=>c.id);data.menus=data.menus.filter(m=>m.id!==md.id);data.categories=data.categories.filter(c=>c.menuId!==md.id);data.products.forEach(p=>{p.catIds=p.catIds.filter(c=>!ids.includes(c));});},'Cardápio “'+md.name+'” excluído',true);
+    this.closeDrawer();this.setState({menuId:null,selCat:'all'});}
+
+  // ---------- groups
+  openGroup(g){const row=o=>({id:o?o.id:uid(),name:o?o.name:'',desc:o?o.desc:'',img:o?o.img:'',priceStr:o?ms(o.price):''});
+    this.setState({drawer:'group',gd:g?{id:g.id,name:g.name,min:g.min,max:g.max,rows:g.options.map(row)}:{id:null,name:'',min:0,max:1,rows:[row(),row()]}});}
+  sgd(p){this.setState(s=>({gd:{...s.gd,...p}}));}
+  gdRow(i,p){const rows=this.state.gd.rows.slice();rows[i]={...rows[i],...p};this.sgd({rows});}
+  saveGroup(){const gd=this.state.gd;const rows=gd.rows.filter(r=>r.name.trim());if(!gd.name.trim()||!rows.length)return;
+    const g={id:gd.id||uid(),name:gd.name.trim(),min:gd.min,max:Math.max(gd.max,gd.min,1),options:rows.map(r=>({id:r.id,name:r.name.trim(),desc:r.desc.trim(),img:r.img,price:pm(r.priceStr)}))};
+    this.mut(data=>{const i=data.groups.findIndex(x=>x.id===g.id);if(i>-1)data.groups[i]=g;else data.groups.push(g);},gd.id?'Grupo atualizado em todos os produtos':'Grupo criado');this.closeDrawer();}
+  deleteGroup(){const gd=this.state.gd;this.mut(data=>{data.groups=data.groups.filter(x=>x.id!==gd.id);data.products.forEach(p=>{p.groupIds=p.groupIds.filter(g=>g!==gd.id);});},'Grupo excluído',true);this.closeDrawer();}
+
+  // ---------- phone
+  pickOpt(g,oid){const s=this.state.ph.sel;const ch=(s.g[g.id]||[]).slice();let n;
+    if(g.max===1)n=ch[0]===oid?[]:[oid];
+    else if(ch.includes(oid))n=ch.filter(x=>x!==oid);
+    else{if(ch.length>=g.max){this.phSay('Máximo de '+g.max+' em “'+g.name+'”');return;}n=ch.concat(oid);}
+    this.setPh({sel:{...s,g:{...s.g,[g.id]:n}}});}
+  draftProduct(d){return {id:d.id||'draft',name:d.name.trim()||'Nome do produto',desc:d.desc.trim()||'A descrição aparece aqui.',img:d.img,badge:d.badge,serves:d.serves,type:d.type,price:pm(d.priceStr),orig:pm(d.origStr),varName:d.varName||'Tamanho',
+    varOpts:d.varOpts.filter(o=>o.name.trim()||o.priceStr).map(o=>({id:o.id,name:o.name.trim()||'Opção',price:pm(o.priceStr)})),groupIds:d.groupIds,active:d.active};}
+
+  renderVals(){
+    const S=this.state,data=S.data,store=data.store;
+    const mid=this.curMenuId(),menu=data.menus.find(m=>m.id===mid),mcats=data.categories.filter(c=>c.menuId===mid),mcatIds=mcats.map(c=>c.id);
+    const liveMenu=data.menus.find(m=>this.catStatus(m).live);
+    const menuCards=data.menus.map(m=>{const on=m.id===mid;const st=this.catStatus(m);const cs=data.categories.filter(c=>c.menuId===m.id);const np=data.products.filter(p=>p.catIds.some(c=>cs.some(x=>x.id===c))).length;
+      const thumbP=data.products.find(p=>p.img&&p.catIds.some(c=>cs.some(x=>x.id===c)));
+      const isLiveNow=liveMenu&&liveMenu.id===m.id;
+      const status=!m.active?'Desligado':isLiveNow?'No ar agora':st.live?'No horário · outro cardápio tem prioridade':st.label;
+      const sfg=!m.active?'#6B7280':isLiveNow?'#12A150':'#B45309';
+      return {name:m.name,sched:this.schedText(m),status,sfg,count:cs.length+(cs.length===1?' categoria':' categorias')+' · '+np+(np===1?' produto':' produtos'),
+        bd:on?'#14171F':'#ECEEF2',bg:on?'#fff':'#FAFBFC',editing:on,op:m.active?1:.5,t:tg(m.active),thumb:thumbP?thumbP.img:'',hasThumb:!!thumbP,noThumb:!thumbP,initial:m.name[0]||'C',
+        onClick:()=>this.selectMenu(m.id),onEdit:this.stop(()=>this.openMenu(m)),
+        onToggle:this.stop(()=>this.mut(d=>{const x=d.menus.find(y=>y.id===m.id);x.active=!x.active;},m.active?'“'+m.name+'” desligado — saiu do ar':'“'+m.name+'” ligado'))};});
+    const md=S.md||{name:'',days:[],confirm:false};let me={days:[],copies:[]};
+    if(S.drawer==='menu'&&S.md){const st=this.catStatus(md);const nc=md.id?data.categories.filter(c=>c.menuId===md.id).length:0;
+      me={title:md.name||(md.id?'Cardápio':'Novo cardápio'),kicker:md.id?'Editar cardápio':'Novo cardápio',isEdit:!!md.id,isNew:!md.id,tAct:tg(md.active),
+        sA:{bd:md.avail!=='schedule'?ORANGE:'#E3E6EB',bg:md.avail!=='schedule'?'#FFF6F0':'#fff'},sS:{bd:md.avail==='schedule'?ORANGE:'#E3E6EB',bg:md.avail==='schedule'?'#FFF6F0':'#fff'},isSched:md.avail==='schedule',
+        days:DAY_ORDER.map(dd=>{const on=md.days.includes(dd);return {label:DAYS[dd],bg:on?ORANGE:'#fff',fg:on?'#fff':'#8A91A0',bd:on?ORANGE:'#E3E6EB',onClick:()=>this.smd({days:on?md.days.filter(x=>x!==dd):md.days.concat(dd)})};}),
+        status:st.label,sbg:st.bg,sfg:st.fg,saveBg:md.name.trim()?ORANGE:'#FFB98C',
+        copies:[{id:'',label:'Em branco',sub:'Crie as categorias do zero'}].concat(data.menus.map(m=>({id:m.id,label:'Copiar de “'+m.name+'”',sub:'Mesmas categorias e produtos — preços e fotos continuam compartilhados'}))).map(o=>{const on=(md.copy||'')===o.id;return {label:o.label,sub:o.sub,bd:on?ORANGE:'#E3E6EB',bg:on?'#FFF6F0':'#fff',ring:on?ORANGE:'#C9CED8',dot:on?ORANGE:'transparent',onClick:()=>this.smd({copy:o.id})};}),
+        canDelete:!!md.id&&data.menus.length>1,noConfirm:!md.confirm,delText:'As '+nc+' categorias deste cardápio serão removidas. Os produtos continuam salvos e nos outros cardápios. Você pode desfazer logo depois.'};}
+    const catName=id=>{const c=data.categories.find(x=>x.id===id);return c?c.name:'';};
+    const gById=id=>data.groups.find(g=>g.id===id);
+    const url='https://mepede.ai/'+(store.slug||'');
+    const nav=(k)=>({bg:S.tab===k?'#FFF1E8':'transparent',fg:S.tab===k?'#E85700':'#4A5160',fw:S.tab===k?600:500,onClick:()=>this.setState({tab:k,qrOpen:false})});
+    const titles={menu:[menu.name,data.menus.length>1?data.menus.length+' cardápios · editando este':'Categorias e produtos'],groups:['Complementos','Biblioteca de grupos'],settings:['Loja e link','Configurações do cardápio']};
+
+    // checklist
+    const mProds=data.products.filter(p=>p.catIds.some(c=>mcatIds.includes(c)));
+    const noPhoto=mProds.filter(p=>!p.img);
+    const steps=[
+      {label:'Criar uma categoria',done:mcats.length>0,act:()=>this.setState({tab:'menu',newCatOpen:true,selCat:'all'})},
+      {label:'Cadastrar um produto',done:mProds.length>0,act:()=>{this.setState({tab:'menu'});this.openProduct(null,S.selCat!=='all'?[S.selCat]:(mcats[0]?[mcats[0].id]:[]));}},
+      {label:mProds.length&&noPhoto.length?'Pôr foto em '+noPhoto.length+(noPhoto.length>1?' produtos':' produto'):'Pôr fotos nos produtos',done:mProds.length>0&&!noPhoto.length,act:()=>{if(noPhoto[0]){this.setState({tab:'menu'});this.openProduct(noPhoto[0]);}}},
+      {label:'Colocar no ar',done:store.open&&menu.active,act:()=>this.mut(d=>{d.store.open=true;const x=d.menus.find(y=>y.id===mid);if(x)x.active=true;},'“'+menu.name+'” no ar')}
+    ];
+    for(let i=1;i<steps.length;i++)if(!steps[i-1].done)steps[i].done=false;
+    const checkDone=steps.filter(s=>s.done).length;
+    const nextIdx=steps.findIndex(s=>!s.done);
+    const checkSteps=steps.map((s,i)=>{const cur=i===nextIdx;const locked=!s.done&&!cur;
+      return {label:s.label,bg:s.done?'#E8F7EE':cur?ORANGE:'#F1F2F5',fg:s.done?'#12A150':cur?'#fff':'#8A91A0',markBg:s.done?'#12A150':cur?'#fff':'#C9CED8',markFg:cur?ORANGE:'#fff',mark:s.done?'✓':String(i+1),arrow:cur?'→':'',
+        onClick:s.done?()=>{}:locked?()=>this.say('Primeiro: '+steps[nextIdx].label.toLowerCase()):s.act};});
+    const checkTitle=checkDone===0?'Monte “'+menu.name+'” passo a passo':'“'+menu.name+'” está quase pronto';
+    const checkSub=nextIdx>-1?'Passo '+(nextIdx+1)+' de 4 · '+steps[nextIdx].label:'';
+
+    // chips
+    const q=S.search.trim().toLowerCase();
+    const sel=S.selCat!=='all'&&mcats.find(c=>c.id===S.selCat)?S.selCat:'all';
+    const chips=mcats.map(c=>{const on=sel===c.id;const st=this.catStatus(c);return {label:c.name,count:data.products.filter(p=>p.catIds.includes(c.id)).length,bg:on?'#14171F':'#fff',fg:on?'#fff':'#14171F',bd:on?'#14171F':'#E3E6EB',dot:st.dot,onClick:()=>this.setState(s=>({selCat:c.id,menuFor:null,ph:{...s.ph,cat:c.id,view:'home',pid:null}}))};});
+    const allOn=sel==='all';
+    const inMenu=data.products.filter(p=>!p.catIds.length||p.catIds.some(c=>mcatIds.includes(c)));
+    const allChip={count:inMenu.length,bg:allOn?'#14171F':'#fff',fg:allOn?'#fff':'#14171F',bd:allOn?'#14171F':'#E3E6EB',onClick:()=>this.setState({selCat:'all',menuFor:null})};
+    const cat=sel!=='all'?data.categories.find(c=>c.id===sel):null;
+    let list=cat?data.products.filter(p=>p.catIds.includes(cat.id)):inMenu;
+    const inCat=list.length;
+    if(q)list=list.filter(p=>(p.name+' '+p.desc).toLowerCase().includes(q));
+    let head;
+    if(cat){const st=this.catStatus(cat);head={isCat:true,title:cat.name,status:st.label,sbg:st.bg,sfg:st.fg,sub:inCat+(inCat===1?' produto':' produtos')+' · '+this.schedText(cat),onLeft:()=>this.moveCat(cat.id,-1),onRight:()=>this.moveCat(cat.id,1),onSettings:()=>this.openCat(cat),newHint:'em '+cat.name};}
+    else{const vis=inMenu.filter(p=>p.active).length;const orphan=inMenu.filter(p=>!p.catIds.length).length;head={isCat:false,title:'Todos os produtos',sub:inMenu.length+' produtos neste cardápio · '+vis+' visíveis'+(orphan?' · '+orphan+' sem categoria':''),newHint:'Escolha a categoria no formulário'};}
+    const cards=list.map(p=>{const disc=discOf(p);const meta=[];
+      if(p.type==='var')meta.push(p.varOpts.length+' opções de '+(p.varName||'tamanho').toLowerCase());
+      if(p.groupIds.length)meta.push(p.groupIds.length+(p.groupIds.length>1?' grupos de complementos':' grupo de complementos'));
+      if(!cat&&p.catIds.length)meta.push(p.catIds.filter(c=>mcatIds.includes(c)).map(catName).join(', '));
+      const others=data.menus.filter(m=>m.id!==mid&&data.categories.some(c=>c.menuId===m.id&&p.catIds.includes(c.id)));
+      if(others.length)meta.push('Também em: '+others.map(m=>m.name).join(', '));
+      return {name:p.name,desc:p.desc||'Sem descrição',img:p.img,hasImg:!!p.img,noImg:!p.img,badge:p.badge,hasBadge:!!p.badge,price:priceOf(p),orig:money(p.orig),hasOrig:!!disc,disc,meta:meta.join(' · ')||'Sem complementos',
+        warn:!p.catIds.length,warnText:'Sem categoria — não aparece para o cliente',t:tg(p.active),op:p.active?1:.45,activeLabel:p.active?'Visível':'Oculto',menuOpen:S.menuFor===p.id,canRemoveCat:!!cat,
+        onEdit:()=>this.openProduct(p),onEditBtn:this.stop(()=>this.openProduct(p)),
+        onToggle:this.stop(()=>this.mut(d=>{const x=d.products.find(y=>y.id===p.id);x.active=!x.active;},p.active?'“'+p.name+'” oculto do cardápio':'“'+p.name+'” visível de novo')),
+        onMenu:this.stop(()=>this.setState({menuFor:S.menuFor===p.id?null:p.id})),
+        onPreview:this.stop(()=>{const c0=p.catIds.find(id=>{const c=data.categories.find(x=>x.id===id);return c&&this.catStatus(c).live;});this.setState(s=>({menuFor:null,ph:{...s.ph,cat:c0||s.ph.cat,pid:p.id,view:'home',sel:{v:null,g:{}},qty:1}}));if(!p.active)this.phSay('Este produto está oculto — prévia só para você');}),
+        onDup:this.stop(()=>this.dupProduct(p.id)),onDel:this.stop(()=>this.deleteProduct(p.id)),
+        onRemoveCat:this.stop(()=>{this.mut(d=>{const x=d.products.find(y=>y.id===p.id);x.catIds=x.catIds.filter(c=>c!==cat.id);},'Removido de '+cat.name,true);this.setState({menuFor:null});})};});
+    const empty=q?{title:'Nada encontrado para “'+S.search+'”',sub:'Tente outro nome.',canPick:false}:cat?{title:'Nenhum produto em '+cat.name+' ainda',sub:'Crie um novo ou reaproveite um que já existe.',canPick:data.products.length>0}:{title:'Nenhum produto cadastrado',sub:'Cadastre o primeiro — leva menos de 1 minuto.',canPick:false};
+
+    // groups tab
+    const groupCards=data.groups.map(g=>{const used=data.products.filter(p=>p.groupIds.includes(g.id));return {name:g.name,rule:ruleText(g),ruleTag:g.min>0?'OBRIGATÓRIO':'OPCIONAL',rbg:g.min>0?'#FFF1E8':'#F1F2F5',rfg:g.min>0?'#E85700':'#4A5160',
+      opts:g.options.map(o=>({name:o.name,price:o.price?'+ '+money(o.price):'Grátis',img:o.img,hasImg:!!o.img})),used:used.length?'Usado em '+used.length+': '+used.map(p=>p.name).join(', '):'Ainda não vinculado a nenhum produto',onEdit:()=>this.openGroup(g)};});
+
+    // product editor
+    const d=S.draft||{name:'',desc:'',catIds:[],varOpts:[],groupIds:[],priceStr:'',origStr:'',varName:'',serves:'',img:''};
+    let pe={secs:[],cats:[],badges:[],varRows:[],linked:[],lib:[]};let ngRows=[],ngSeg={},ng=d.ng||{name:'',max:1};
+    if(S.drawer==='product'&&S.draft){
+      const miss=this.missing(d);const tried=d.tried;
+      const basicOk=d.name.trim()&&d.catIds.length;const priceOk=!miss.some(m=>m.indexOf('preço')>-1||m.indexOf('opç')>-1);
+      const sec=(label,k,ok,opt)=>({label,mark:ok?'✓':'',dot:ok?'#12A150':'#fff',ring:ok?'#12A150':(opt?'#C9CED8':ORANGE),fg:'#14171F',bd:'transparent',onClick:()=>this.goSec(k)});
+      const pr=pm(d.priceStr),orr=pm(d.origStr);
+      let hint='',hfg='#12A150',hbg='#E8F7EE';
+      if(orr>0&&pr>0&&orr>pr){hint='O cliente verá '+money(orr)+' riscado e -'+Math.round((1-pr/orr)*100)+'% de desconto.';}
+      else if(orr>0&&pr>0){hint='O preço antes precisa ser maior que o de venda para mostrar desconto.';hfg='#B45309';hbg='#FFF4E0';}
+      const linked=d.groupIds.map(gById).filter(Boolean);
+      const libList=data.groups.filter(g=>!d.groupIds.includes(g.id));
+      const moveG=(i,dir)=>{const a=d.groupIds.slice(),j=i+dir;if(j<0||j>=a.length)return;[a[i],a[j]]=[a[j],a[i]];this.sd({groupIds:a});};
+      const vrows=d.varOpts;const phs=['Ex: 300ml','Ex: 500ml','Ex: 700ml','Ex: 1L'];
+      pe={kicker:d.id?'Editar produto':'Novo produto',title:d.name.trim()||(d.id?'Produto':'Novo produto'),isEdit:!!d.id,isNew:!d.id,
+        secs:[sec('Básico','secBasic',basicOk),sec('Preço','secPrice',priceOk),sec('Complementos','secComp',linked.length>0,true),sec('Visibilidade','secVis',true,true)],
+        hasImg:!!d.img,noImg:!d.img,descCount:d.desc.length,nameBd:tried&&!d.name.trim()?'#E5352B':'#E3E6EB',priceBd:tried&&pr<=0?'#E5352B':'#E3E6EB',
+        cats:mcats.map(c=>{const on=d.catIds.includes(c.id);return {label:c.name,mark:on?'✓ ':'',bg:on?'#FFF1E8':'#fff',fg:on?'#C24A00':'#4A5160',bd:on?ORANGE:(tried&&!d.catIds.length?'#E5352B':'#E3E6EB'),onClick:()=>this.sd({catIds:on?d.catIds.filter(x=>x!==c.id):d.catIds.concat(c.id)})};}),
+        badges:[''].concat(BADGES).map(b=>{const on=d.badge===b;return {label:b||'Nenhum',bg:on?'#FFF1E8':'#fff',fg:on?'#C24A00':'#4A5160',bd:on?ORANGE:'#E3E6EB',onClick:()=>this.sd({badge:b})};}),
+        tS:{bd:d.type==='simple'?ORANGE:'#E3E6EB',bg:d.type==='simple'?'#FFF6F0':'#fff'},tV:{bd:d.type==='var'?ORANGE:'#E3E6EB',bg:d.type==='var'?'#FFF6F0':'#fff'},
+        isSimple:d.type==='simple',isVar:d.type==='var',hasPriceHint:!!hint,priceHint:hint,priceHintFg:hfg,priceHintBg:hbg,
+        varRows:vrows.map((o,i)=>({name:o.name,price:o.priceStr,ph:phs[i]||'Opção',onName:e=>{const a=d.varOpts.slice();a[i]={...a[i],name:e.target.value};this.sd({varOpts:a});},onPrice:e=>{const a=d.varOpts.slice();a[i]={...a[i],priceStr:e.target.value};this.sd({varOpts:a});},onRemove:()=>{if(d.varOpts.length<=1)return;this.sd({varOpts:d.varOpts.filter((_,j)=>j!==i)});}})),
+        linked:linked.map((g,i)=>({name:g.name,ruleTag:g.min>0?'OBRIGATÓRIO':'OPCIONAL',rbg:g.min>0?'#FFF1E8':'#F1F2F5',rfg:g.min>0?'#E85700':'#4A5160',optsText:ruleText(g)+' · '+g.options.map(o=>o.name).join(', '),onUp:()=>moveG(i,-1),onDown:()=>moveG(i,1),onRemove:()=>this.sd({groupIds:d.groupIds.filter(x=>x!==g.id)})})),
+        libOpen:d.libOpen,lib:libList.map(g=>({name:g.name,ruleTag:g.min>0?'Obrigatório':'Opcional',optsText:g.options.map(o=>o.name).join(', '),onAdd:()=>this.sd({groupIds:d.groupIds.concat(g.id),libOpen:libList.length>1})})),libEmpty:!libList.length,
+        libBtn:d.libOpen?'Fechar biblioteca':'Usar da biblioteca ('+libList.length+')',ngOpen:!!d.ng,showCompBtns:!d.ng,
+        tAct:tg(d.active),missText:miss.length?'Falta: '+miss.join(', '):'Tudo certo! Confira a prévia ao lado.',missFg:miss.length?(tried?'#E5352B':'#8A91A0'):'#12A150',
+        saveBg:miss.length?'#FFB98C':ORANGE,saveLabel:d.id?'Salvar alterações':'Salvar produto'};
+      if(d.ng){const n=d.ng;const nrow=(i,p)=>{const rows=n.rows.slice();rows[i]={...rows[i],...p};this.sd({ng:{...n,rows}});};
+        ngRows=n.rows.map((r,i)=>({name:r.name,price:r.priceStr,onName:e=>nrow(i,{name:e.target.value}),onPrice:e=>nrow(i,{priceStr:e.target.value}),onRemove:()=>{if(n.rows.length>1)this.sd({ng:{...n,rows:n.rows.filter((_,j)=>j!==i)}});}}));
+        const ok=n.name.trim()&&n.rows.some(r=>r.name.trim());
+        ngSeg={oBg:!n.req?'#14171F':'transparent',oFg:!n.req?'#fff':'#4A5160',rBg:n.req?'#14171F':'transparent',rFg:n.req?'#fff':'#4A5160',saveBg:ok?ORANGE:'#FFB98C'};}
+    }
+
+    // category editor
+    const cd=S.cd||{name:'',days:[],confirm:false};let ce={days:[]};
+    if(S.drawer==='category'&&S.cd){const st=this.catStatus({...cd,active:cd.active});const cnt=data.products.filter(p=>p.catIds.includes(cd.id)).length;
+      ce={title:cd.name||'Categoria',isEdit:!!cd.id,tAct:tg(cd.active),sA:{bd:cd.avail!=='schedule'?ORANGE:'#E3E6EB',bg:cd.avail!=='schedule'?'#FFF6F0':'#fff'},sS:{bd:cd.avail==='schedule'?ORANGE:'#E3E6EB',bg:cd.avail==='schedule'?'#FFF6F0':'#fff'},isSched:cd.avail==='schedule',
+        days:DAY_ORDER.map(dd=>{const on=cd.days.includes(dd);return {label:DAYS[dd],bg:on?ORANGE:'#fff',fg:on?'#fff':'#8A91A0',bd:on?ORANGE:'#E3E6EB',onClick:()=>this.scd({days:on?cd.days.filter(x=>x!==dd):cd.days.concat(dd)})};}),
+        status:st.label,sbg:st.bg,sfg:st.fg,noConfirm:!cd.confirm,delText:cnt?'Os '+cnt+' produtos dela não serão excluídos — só saem desta categoria. Você pode desfazer logo depois.':'A categoria está vazia. Você pode desfazer logo depois.',saveBg:cd.name.trim()?ORANGE:'#FFB98C'};}
+
+    // group editor
+    const gd=S.gd||{name:'',min:0,max:1,rows:[]};let ge={},gdRows=[];
+    if(S.drawer==='group'&&S.gd){const req=gd.min>0;const used=gd.id?data.products.filter(p=>p.groupIds.includes(gd.id)):[];
+      ge={title:gd.name||'Novo grupo',isEdit:!!gd.id,isReq:req,oBg:!req?'#fff':'transparent',oFg:!req?'#14171F':'#8A91A0',rBg:req?'#fff':'transparent',rFg:req?'#14171F':'#8A91A0',
+        ruleText:'O cliente vai ver: “'+ruleText({min:gd.min,max:Math.max(gd.max,gd.min,1)})+'”'+(req?' — e não consegue pedir sem escolher.':''),
+        used:used.length?'Vinculado a '+used.length+' produto(s): '+used.map(p=>p.name).join(', ')+'. Alterações valem para todos.':'Depois de salvar, vincule este grupo ao editar um produto.',
+        saveBg:gd.name.trim()&&gd.rows.some(r=>r.name.trim())?ORANGE:'#FFB98C'};
+      gdRows=gd.rows.map((r,i)=>({name:r.name,desc:r.desc,price:r.priceStr,onName:e=>this.gdRow(i,{name:e.target.value}),onDesc:e=>this.gdRow(i,{desc:e.target.value}),onPrice:e=>this.gdRow(i,{priceStr:e.target.value}),onRemove:()=>{if(gd.rows.length>1)this.sgd({rows:gd.rows.filter((_,j)=>j!==i)});}}));}
+
+    // pick
+    let pk={rows:[]};
+    if(S.drawer==='pick'&&S.pick&&cat){const pq=S.pick.q.trim().toLowerCase();const cands=data.products.filter(p=>!p.catIds.includes(cat.id)).filter(p=>!pq||p.name.toLowerCase().includes(pq));const n=Object.values(S.pick.sel).filter(Boolean).length;
+      pk={cat:cat.name,q:S.pick.q,empty:!cands.length,saveBg:n?ORANGE:'#FFB98C',saveLabel:n?'Adicionar '+n+(n>1?' produtos':' produto'):'Adicionar',
+        rows:cands.map(p=>{const on=!!S.pick.sel[p.id];return {name:p.name,price:priceOf(p),cats:p.catIds.map(catName).join(', ')||'Sem categoria',img:p.img,hasImg:!!p.img,noImg:!p.img,initial:p.name[0],bd:on?ORANGE:'#ECEEF2',bg:on?'#FFF6F0':'#fff',box:on?ORANGE:'#C9CED8',fill:on?ORANGE:'#fff',onClick:()=>this.setState(s=>({pick:{...s.pick,sel:{...s.pick.sel,[p.id]:!on}}}))};})};}
+
+    // phone
+    const ph=S.ph;
+    const live=mcats.filter(c=>this.catStatus(c).live).map(c=>({c,ps:data.products.filter(p=>p.active&&p.catIds.includes(c.id))})).filter(x=>x.ps.length);
+    const curCat=live.find(x=>x.c.id===ph.cat)||live[0];
+    const phCard=p=>{const disc=discOf(p);return {name:p.name,desc:p.desc,img:p.img,hasImg:!!p.img,noImg:!p.img,initial:p.name[0],price:priceOf(p),orig:money(p.orig),hasOrig:!!disc,disc,badge:p.badge,hasBadge:!!p.badge,bd:p.badge?'#FFD2B5':'#ECEEF2',onClick:()=>this.setPh({pid:p.id,view:'home',sel:{v:null,g:{}},qty:1})};};
+    const hidden=mcats.length-live.length;
+    const editing=S.drawer==='product'&&!!S.draft;
+    const sp=editing?this.draftProduct(S.draft):(ph.pid?data.products.find(p=>p.id===ph.pid):null);
+    let sh={vars:[],groups:[]};
+    if(sp){const sl=ph.sel;const vOk=sp.varOpts.find(o=>o.id===sl.v);const gl=sp.groupIds.map(gById).filter(Boolean);
+      const extras=gl.reduce((a,g)=>a+(sl.g[g.id]||[]).reduce((b,oid)=>{const o=g.options.find(x=>x.id===oid);return b+(o?o.price:0);},0),0);
+      const base=sp.type==='var'?(vOk?vOk.price:0):sp.price;const total=(base+extras)*ph.qty;
+      const missG=gl.find(g=>(sl.g[g.id]||[]).length<g.min);const needV=sp.type==='var'&&!vOk;
+      const ok=!needV&&!missG;const disc=discOf(sp);
+      sh={name:sp.name,desc:sp.desc,img:sp.img,hasImg:!!sp.img,noImg:!sp.img,initial:sp.name[0],badge:sp.badge,hasBadge:!!sp.badge,price:priceOf(sp),orig:money(sp.orig),hasOrig:!!disc,disc,serves:sp.serves,hasServes:!!sp.serves,
+        isVar:sp.type==='var',varName:(sp.varName||'tamanho').toLowerCase(),editing,canClose:!editing,qty:ph.qty,
+        vars:sp.varOpts.map(o=>{const on=sl.v===o.id;return {name:o.name,price:money(o.price),ring:on?ORANGE:'#C9CED8',dot:on?ORANGE:'transparent',onClick:()=>this.setPh({sel:{...sl,v:o.id}})};}),
+        groups:gl.map(g=>{const ch=sl.g[g.id]||[];return {name:g.name,rule:ruleText(g),count:ch.length+'/'+g.max,tag:g.min>0?'OBRIGATÓRIO':'OPCIONAL',tagBg:g.min>0?'#14171F':'#E3E6EB',tagFg:g.min>0?'#fff':'#4A5160',
+          opts:g.options.map(o=>{const on=ch.includes(o.id);return {name:o.name,desc:o.desc,hasDesc:!!o.desc,price:o.price?'+ '+money(o.price):'Grátis',ring:on?ORANGE:'#C9CED8',fill:on?ORANGE:'#fff',radius:g.max===1?'9px':'5px',onClick:()=>this.pickOpt(g,o.id)};})};}),
+        addBg:ok?ORANGE:'#FFB98C',addLabel:ok?'Adicionar · '+money(total):(needV?'Escolha o(a) '+(sp.varName||'tamanho').toLowerCase():'Escolha: '+missG.name),
+        _ok:ok,_total:total,_detail:[vOk?vOk.name:''].concat(gl.flatMap(g=>(sl.g[g.id]||[]).map(oid=>{const o=g.options.find(x=>x.id===oid);return o?o.name:'';}))).filter(Boolean).join(', ')};}
+    const cartSub=ph.cart.reduce((a,c)=>a+c.total,0);const minOk=cartSub>=(store.min||0);
+    const cart={items:ph.cart.map(c=>({name:c.name,qty:c.qty,detail:c.detail||'Sem adicionais',total:money(c.total),onRemove:()=>this.setPh({cart:ph.cart.filter(x=>x.id!==c.id)})})),empty:!ph.cart.length,sub:money(cartSub),fee:store.fee?money(store.fee):'Grátis',total:money(cartSub+(ph.cart.length?store.fee||0:0)),
+      btnBg:ph.cart.length&&minOk&&store.open?ORANGE:'#FFB98C',btn:!ph.cart.length?'Adicione itens':!store.open?'Loja fechada agora':!minOk?'Mínimo de '+money(store.min):'Fazer pedido'};
+    const phView={storeName:store.name||'Sua loja',openLabel:store.open?'Aberto':'Fechado',openFg:store.open?'#FF6100':'#E5352B',eta:store.eta||'—',fee:store.fee?money(store.fee):'Grátis',min:money(store.min||0),
+      chips:live.map(x=>{const on=curCat&&x.c.id===curCat.c.id;return {label:x.c.name,bg:on?ORANGE:'#F1F2F5',fg:on?'#fff':'#4A5160',onClick:()=>this.setPh({cat:x.c.id})};}),
+      products:curCat?curCat.ps.map(phCard):[],empty:!curCat,emptyText:mcats.length?'Nenhuma categoria visível agora com produtos ativos.':'Crie uma categoria e um produto para ver seu cardápio aqui.',
+      hiddenNote:hidden>0&&!!curCat,hiddenText:hidden+(hidden>1?' categorias ocultas':' categoria oculta')+' agora (fora do horário, desligada ou vazia)',
+      homeFg:ph.view==='home'?ORANGE:'#4A5160',cartFg:ph.view==='cart'?ORANGE:'#4A5160',hasCart:ph.cart.length>0,cartCount:ph.cart.reduce((a,c)=>a+c.qty,0)};
+
+    return {
+      storeCard:store.open?{bg:'#E8F7EE',bd:'#C6EBD4',fg:'#12A150',label:'Loja aberta',sub:'Recebendo pedidos'}:{bg:'#FDECEB',bd:'#F8C9C5',fg:'#E5352B',label:'Loja fechada',sub:'Clientes só visualizam'},
+      tStore:tg(store.open),onToggleStore:()=>this.mut(dd=>{dd.store.open=!dd.store.open;},store.open?'Loja fechada':'Loja aberta'),
+      navMenu:{...nav('menu'),count:data.products.length},navGroups:{...nav('groups'),count:data.groups.length},navSettings:nav('settings'),
+      pageTitle:titles[S.tab][0],pageKicker:titles[S.tab][1],linkText:'mepede.ai/'+(store.slug||''),
+      onCopyLink:()=>{try{navigator.clipboard.writeText(url).catch(()=>{});}catch(e){}this.say('Link copiado');},
+      onWhats:()=>window.open('https://wa.me/?text='+encodeURIComponent('Confira nosso cardápio: '+url),'_blank'),
+      onToggleQr:()=>this.setState({qrOpen:!S.qrOpen}),qrOpen:S.qrOpen,qrSrc:'https://api.qrserver.com/v1/create-qr-code/?size=360x360&margin=8&data='+encodeURIComponent(url),
+      isMenu:S.tab==='menu',isGroups:S.tab==='groups',isSettings:S.tab==='settings',
+      showChecklist:!(S.hideCheck||{})[mid]&&checkDone<4,checkDone,checkSteps,checkTitle,checkSub,onHideChecklist:()=>this.setState({hideCheck:{...(S.hideCheck||{}),[mid]:true}}),
+      noCats:!mcats.length,hasCats:mcats.length>0,
+      menuCards,showMenus:true,onNewMenu:()=>this.openMenu(null),dMenu:S.drawer==='menu',md,me,
+      onMdName:e=>this.smd({name:e.target.value}),onMdActive:()=>this.smd({active:!md.active}),onMdAlways:()=>this.smd({avail:'always'}),onMdSched:()=>this.smd({avail:'schedule'}),
+      onMdStart:e=>this.smd({start:e.target.value}),onMdEnd:e=>this.smd({end:e.target.value}),onMdSave:()=>this.saveMenu(),onMdAskDelete:()=>this.smd({confirm:true}),onMdCancelDelete:()=>this.smd({confirm:false}),onMdDelete:()=>this.deleteMenu(),
+      liveBar:data.menus.length>1?(liveMenu?{fg:'#12A150',bg:'#E8F7EE',text:'Agora o cliente vê: '+liveMenu.name}:{fg:'#B45309',bg:'#FFF4E0',text:'Nenhum cardápio no horário agora'}):{fg:'#12A150',bg:'#E8F7EE',text:''},hasLiveBar:data.menus.length>1,
+      suggestions:['Lanches','Bebidas','Porções','Combos','Sobremesas'].map(l=>({label:l,onClick:()=>this.createCat(l)})),
+      newCatName:S.newCatName,onNewCatName:e=>this.setState({newCatName:e.target.value}),onNewCatKey:e=>{if(e.key==='Enter')this.createCat(S.newCatName);if(e.key==='Escape')this.setState({newCatOpen:false,newCatName:''});},
+      onCreateCatInput:()=>this.createCat(S.newCatName),newCatOpen:S.newCatOpen,newCatClosed:!S.newCatOpen,onOpenNewCat:()=>this.setState({newCatOpen:true}),onCloseNewCat:()=>this.setState({newCatOpen:false,newCatName:''}),
+      chips,allChip,head,search:S.search,onSearch:e=>this.setState({search:e.target.value}),cards,hasCards:cards.length>0,noCards:!cards.length,empty,
+      onNewProduct:()=>this.openProduct(null,cat?[cat.id]:[]),onPickExisting:()=>{if(cat)this.setState({drawer:'pick',pick:{q:'',sel:{}}});},
+      groupCards,noGroups:!data.groups.length,groupsSummary:data.groups.length+' grupos · '+data.groups.reduce((a,g)=>a+g.options.length,0)+' opções cadastradas',onNewGroup:()=>this.openGroup(null),
+      st:{name:store.name,eta:store.eta,fee:S.feeStr!=null?S.feeStr:ms(store.fee),min:S.minStr!=null?S.minStr:ms(store.min),slug:store.slug},
+      onStName:e=>{const v=e.target.value;this.mut(dd=>{dd.store.name=v;});},onStEta:e=>{const v=e.target.value;this.mut(dd=>{dd.store.eta=v;});},
+      onStFee:e=>{const v=e.target.value;this.setState({feeStr:v});this.mut(dd=>{dd.store.fee=pm(v);});},onStMin:e=>{const v=e.target.value;this.setState({minStr:v});this.mut(dd=>{dd.store.min=pm(v);});},
+      onStSlug:e=>{const v=e.target.value.toLowerCase().replace(/[^a-z0-9-]/g,'');this.mut(dd=>{dd.store.slug=v;});},
+      onResetEmpty:()=>{const prev=data;this.setState({data:emptyData(),selCat:'all',hideCheck:false,tab:'menu',toast:{msg:'Cardápio zerado',undo:prev},ph:{...ph,cart:[],pid:null}});this.armToast();},
+      onResetSeed:()=>{const prev=data;this.setState({data:seed(),selCat:'all',toast:{msg:'Exemplo restaurado',undo:prev},ph:{...ph,cart:[],pid:null}});this.armToast();},
+      drawerOpen:!!S.drawer,dProduct:S.drawer==='product',dCategory:S.drawer==='category',dGroup:S.drawer==='group',dPick:S.drawer==='pick',onCloseDrawer:()=>this.closeDrawer(),
+      d,pe,ng,ngRows,ngSeg,scrollRef:this.scrollRef,secBasic:this.secBasic,secPrice:this.secPrice,secComp:this.secComp,secVis:this.secVis,
+      onDImg:e=>this.readImg(e,url=>this.sd({img:url})),onDImgRemove:()=>this.sd({img:''}),
+      onDName:e=>this.sd({name:e.target.value}),onDDesc:e=>this.sd({desc:e.target.value}),onDServes:e=>this.sd({serves:e.target.value}),
+      onTypeSimple:()=>{this.sd({type:'simple'});this.setPh({sel:{v:null,g:ph.sel.g}});},onTypeVar:()=>this.sd({type:'var'}),
+      onDPrice:e=>this.sd({priceStr:e.target.value}),onDOrig:e=>this.sd({origStr:e.target.value}),onDVarName:e=>this.sd({varName:e.target.value}),
+      onAddVar:()=>this.sd({varOpts:d.varOpts.concat({id:uid(),name:'',priceStr:''})}),
+      onToggleLib:()=>this.sd({libOpen:!d.libOpen}),onNgOpen:()=>this.sd({libOpen:false,ng:{name:'',req:false,max:1,rows:[{id:uid(),name:'',priceStr:''}]}}),onNgCancel:()=>this.sd({ng:null}),
+      onNgName:e=>this.sd({ng:{...d.ng,name:e.target.value}}),onNgOpt:()=>this.sd({ng:{...d.ng,req:false}}),onNgReq:()=>this.sd({ng:{...d.ng,req:true}}),
+      onNgMaxDec:()=>this.sd({ng:{...d.ng,max:Math.max(1,d.ng.max-1)}}),onNgMaxInc:()=>this.sd({ng:{...d.ng,max:d.ng.max+1}}),
+      onNgAddRow:()=>this.sd({ng:{...d.ng,rows:d.ng.rows.concat({id:uid(),name:'',priceStr:''})}}),
+      onNgSave:()=>{const n=d.ng;const rows=n.rows.filter(r=>r.name.trim());if(!n.name.trim()||!rows.length)return;const id=uid();
+        this.mut(dd=>{dd.groups.push({id,name:n.name.trim(),min:n.req?1:0,max:Math.max(1,n.max),options:rows.map(r=>({id:r.id,name:r.name.trim(),desc:'',img:'',price:pm(r.priceStr)}))});},'Grupo salvo na biblioteca e vinculado');
+        this.sd({ng:null,groupIds:d.groupIds.concat(id)});},
+      onDActive:()=>this.sd({active:!d.active}),onDDelete:()=>{const id=d.id;this.closeDrawer();this.deleteProduct(id);},
+      onSaveProduct:()=>this.saveProduct(false),onSaveAgain:()=>this.saveProduct(true),
+      cd,ce,onCdName:e=>this.scd({name:e.target.value}),onCdActive:()=>this.scd({active:!cd.active}),onCdAlways:()=>this.scd({avail:'always'}),onCdSched:()=>this.scd({avail:'schedule'}),
+      onCdStart:e=>this.scd({start:e.target.value}),onCdEnd:e=>this.scd({end:e.target.value}),onCdAskDelete:()=>this.scd({confirm:true}),onCdCancelDelete:()=>this.scd({confirm:false}),onCdDelete:()=>this.deleteCat(),onCdSave:()=>this.saveCat(),
+      gd,ge,gdRows,onGdName:e=>this.sgd({name:e.target.value}),onGdOpt:()=>this.sgd({min:0}),onGdReq:()=>this.sgd({min:Math.max(1,gd.min),max:Math.max(gd.max,1)}),
+      onGdMinDec:()=>this.sgd({min:Math.max(1,gd.min-1)}),onGdMinInc:()=>this.sgd({min:gd.min+1,max:Math.max(gd.max,gd.min+1)}),
+      onGdMaxDec:()=>this.sgd({max:Math.max(1,gd.min,gd.max-1)}),onGdMaxInc:()=>this.sgd({max:gd.max+1}),
+      onGdAddRow:()=>this.sgd({rows:gd.rows.concat({id:uid(),name:'',desc:'',img:'',priceStr:''})}),onGdSave:()=>this.saveGroup(),onGdDelete:()=>this.deleteGroup(),
+      pk,onPickQ:e=>{const v=e.target.value;this.setState(s=>({pick:{...s.pick,q:v}}));},
+      onPickSave:()=>{const ids=Object.keys(S.pick.sel).filter(k=>S.pick.sel[k]);if(!ids.length||!cat)return;this.mut(dd=>{dd.products.forEach(p=>{if(ids.includes(p.id)&&!p.catIds.includes(cat.id))p.catIds.push(cat.id);});},ids.length+' adicionado(s) a '+cat.name,true);this.closeDrawer();},
+      hasToast:!!S.toast,toast:S.toast?{msg:S.toast.msg,canUndo:!!S.toast.undo}:{msg:'',canUndo:false},onUndo:()=>{const t=S.toast;if(t&&t.undo)this.setState({data:t.undo,toast:null});},
+      phLabel:editing?'Mostrando o produto que você está editando':(data.menus.length>1?(liveMenu&&liveMenu.id===mid?menu.name+' · no ar agora':menu.name+' · fora do horário (prévia)'):'Toque nos produtos para testar'),
+      ph:phView,phSheet:!!sp,phCart:ph.view==='cart'&&!sp,phNav:!sp,sh,cart,phHasMsg:!!ph.msg,phMsg:ph.msg,
+      onSheetClose:()=>this.setPh({pid:null}),onQtyDec:()=>this.setPh({qty:Math.max(1,ph.qty-1)}),onQtyInc:()=>this.setPh({qty:ph.qty+1}),
+      onAddCart:()=>{if(!sp)return;if(editing){this.phSay(sh._ok?'Prévia: salve o produto para testar o carrinho':sh.addLabel);return;}if(!sh._ok){this.phSay(sh.addLabel);return;}
+        this.setPh({pid:null,cart:ph.cart.concat({id:uid(),name:sp.name,detail:sh._detail,qty:ph.qty,total:sh._total})});this.phSay('Adicionado ao carrinho');},
+      onPhHome:()=>this.setPh({view:'home'}),onPhCart:()=>this.setPh({view:'cart'}),
+      onCheckout:()=>{if(!ph.cart.length)return;if(!store.open){this.phSay('A loja está fechada — abra no menu lateral');return;}if(!minOk){this.phSay('Pedido mínimo de '+money(store.min));return;}this.setPh({cart:[],view:'home'});this.phSay('Pedido enviado! (simulação)');}
+    };
+  }
+}
+</script>
+</body>
+</html>
