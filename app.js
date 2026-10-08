@@ -18,7 +18,42 @@
 
   const DAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
   const DAY_ORDER = [1, 2, 3, 4, 5, 6, 0];
-  const BADGES = ['Mais pedido', 'Novidade', 'Promoção', 'Vegetariano'];
+  const PRODUCT_TAGS = [
+    { id: 'promocao', label: 'promoção', emoji: '🎉', bg: '#FDF6E2', color: '#E67E00' },
+    { id: 'mais_pedido', label: 'mais pedido', emoji: '🔥', bg: '#FDEAE2', color: '#EA580C' },
+    { id: 'queridinho', label: 'O Queridinho', emoji: '😇', bg: '#E2EEFD', color: '#007AFF' },
+    { id: 'novidade', label: 'Novidade', emoji: '✨', bg: '#FCF8DA', color: '#9E8A00' },
+    { id: 'favorito', label: 'Favorito da casa', emoji: '⭐', bg: '#FEF8DA', color: '#D49B00' },
+    { id: 'chef', label: 'Recomendado pelo chef', emoji: '👨‍🍳', bg: '#FDEEE4', color: '#E8590C' },
+    { id: 'ultimas', label: 'Últimas unidades', emoji: '⏰', bg: '#FDE4E7', color: '#C92A42' },
+    { id: 'so_hoje', label: 'Só hoje', emoji: '📅', bg: '#FDEEE4', color: '#E65100' },
+    { id: 'combo', label: 'Combo especial', emoji: '🎁', bg: '#FDF0E4', color: '#EA580C' },
+    { id: 'picante', label: 'Picante', emoji: '🌶️', bg: '#FDE2E4', color: '#E00025' },
+    { id: 'sem_gluten', label: 'Sem glúten', emoji: '🌾', bg: '#E8F5E9', color: '#558B2F' },
+    { id: 'vegetariano', label: 'Vegetariano', emoji: '🌱', bg: '#E4F6DF', color: '#43A047' },
+    { id: 'vegano', label: 'Vegano', emoji: '🥬', bg: '#DCF3E8', color: '#0E8A59' }
+  ];
+  const BADGES = PRODUCT_TAGS.map(t => t.label);
+
+  function getTagInfo(badge) {
+    if (!badge) return null;
+    const clean = String(badge).trim().toLowerCase();
+    const found = PRODUCT_TAGS.find(t => 
+      t.label.toLowerCase() === clean || 
+      t.id === clean ||
+      clean.includes(t.label.toLowerCase()) ||
+      t.label.toLowerCase().includes(clean)
+    );
+    if (found) return found;
+    return { id: 'custom', label: badge, emoji: '🏷️', bg: '#F1F2F5', color: '#555A68' };
+  }
+
+  function renderBadgeHtml(badge, customStyle = '') {
+    const t = getTagInfo(badge);
+    if (!t) return '';
+    return `<span class="product-tag-pill" style="display:inline-flex; align-items:center; gap:4px; background:${t.bg}; color:${t.color}; padding:2.5px 8px; border-radius:12px; font-size:10.5px; font-weight:700; line-height:1.2; user-select:none; ${customStyle}"><span style="font-size:12px; line-height:1">${t.emoji}</span><span>${t.label}</span></span>`;
+  }
+
   const ALL_DAYS = [0, 1, 2, 3, 4, 5, 6];
 
   const PRESET_PHOTOS = [
@@ -1017,6 +1052,35 @@
       }, 'Grupo excluído', true);
       this.closeDrawer();
     }
+
+    runChecklistStep(stepIndex) {
+      const data = this.data;
+      const curMid = this.curMenuId();
+      const mCats = data.categories.filter(c => c.menuId === curMid);
+      const mCatIds = mCats.map(c => c.id);
+      const mProds = data.products.filter(p => !p.catIds.length || p.catIds.some(c => mCatIds.includes(c)));
+      const noPhotoProds = mProds.filter(p => !p.img);
+      const curMenu = this.curMenu();
+
+      if (stepIndex === 0) {
+        this.tab = 'menu';
+        this.newCatOpen = true;
+        this.selCat = 'all';
+        this.notify();
+      } else if (stepIndex === 1) {
+        this.tab = 'menu';
+        const catId = this.selCat !== 'all' ? this.selCat : (mCats[0] ? mCats[0].id : null);
+        this.openProduct(null, catId ? [catId] : []);
+      } else if (stepIndex === 2) {
+        if (noPhotoProds[0]) this.openProduct(noPhotoProds[0]);
+      } else if (stepIndex === 3) {
+        this.mut(d => {
+          d.store.open = true;
+          const x = d.menus.find(y => y.id === curMid);
+          if (x) x.active = true;
+        }, '“' + (curMenu ? curMenu.name : 'Cardápio') + '” no ar!');
+      }
+    }
   }
 
   // Instância Global
@@ -1223,7 +1287,7 @@
           const mark = s.done ? '✓' : String(i + 1);
 
           return `
-            <div ${i === 1 ? 'id="tut-checklist-prod"' : ''} class="check-step" style="background:${bg}; color:${fg}" onclick="(${s.act.toString()})(); if(window.__mepedeStore.tutorialStep === 4 && ${i === 1}) window.__mepedeStore.nextTutorial();">
+            <div ${i === 1 ? 'id="tut-checklist-prod"' : ''} class="check-step" style="background:${bg}; color:${fg}; cursor:pointer" onclick="window.__mepedeStore.runChecklistStep(${i}); if(window.__mepedeStore.tutorialStep === 4 && ${i === 1}) window.__mepedeStore.nextTutorial();">
               <span class="check-step-mark" style="background:${markBg}; color:${markFg}">${mark}</span>
               ${s.label} ${isCurStep ? '→' : ''}
             </div>
@@ -1360,7 +1424,7 @@
                 ? `<img src="${p.img}" alt="${p.name}">`
                 : `<div class="product-no-img"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg><span style="font-size:12px; font-weight:500">Adicionar foto</span></div>`
               }
-              ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}
+              ${p.badge ? `<div style="position:absolute; top:8px; left:8px; z-index:2">${renderBadgeHtml(p.badge, 'box-shadow:0 2px 6px rgba(0,0,0,0.1)')}</div>` : ''}
             </div>
 
             <div style="padding:12px 4px 4px; display:flex; flex-direction:column; gap:4px; flex:1">
@@ -1654,9 +1718,9 @@
         return `
           <div ${isFirst ? 'id="tut-phone-product-card"' : ''} onclick="window.__mepedeStore.setPhone({ pid: '${p.id}', view: 'home', qty: 1 }); if(window.__mepedeStore.tutorialStep === 7) window.__mepedeStore.nextTutorial();" style="border:1px solid #ECEEF2; border-radius:18px; background:#fff; padding:11px; display:flex; flex-direction:column; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.03); cursor:pointer; position:relative">
             ${p.badge ? `
-              <span style="align-self:flex-start; border:1px solid #FFBE99; background:#FFF5EE; color:#FF5B00; font-size:9.5px; font-weight:700; border-radius:12px; padding:2px 8px; display:inline-flex; align-items:center; gap:3px">
-                🔥 ${p.badge.toLowerCase()}
-              </span>
+              <div style="align-self:flex-start">
+                ${renderBadgeHtml(p.badge, 'font-size:9.5px; padding:2px 7px; border-radius:10px')}
+              </div>
             ` : ''}
             <div style="display:flex; gap:10px; align-items:center">
               <div style="width:84px; height:84px; flex:none; border-radius:14px; overflow:hidden; background:#F8F9FA">
@@ -1880,9 +1944,11 @@
             <!-- Sheet Content Body -->
             <div style="padding:18px 14px 16px">
               <!-- Badge -->
-              <div style="display:inline-flex; align-items:center; gap:4px; background:#E8F7F0; color:#008744; border-radius:10px; padding:2px 8px; font-size:10px; font-weight:700; margin-bottom:6px">
-                ${sp.badge ? `🎉 ${sp.badge}` : '🎉 Promoção'}
-              </div>
+              ${sp.badge ? `
+                <div style="margin-bottom:8px">
+                  ${renderBadgeHtml(sp.badge, 'font-size:10.5px; padding:3px 9px; border-radius:10px')}
+                </div>
+              ` : ''}
 
               <!-- Title -->
               <div style="font-size:16.5px; font-weight:800; color:#14171F; line-height:1.25">${sp.name}</div>
@@ -2371,23 +2437,31 @@ ${msgWhats}
                 </div>
               </div>
 
-              <!-- Selos e Serve -->
-              <div style="display:grid; grid-template-columns:1fr 180px; gap:16px">
-                <div style="display:flex; flex-direction:column; gap:8px">
-                  <span style="font-size:13px; font-weight:500">Selo de destaque <span style="color:var(--gray-400); font-weight:400">opcional</span></span>
-                  <div style="display:flex; gap:6px; flex-wrap:wrap">
-                    ${['', ...BADGES].map(b => {
-                      const isB = d.badge === b;
-                      return `
-                        <div onclick="window.__mepedeStore.draft.badge = '${b}'; window.__mepedeStore.notify()" style="height:32px; padding:0 12px; border-radius:16px; border:1px solid ${isB ? '#FF6100' : 'var(--gray-200)'}; background:${isB ? '#FFF1E8' : '#fff'}; color:${isB ? '#C24A00' : 'var(--gray-700)'}; font-size:12px; font-weight:500; cursor:pointer; display:flex; align-items:center">
-                          ${b || 'Nenhum'}
-                        </div>
-                      `;
-                    }).join('')}
-                  </div>
+              <!-- Destaques -->
+              <div style="display:flex; flex-direction:column; gap:10px; padding:16px 0 8px; border-top:1px solid var(--gray-100)">
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                  <span style="font-size:13.5px; font-weight:600; color:#14171F">Destaques <span style="color:var(--gray-400); font-weight:400; font-size:12px">opcional</span></span>
+                  ${d.badge ? `
+                    <button type="button" onclick="window.__mepedeStore.draft.badge = ''; window.__mepedeStore.notify()" style="background:none; border:none; color:var(--gray-500); font-size:12px; cursor:pointer; text-decoration:underline; padding:0">Remover destaque</button>
+                  ` : ''}
                 </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap">
+                  ${PRODUCT_TAGS.map(t => {
+                    const isSelected = d.badge && (d.badge.toLowerCase() === t.label.toLowerCase() || d.badge === t.id);
+                    return `
+                      <div onclick="window.__mepedeStore.draft.badge = '${isSelected ? '' : t.label}'; window.__mepedeStore.notify()" style="height:34px; padding:0 14px; border-radius:18px; border:1.5px solid ${isSelected ? t.color : 'transparent'}; background:${t.bg}; color:${t.color}; font-size:12.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; transition:all .15s ease; box-shadow:${isSelected ? '0 0 0 2px ' + t.color + '40' : 'none'}; transform:${isSelected ? 'scale(1.03)' : 'scale(1)'}; user-select:none">
+                        <span style="font-size:14px; line-height:1">${t.emoji}</span>
+                        <span>${t.label}</span>
+                        ${isSelected ? `<span style="font-size:11px; margin-left:2px; font-weight:900">✓</span>` : ''}
+                      </div>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
 
-                <label style="display:flex; flex-direction:column; gap:8px">
+              <!-- Serve até -->
+              <div style="display:flex; flex-direction:column; gap:8px">
+                <label style="display:flex; flex-direction:column; gap:8px; max-width:240px">
                   <span style="font-size:13px; font-weight:500">Serve até</span>
                   <select onchange="window.__mepedeStore.draft.serves = this.value; window.__mepedeStore.notify()" style="height:40px; padding:0 10px; border:1px solid var(--gray-200); border-radius:10px; font-size:13px; background:#fff; outline:none">
                     <option value="" ${!d.serves ? 'selected' : ''}>Não se aplica</option>
@@ -3012,9 +3086,9 @@ ${msgWhats}
     {
       num: 4,
       title: 'Cadastrar o Primeiro Produto',
-      targetSelector: '#tut-checklist-prod, #tut-btn-new-product-empty, #tut-btn-new-product',
+      targetSelector: '#tut-btn-new-product-empty, #tut-btn-new-product, #tut-checklist-prod',
       desc: 'Categoria criada! Agora vamos cadastrar seu primeiro hambúrguer artesanal.',
-      tip: 'Clique em “Cadastrar um produto” para abrir a gaveta.',
+      tip: 'Clique no botão laranja “Criar produto” para abrir a gaveta.',
       btn: 'Cadastrar Produto'
     },
     {
@@ -3120,7 +3194,7 @@ ${msgWhats}
       target = document.querySelector('#tut-quick-cat-lanches') || document.querySelector('.btn-new-cat-dashed');
     }
     if (!target && step === 4) {
-      target = document.querySelector('#tut-checklist-prod') || document.querySelector('#tut-btn-new-product-empty') || document.querySelector('#tut-btn-new-product');
+      target = document.querySelector('#tut-btn-new-product-empty') || document.querySelector('#tut-btn-new-product') || document.querySelector('#tut-checklist-prod');
     }
     if (!target && step === 5) {
       target = document.querySelector('#tut-quickfill-product');
