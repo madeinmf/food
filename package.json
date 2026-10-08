@@ -4,6 +4,7 @@
   "description": "Sistema moderno de criação e edição de cardápio para foodtruck (mepede.ai)",
   "scripts": {
     "build": "echo 'Static build ready'",
+    "vercel-build": "echo 'Static build ready'",
     "start": "node dev-server.js",
     "dev": "node dev-server.js"
   },
